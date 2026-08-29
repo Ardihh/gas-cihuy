@@ -20,11 +20,11 @@ export default function Home() {
 
         {/* Gradient Typography */}
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 pb-2">
-          Ardi Gagah
+
         </h1>
 
         <p className="text-slate-400 text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
-          Jun skyub KKN Internasional Unram X SNU batch Summer 2026.
+          
         </p>
 
         {/* Interactive Buttons */}
