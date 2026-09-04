@@ -1,229 +1,194 @@
-# 💕 my Kisah
+# 🎭 Cosplay Asik
 
-> **my Kisah** — Platform penyewaan teman kencan/pasangan secara online yang mempertemukan **Kisah** (partner yang tersedia untuk disewa) dengan **Public** (pengguna yang ingin melakukan penyewaan).
+> **Cosplay Asik** adalah sistem berbasis web untuk mengelola penyewaan kostum dan aksesoris cosplay.
 
----
+Sistem ini mempertemukan **pelanggan** yang ingin menyewa perlengkapan cosplay dengan **pemilik toko** yang mengelola koleksi kostum dan aksesoris.
 
 ## 📌 Tentang Project
 
-**my Kisah** adalah sebuah platform berbasis web yang menyediakan layanan penyewaan pasangan/teman kencan dalam periode tertentu.
-
-Platform ini dirancang untuk mempertemukan dua jenis pengguna utama:
-
-- **Kisah** — pengguna yang mendaftarkan dirinya sebagai pasangan/partner yang dapat disewa.
-- **Public** — pengguna yang ingin menyewa Kisah untuk aktivitas atau periode tertentu.
-
-Selain proses penyewaan, sistem menyediakan mekanisme **approval**, **status ketersediaan**, **rating**, serta **dashboard** sesuai dengan role pengguna.
-
-> **Catatan:** Platform ditujukan untuk pengguna dewasa dan aktivitas penyewaan harus mengikuti ketentuan layanan, keamanan, serta hukum yang berlaku.
-
----
-
-# 🎯 Tujuan
-
-Project **my Kisah** bertujuan untuk:
-
-1. Menyediakan platform terpusat untuk mencari dan menyewa partner.
-2. Memudahkan Kisah dalam mengatur profil dan ketersediaannya.
-3. Memudahkan Public dalam mencari partner berdasarkan informasi dan rating.
-4. Menyediakan sistem approval untuk menjaga keamanan transaksi.
-5. Menyediakan sistem rating dua arah antara Kisah dan Public.
-6. Menyediakan dashboard yang berbeda berdasarkan role pengguna.
-7. Mencatat seluruh aktivitas penyewaan secara terstruktur.
-
----
+**Cosplay Asik** dibuat untuk membantu proses penyewaan kostum dan aksesoris cosplay, mulai dari melihat katalog, mengecek ketersediaan barang, melakukan pengajuan penyewaan, hingga proses persetujuan dan pengembalian. Sistem juga menyediakan dashboard bagi pelanggan dan pemilik toko untuk memantau aktivitas penyewaan.
 
 # 👥 Role Pengguna
 
-Sistem memiliki **3 role utama**:
+Sistem memiliki dua role utama:
 
-### 1. Admin
+### 👤 Pelanggan
 
-Admin bertugas mengelola dan mengawasi seluruh aktivitas platform.
+Pelanggan dapat:
 
-Fitur:
+* Membuat akun
+* Login
+* Melihat katalog kostum dan aksesoris
+* Melihat detail barang
+* Melihat harga sewa per hari
+* Melihat stok/ketersediaan
+* Mengajukan penyewaan
+* Melihat status penyewaan
+* Melihat riwayat penyewaan
+* Memberikan feedback setelah rental selesai
 
-- Login Admin
-- Dashboard Admin
-- Mengelola akun pengguna
-- Mengelola akun Kisah
-- Verifikasi/approval pendaftaran Kisah
-- Mengelola transaksi penyewaan
-- Memantau status penyewaan
-- Mengelola rating/review
-- Melihat laporan aktivitas
-- Menonaktifkan akun yang melanggar ketentuan
+### 🏪 Pemilik Toko
 
----
+Pemilik toko dapat:
 
-### 2. Kisah
+* Login
+* Mengelola profil toko
+* Menambahkan kostum dan aksesoris
+* Mengubah informasi barang
+* Mengatur harga sewa
+* Mengatur stok
+* Melihat daftar penyewaan
+* Menyetujui atau menolak pengajuan rental
+* Mengubah status penyewaan
+* Melihat riwayat rental
+* Melihat feedback pelanggan
 
-Kisah merupakan pengguna yang menawarkan dirinya sebagai partner yang dapat disewa.
-
-Fitur:
-
-- Registrasi sebagai Kisah
-- Login
-- Mengelola profil
-- Mengatur foto profil
-- Menentukan informasi dan deskripsi diri
-- Menentukan harga/sewa
-- Mengatur jadwal ketersediaan
-- Melihat permintaan rental
-- Menerima/menolak permintaan rental
-- Melihat riwayat rental
-- Memberikan rating kepada Public
-- Melihat rating yang diterima
-- Melihat dashboard pribadi
-
----
-
-### 3. Public
-
-Public merupakan pengguna yang menggunakan layanan my Kisah untuk mencari dan menyewa Kisah.
-
-Fitur:
-
-- Registrasi akun
-- Login
-- Melihat daftar Kisah
-- Melihat profil Kisah
-- Melihat rating Kisah
-- Melihat harga sewa
-- Melihat status ketersediaan
-- Mengajukan rental
-- Melihat status permintaan rental
-- Melihat riwayat rental
-- Memberikan rating kepada Kisah
-- Menerima rating dari Kisah
-- Melihat dashboard pribadi
-
----
 
 # 🚀 Fitur Utama
 
 ## 🔐 1. Authentication
 
-Pengguna dapat membuat akun dan masuk ke dalam sistem.
+Pengguna dapat membuat akun dan masuk ke sistem.
 
-### Registrasi
+Data akun meliputi:
 
-Public dapat membuat akun sebagai:
+* Nama
+* Email
+* Password
+* Nomor telepon
+* Role pengguna
+
+Setelah login, pengguna akan diarahkan ke dashboard sesuai role.
+
+
+## 🎭 2. Katalog Kostum & Aksesoris
+
+Pelanggan dapat melihat berbagai perlengkapan cosplay yang tersedia.
+
+Setiap barang memiliki informasi:
+
+* Nama barang
+* Kategori
+* Foto
+* Deskripsi
+* Harga sewa per hari
+* Stok
+* Status ketersediaan
+
+Contoh kategori:
 
 ```text
-Public
-Kisah
+Kostum
+├── Anime
+├── Game
+├── Film
+└── Character
+
+Aksesoris
+├── Wig
+├── Senjata Cosplay
+├── Sepatu
+├── Props
+└── Aksesoris lainnya
 ```
 
-Setiap akun memiliki data dasar seperti:
 
-- Nama
-- Email
-- Password
-- Nomor telepon
-- Foto profil
-- Role
-- Status akun
+## 📦 3. Stock Management
 
-Untuk akun **Kisah**, diperlukan proses approval sebelum profil dapat ditampilkan secara publik.
-
-### Login
-
-Pengguna melakukan login menggunakan:
-
-```text
-Email
-Password
-```
-
-Setelah login, pengguna diarahkan ke dashboard berdasarkan role.
-
----
-
-# 💕 2. Kisah Profile
-
-Setiap Kisah memiliki halaman profil yang dapat dilihat oleh Public.
-
-Informasi yang dapat ditampilkan:
-
-- Foto
-- Nama
-- Deskripsi
-- Informasi dasar
-- Harga rental
-- Rating
-- Jumlah rental
-- Status ketersediaan
-- Jadwal tersedia
+Pemilik toko dapat mengelola jumlah stok setiap barang.
 
 Contoh:
 
 ```text
-┌──────────────────────────────────┐
-│          FOTO KISAH              │
-│                                  │
-│  Nama       : Amanda             │
-│  Rating     : ⭐ 4.8             │
-│  Rental     : 32 kali            │
-│  Harga      : Rp xxx.xxx / hari  │
-│  Status     : 🟢 Available       │
-│                                  │
-│       [ Rental Sekarang ]        │
-└──────────────────────────────────┘
+Nama       : Costume Gojo
+Kategori   : Kostum
+Harga      : Rp100.000 / hari
+Stok       : 3
+Tersedia   : 2
+Disewa     : 1
 ```
 
----
+Stok akan disesuaikan berdasarkan rental yang sedang berlangsung.
 
-# 🟢 3. Availability Status
+### Status Barang
 
-Setiap Kisah memiliki status ketersediaan.
+| Status         | Keterangan      |
+| -------------- | --------------- |
+| 🟢 Available   | Barang tersedia |
+| 🟡 Limited     | Stok terbatas   |
+| 🔴 Unavailable | Tidak tersedia  |
 
-Status yang dapat digunakan:
-
-| Status | Keterangan |
-|---|---|
-| 🟢 Available | Kisah dapat disewa |
-| 🟡 Pending | Sedang menunggu approval rental |
-| 🔴 Rented | Sedang dalam masa rental |
-| ⚫ Offline | Tidak tersedia |
-
-Status harus berubah secara otomatis berdasarkan kondisi rental.
-
-Contoh:
-
-```text
-Available
-    ↓
-Rental Request
-    ↓
-Pending
-    ↓
-Approved
-    ↓
-Rented
-    ↓
-Rental Finished
-    ↓
-Available
-```
-
----
 
 # 📅 4. Rental System
 
-Public dapat melakukan penyewaan terhadap Kisah yang tersedia.
+Pelanggan dapat mengajukan penyewaan dengan menentukan:
 
-Informasi rental:
+* Barang yang ingin disewa
+* Jumlah barang
+* Tanggal mulai
+* Tanggal selesai
+* Durasi sewa
 
-- Kisah yang dipilih
-- Tanggal mulai
-- Tanggal selesai
-- Durasi
-- Harga
-- Catatan/keperluan
-- Status rental
+Harga rental dihitung berdasarkan:
 
-### Status Rental
+```text
+Total Harga = Harga Sewa per Hari × Jumlah Hari × Jumlah Barang
+```
+
+Contoh:
+
+```text
+Kostum        : Rp100.000 / hari
+Jumlah        : 1
+Durasi        : 3 hari
+
+Total         : Rp300.000
+```
+
+
+# ✅ 5. Approval Rental
+
+Setiap pengajuan rental harus melalui proses persetujuan dari pemilik toko.
+
+Alurnya:
+
+```text
+Pelanggan
+    │
+    ▼
+Pilih Barang
+    │
+    ▼
+Isi Form Rental
+    │
+    ▼
+Rental Request
+    │
+    ▼
+Pending
+    │
+    ▼
+Pemilik Toko
+    │
+ ┌──┴──────────┐
+ ▼             ▼
+Approve       Reject
+ │             │
+ ▼             ▼
+Approved     Rejected
+ │
+ ▼
+Rental
+```
+
+Pemilik toko dapat melihat detail pengajuan sebelum memberikan keputusan.
+
+
+# 📋 6. Status Penyewaan
+
+Setiap rental memiliki status untuk memudahkan pemantauan.
+
+Status utama:
 
 ```text
 PENDING
@@ -234,271 +199,163 @@ COMPLETED
 CANCELLED
 ```
 
-### Alur Rental
+Alur normal:
 
 ```text
-Public
-  │
-  ▼
-Pilih Kisah
-  │
-  ▼
-Pilih tanggal
-  │
-  ▼
-Kirim Rental Request
-  │
-  ▼
-Kisah menerima request
-  │
-  ├── Reject ──► REJECTED
-  │
-  └── Approve
-          │
-          ▼
-       APPROVED
-          │
-          ▼
-        ONGOING
-          │
-          ▼
-       COMPLETED
+PENDING
+   ↓
+APPROVED
+   ↓
+ONGOING
+   ↓
+COMPLETED
 ```
 
----
-
-# ✅ 5. Approval System
-
-Sistem memiliki dua jenis approval.
-
-### Approval Kisah
-
-Ketika seseorang mendaftar sebagai Kisah:
+Jika pengajuan ditolak:
 
 ```text
-Register
+PENDING
    ↓
-Pending Verification
-   ↓
-Admin Review
-   ↓
-Approved / Rejected
+REJECTED
 ```
 
-Kisah yang belum mendapatkan approval tidak dapat ditampilkan pada daftar Kisah publik.
 
-### Approval Rental
+# 📊 7. Dashboard Pelanggan
 
-Ketika Public melakukan rental:
+Dashboard pelanggan digunakan untuk melihat aktivitas rental.
+
+Informasi yang ditampilkan:
 
 ```text
-Public Request
-      ↓
-Pending
-      ↓
-Kisah Review
-      ↓
-Approve / Reject
+┌─────────────────────────────────────┐
+│         CUSTOMER DASHBOARD          │
+├─────────────────────────────────────┤
+│ Rental Aktif       : 1              │
+│ Menunggu Approval  : 2              │
+│ Selesai            : 5              │
+├─────────────────────────────────────┤
+│ Rental Terbaru                      │
+│                                     │
+│ Costume Naruto                      │
+│ 10 Sep - 12 Sep                     │
+│ Status: APPROVED                    │
+└─────────────────────────────────────┘
 ```
 
-Jika disetujui, sistem melakukan pengecekan kembali terhadap jadwal untuk mencegah bentrok rental.
+Menu:
 
----
+* Dashboard
+* Katalog
+* Rental Saya
+* Riwayat Rental
+* Feedback
+* Profile
 
-# ⭐ 6. Rating & Review
 
-my Kisah menggunakan sistem rating **dua arah**.
+# 🏪 8. Dashboard Pemilik Toko
 
-## Public → Kisah
+Pemilik toko dapat memantau kondisi toko melalui dashboard.
 
-Setelah rental selesai, Public dapat memberikan:
+Informasi yang ditampilkan:
 
-- Rating ⭐ 1–5
-- Review
+```text
+┌─────────────────────────────────────┐
+│          OWNER DASHBOARD            │
+├─────────────────────────────────────┤
+│ Total Produk       : 50             │
+│ Rental Aktif       : 12             │
+│ Pending Request    : 5              │
+│ Produk Terbatas    : 4              │
+├─────────────────────────────────────┤
+│ Rental Terbaru                      │
+│                                     │
+│ Costume Mikasa                      │
+│ Customer: User123                   │
+│ Status: PENDING                     │
+│                                     │
+│        [Approve] [Reject]            │
+└─────────────────────────────────────┘
+```
+
+Menu:
+
+* Dashboard
+* Produk
+* Stok
+* Rental
+* Approval
+* Feedback
+* Profile Toko
+
+
+# 💬 9. Customer Feedback
+
+Setelah rental selesai, pelanggan dapat memberikan **feedback secara opsional**.
+
+Feedback dapat berupa:
+
+* Komentar
+* Saran
+* Pengalaman menggunakan layanan
 
 Contoh:
 
 ```text
-⭐ ⭐ ⭐ ⭐ ⭐
-
-"Amanda sangat ramah dan komunikatif."
+"Costume-nya masih bagus dan proses rental
+juga cukup mudah. Terima kasih!"
 ```
 
-## Kisah → Public
+Feedback **tidak menggunakan sistem rating**, sehingga tidak ada penilaian bintang terhadap produk maupun pelanggan.
 
-Kisah juga dapat memberikan rating kepada Public setelah rental selesai.
-
-Hal ini bertujuan untuk menciptakan sistem reputasi bagi kedua pihak.
-
-```text
-Public Rating
-      ↕
-   Rental
-      ↕
-Kisah Rating
-```
-
-Rating hanya dapat diberikan apabila rental memiliki status:
-
-```text
-COMPLETED
-```
-
----
-
-# 📊 7. Dashboard
-
-## Admin Dashboard
-
-Admin dapat melihat:
-
-```text
-┌────────────────────────────────────────┐
-│              ADMIN DASHBOARD            │
-├────────────────────────────────────────┤
-│ Total Users        │ 1,250             │
-│ Total Kisah        │ 320               │
-│ Rental Aktif       │ 45                │
-│ Pending Approval   │ 12                │
-├────────────────────────────────────────┤
-│ Recent Rentals                         │
-│ Pending Kisah                           │
-│ User Activity                           │
-└────────────────────────────────────────┘
-```
-
-Menu:
-
-- Dashboard
-- Users
-- Kisah
-- Rental
-- Approval
-- Reviews
-- Reports
-- Settings
-
----
-
-## Kisah Dashboard
-
-Kisah dapat melihat:
-
-```text
-┌────────────────────────────────────────┐
-│             KISAH DASHBOARD             │
-├────────────────────────────────────────┤
-│ Rating             ⭐ 4.8              │
-│ Total Rental       32                  │
-│ Rental Aktif       1                   │
-│ Pendapatan         Rp xxx.xxx          │
-├────────────────────────────────────────┤
-│ Rental Request                         │
-│ Upcoming Rental                         │
-│ Availability                            │
-└────────────────────────────────────────┘
-```
-
-Menu:
-
-- Dashboard
-- Profile
-- Rental Request
-- Active Rental
-- Schedule
-- Rating
-- Rental History
-- Settings
-
----
-
-## Public Dashboard
-
-Public dapat melihat:
-
-```text
-┌────────────────────────────────────────┐
-│             PUBLIC DASHBOARD            │
-├────────────────────────────────────────┤
-│ Active Rental       1                  │
-│ Completed Rental    12                 │
-│ Favorite Kisah      5                  │
-├────────────────────────────────────────┤
-│ Active Rental                         │
-│ Upcoming Rental                       │
-│ Recommended Kisah                     │
-└────────────────────────────────────────┘
-```
-
-Menu:
-
-- Dashboard
-- Explore Kisah
-- My Rental
-- Rental History
-- Rating
-- Profile
-- Settings
-
----
 
 # 🔄 System Flow
 
-Secara umum sistem bekerja seperti berikut:
+Alur utama sistem:
 
 ```text
-                    ┌──────────────┐
-                    │    USER      │
-                    └──────┬───────┘
-                           │
-                     Registration
-                           │
-                ┌──────────┴──────────┐
-                │                     │
-             PUBLIC                 KISAH
-                │                     │
-                │                Admin Approval
-                │                     │
-                │              ┌──────┴──────┐
-                │              │             │
-                │           Approved      Rejected
-                │              │
-                └──────┬───────┘
-                       │
-                  Explore Kisah
-                       │
-                       ▼
-                Select Kisah
-                       │
-                       ▼
-                 Rental Request
-                       │
-                       ▼
-                 Kisah Approval
-                       │
-              ┌────────┴────────┐
-              │                 │
-           Rejected           Approved
-                                │
-                                ▼
-                              Rental
-                                │
-                                ▼
-                             Complete
-                                │
-                         ┌──────┴──────┐
-                         │             │
-                      Rating         Rating
-                      Public         Kisah
-                         │             │
-                         └──────┬──────┘
-                                ▼
-                         Rental History
+              ┌───────────────┐
+              │   Pelanggan   │
+              └───────┬───────┘
+                      │
+                   Login
+                      │
+                      ▼
+                Lihat Katalog
+                      │
+                      ▼
+              Pilih Kostum/Barang
+                      │
+                      ▼
+              Cek Ketersediaan
+                      │
+                      ▼
+               Ajukan Rental
+                      │
+                      ▼
+                  PENDING
+                      │
+                      ▼
+             Pemilik Toko Review
+                      │
+               ┌──────┴──────┐
+               │             │
+            APPROVE        REJECT
+               │
+               ▼
+            ONGOING
+               │
+               ▼
+           Pengembalian
+               │
+               ▼
+           COMPLETED
+               │
+               ▼
+       Feedback (Opsional)
 ```
 
----
 
-# 🗄️ Database Design
+# 🗄️ Database
 
 Gambaran tabel utama:
 
@@ -508,270 +365,75 @@ users
 ├── name
 ├── email
 ├── password
-├── role
 ├── phone
-├── photo
-├── status
+├── role
 └── created_at
 
-kisah_profiles
+products
 ├── id
-├── user_id
+├── name
+├── category
 ├── description
-├── price
-├── approval_status
-├── availability_status
+├── price_per_day
+├── stock
+├── image
 └── created_at
 
 rentals
 ├── id
-├── public_id
-├── kisah_id
-├── start_date
-├── end_date
-├── duration
+├── user_id
+├── rental_date
+├── return_date
 ├── total_price
-├── notes
 ├── status
 └── created_at
 
-ratings
+rental_items
 ├── id
 ├── rental_id
-├── reviewer_id
-├── reviewed_user_id
-├── rating
-├── review
-└── created_at
+├── product_id
+├── quantity
+├── price_per_day
+└── subtotal
 
-availability
+feedbacks
 ├── id
-├── kisah_id
-├── date
-├── status
+├── rental_id
+├── user_id
+├── message
 └── created_at
 ```
 
-### Relasi sederhana
+### Relasi Sederhana
 
 ```text
-USERS
-  │
-  ├────────────── KISAH_PROFILES
-  │
-  ├────────────── RENTALS
-  │
-  └────────────── RATINGS
+USER
+ │
+ └──────< RENTAL
+             │
+             └──────< RENTAL_ITEMS
+                          │
+                          └────── PRODUCT
 
-KISAH_PROFILES
+RENTAL
   │
-  ├────────────── RENTALS
-  │
-  └────────────── AVAILABILITY
-
-RENTALS
-  │
-  └────────────── RATINGS
+  └──────< FEEDBACK
 ```
 
----
 
-# 🔒 Security & Validation
-
-Sistem harus menerapkan beberapa mekanisme keamanan:
-
-- Password disimpan menggunakan hashing.
-- Authentication menggunakan session/token yang aman.
-- Role-based access control.
-- Validasi input pada setiap form.
-- Validasi tanggal rental.
-- Mencegah double booking.
-- User hanya dapat memberikan rating setelah rental selesai.
-- User tidak dapat memberikan rating berkali-kali untuk rental yang sama.
-- Data pribadi pengguna dibatasi sesuai kebutuhan sistem.
-- Admin memiliki hak akses tertinggi.
-
----
-
-# 🛠️ Teknologi
-
-Teknologi yang digunakan dapat disesuaikan dengan kebutuhan project.
-
-Contoh stack:
-
-### Frontend
-
-- HTML
-- CSS
-- JavaScript
-- Tailwind CSS
-
-### Backend
-
-- Laravel / PHP
-
-### Database
-
-- MySQL
-
-### Development Tools
-
-- Git
-- GitHub
-- Visual Studio Code
-- Laragon
-
----
-
-# 📁 Project Structure
-
-Contoh struktur project apabila menggunakan Laravel:
-
-```text
-my-kisah/
-│
-├── app/
-│   ├── Http/
-│   ├── Models/
-│   └── Services/
-│
-├── database/
-│   ├── migrations/
-│   └── seeders/
-│
-├── public/
-│   ├── images/
-│   └── assets/
-│
-├── resources/
-│   ├── views/
-│   │   ├── admin/
-│   │   ├── kisah/
-│   │   ├── public/
-│   │   └── auth/
-│   │
-│   ├── css/
-│   └── js/
-│
-├── routes/
-│   └── web.php
-│
-├── .env
-├── composer.json
-└── README.md
-```
-
----
-
-# 📋 Business Rules
+# 🔒 Business Rules
 
 Beberapa aturan utama sistem:
 
-1. Satu akun hanya memiliki satu role.
-2. Kisah harus mendapatkan approval Admin sebelum dapat disewa.
-3. Kisah yang sedang memiliki rental aktif tidak dapat menerima rental lain pada waktu yang bentrok.
-4. Public tidak dapat melakukan rental terhadap Kisah yang berstatus tidak tersedia.
-5. Rental harus melalui proses approval.
-6. Rating hanya dapat diberikan setelah rental selesai.
-7. Rating dilakukan oleh kedua pihak.
-8. Rental yang sudah berjalan tidak dapat diubah secara sembarangan.
-9. Admin dapat membatalkan atau menonaktifkan akun yang melanggar aturan.
-10. Sistem harus mencatat perubahan status rental.
-
----
-
-# 🗺️ Development Roadmap
-
-## Phase 1 — Foundation
-
-- [ ] Setup project
-- [ ] Setup database
-- [ ] Authentication
-- [ ] Role management
-- [ ] User profile
-
-## Phase 2 — Kisah
-
-- [ ] Kisah registration
-- [ ] Kisah approval
-- [ ] Kisah profile
-- [ ] Availability
-- [ ] Schedule
-
-## Phase 3 — Rental
-
-- [ ] Explore Kisah
-- [ ] Rental request
-- [ ] Rental approval
-- [ ] Rental status
-- [ ] Rental history
-- [ ] Double-booking prevention
-
-## Phase 4 — Rating
-
-- [ ] Public → Kisah rating
-- [ ] Kisah → Public rating
-- [ ] Review
-- [ ] Rating calculation
-
-## Phase 5 — Dashboard
-
-- [ ] Admin dashboard
-- [ ] Kisah dashboard
-- [ ] Public dashboard
-- [ ] Statistics
-- [ ] Activity history
-
-## Phase 6 — Security & Testing
-
-- [ ] Authorization
-- [ ] Input validation
-- [ ] Security testing
-- [ ] Functional testing
-- [ ] User acceptance testing
-
----
-
-# 🎯 Future Development
-
-Beberapa fitur yang dapat dikembangkan selanjutnya:
-
-- 🔎 Search & filter Kisah
-- ❤️ Favorite Kisah
-- 💬 Chat antara Public dan Kisah
-- 🔔 Notification system
-- 📅 Calendar availability
-- 💳 Payment gateway
-- 📍 Location-based search
-- 📈 Advanced analytics
-- 🛡️ Identity verification
-- 🚨 Report & block user
-- 📜 Terms of Service
-- 🧾 Invoice/receipt rental
-
----
-
-# ⚠️ Disclaimer
-
-**my Kisah** merupakan platform untuk memfasilitasi layanan companionship/rental partner. Seluruh pengguna wajib mematuhi ketentuan penggunaan platform, menjaga keamanan dan privasi masing-masing, serta mematuhi hukum dan peraturan yang berlaku.
-
-Platform tidak bertanggung jawab atas aktivitas di luar ruang lingkup layanan yang melanggar hukum atau ketentuan penggunaan.
-
----
-
-# 👨‍💻 Development
-
-Project ini dikembangkan sebagai project pengembangan aplikasi web dengan fokus pada:
-
-- Role-Based Access Control
-- Rental Management System
-- Approval Workflow
-- Availability Management
-- Two-Way Rating System
-- Dashboard & Data Visualization
-
----
-
-## 📄 License
-
-This project is intended for educational/development purposes.
+1. Pelanggan harus memiliki akun untuk melakukan rental.
+2. Produk harus memiliki stok yang tersedia untuk dapat disewa.
+3. Setiap rental harus menentukan tanggal mulai dan tanggal selesai.
+4. Harga rental dihitung berdasarkan harga per hari.
+5. Pengajuan rental harus mendapatkan approval dari pemilik toko.
+6. Rental yang ditolak tidak mengurangi stok.
+7. Rental yang telah disetujui akan memengaruhi stok barang.
+8. Barang yang stoknya habis tidak dapat disewa.
+9. Feedback hanya dapat diberikan setelah rental selesai.
+10. Feedback bersifat opsional.
+11. Satu rental dapat berisi lebih dari satu jenis barang.
+12. Sistem harus mencegah penyewaan melebihi stok yang tersedia.
