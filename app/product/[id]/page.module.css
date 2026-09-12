@@ -1,13 +1,15 @@
 .page {
-  --page-bg: #0e0d13;
-  --page-surface: #17141d;
-  --page-text: #f4f1e8;
-  --page-muted: #b8b0bc;
-  --page-line: rgba(244, 241, 232, 0.16);
-  --page-violet: #a78bfa;
-  --page-cyan: #67e8f9;
-  --page-good: #a7e3b3;
-  --page-limited: #f1c66b;
+  --page-bg: #f5f0e8;
+  --page-paper: #fffdf8;
+  --page-plum-deep: #2a1a30;
+  --page-text: #271c2c;
+  --page-muted: #6f6570;
+  --page-line: rgba(39, 28, 44, 0.18);
+  --page-violet: #7450a7;
+  --page-violet-dark: #5d3d89;
+  --page-good: #356447;
+  --page-limited: #8b5a1c;
+  --page-danger: #a3443b;
   min-height: 100vh;
   overflow-x: hidden;
   background: var(--page-bg);
@@ -19,14 +21,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.page a:focus-visible {
-  outline: 2px solid var(--page-cyan);
+.page a:focus-visible,
+.page input:focus-visible {
+  outline: 2px solid var(--page-violet);
   outline-offset: 4px;
 }
 
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   border-bottom: 1px solid var(--page-line);
-  background: var(--page-bg);
+  background: rgba(245, 240, 232, 0.96);
 }
 
 .headerInner {
@@ -60,9 +66,9 @@
   width: 32px;
   height: 32px;
   place-items: center;
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--page-violet);
-  color: var(--page-bg);
+  color: var(--page-paper);
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 800;
@@ -76,6 +82,15 @@
   font-size: 13px;
   text-decoration: none;
   transition: color 160ms ease;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+  border-bottom: 1px solid var(--page-line);
+  padding-bottom: 4px;
 }
 
 .backLink:hover,
@@ -94,71 +109,28 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 30px 0 26px;
+  padding: 28px 0 22px;
   color: var(--page-muted);
   font-size: 12px;
 }
 
 .productLayout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.8fr);
-  align-items: center;
-  gap: 64px;
-  padding-bottom: 82px;
-}
-
-.productMediaColumn {
-  min-width: 0;
-}
-
-.productMedia {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  aspect-ratio: 4 / 5;
-  max-height: 560px;
-  border: 1px solid rgba(33, 26, 43, 0.2);
-  padding: 24px;
-  background: #e5e0d4;
-  color: #211a2b;
-}
-
-.productMedia[data-category="Game"] {
-  background: #dce3d9;
-}
-
-.productMedia[data-category="Aksesoris"] {
-  background: #ddd7e5;
-}
-
-.mediaNumber,
-.mediaLabel {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.mediaNumber {
-  opacity: 0.55;
-}
-
-.mediaLabel {
-  font-size: 12px;
-}
-
-.mediaNote {
-  margin: 12px 0 0;
-  color: var(--page-muted);
-  font-size: 12px;
-  line-height: 1.4;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  grid-template-areas:
+    "media info"
+    "media rental"
+    "media access";
+  align-items: start;
+  column-gap: clamp(36px, 5vw, 72px);
+  row-gap: 24px;
+  padding-bottom: 64px;
 }
 
 .productInfo {
+  grid-area: info;
   min-width: 0;
-  border-left: 1px solid var(--page-line);
-  padding: 12px 0 12px 32px;
+  padding-top: 4px;
 }
 
 .sectionLabel {
@@ -166,148 +138,199 @@
   color: var(--page-violet);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .productInfo h1 {
-  max-width: 620px;
-  margin: 9px 0 32px;
+  max-width: 600px;
+  margin: 10px 0 24px;
   color: var(--page-text);
   font-family: var(--font-display);
-  font-size: clamp(44px, 5.4vw, 72px);
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 0.94;
+  font-size: clamp(48px, 5.1vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
 }
 
 .productFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
   margin: 0;
   border-top: 1px solid var(--page-line);
-  border-bottom: 1px solid var(--page-line);
+  padding: 16px 0;
 }
 
 .productFacts > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 66px;
-  border-bottom: 1px solid rgba(244, 241, 232, 0.1);
-}
-
-.productFacts > div:last-child {
-  border-bottom: 0;
+  display: grid;
+  min-width: 0;
+  gap: 6px;
 }
 
 .productFacts dt {
   color: var(--page-muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
   line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .productFacts dd {
   margin: 0;
-  text-align: right;
+  text-align: left;
 }
 
 .priceValue {
-  color: var(--page-violet);
-  font-family: var(--font-display);
+  color: var(--page-violet-dark);
+  font-family: var(--font-body);
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.025em;
+  line-height: 1.15;
   white-space: nowrap;
 }
 
 .priceValue span {
   color: var(--page-muted);
-  font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
 }
 
 .statusAvailable,
 .statusLimited {
-  border: 1px solid currentColor;
-  padding: 4px 6px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1.15;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--page-muted);
+  font-size: 11px;
+  line-height: 1.3;
 }
 
-.statusAvailable {
+.statusDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.statusAvailable .statusDot {
   color: var(--page-good);
 }
 
-.statusLimited {
+.statusLimited .statusDot {
   color: var(--page-limited);
 }
 
-.prototypeNote {
-  max-width: 430px;
-  margin: 24px 0 0;
-  border-left: 2px solid var(--page-cyan);
-  padding-left: 12px;
-  color: var(--page-muted);
+.productMediaColumn {
+  grid-area: media;
+  min-width: 0;
+  align-self: start;
+}
+
+.productMedia {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgba(57, 36, 63, 0.18);
+  padding: 20px;
+  background: #ede3d1;
+  color: var(--page-plum-deep);
+}
+
+.productMedia[data-category="Game"] {
+  background: #dfe8dc;
+}
+
+.productMedia[data-category="Aksesoris"] {
+  background: #ded4e7;
+}
+
+.mediaMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(42, 26, 48, 0.68);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.mediaSpecimen {
+  max-width: 360px;
+  margin: auto 0;
+  padding: 28px 0;
+}
+
+.mediaName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.2vw, 43px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
+}
+
+.mediaCategory {
+  display: block;
+  margin-top: 10px;
+  color: rgba(42, 26, 48, 0.72);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.3;
+}
+
+.mediaLabel {
+  color: rgba(42, 26, 48, 0.76);
+  font-size: 11px;
+  line-height: 1.3;
 }
 
 .calculatorSection {
+  grid-area: rental;
+  min-width: 0;
   border-top: 1px solid var(--page-line);
-  padding: 32px 0 82px;
+  padding-top: 24px;
 }
 
 .calculatorIntro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(250px, 360px);
-  align-items: end;
-  gap: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
 }
 
 .calculatorIntro h2 {
-  margin: 8px 0 0;
+  margin: 7px 0 0;
   color: var(--page-text);
   font-family: var(--font-display);
-  font-size: clamp(30px, 3.4vw, 42px);
-  font-weight: 800;
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 0.98;
 }
 
 .calculatorIntro > p {
-  max-width: 360px;
+  max-width: 230px;
   margin: 0;
   color: var(--page-muted);
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .calculatorBody {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
-  align-items: start;
-  gap: 56px;
-  margin-top: 24px;
-  border-top: 1px solid var(--page-line);
+  display: block;
+  margin-top: 20px;
 }
 
 .calculatorForm {
   min-width: 0;
-  padding-top: 20px;
 }
 
 .calculatorFields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
 }
 
 .calculatorField {
@@ -316,33 +339,35 @@
   gap: 7px;
 }
 
+.calculatorField:last-child {
+  grid-column: 1 / -1;
+  max-width: 180px;
+}
+
 .calculatorField label {
   color: var(--page-muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
   line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .calculatorField input {
   width: 100%;
-  min-height: 44px;
+  min-height: 46px;
   border: 1px solid var(--page-line);
   border-radius: 0;
   padding: 9px 10px;
-  background: var(--page-surface);
+  background: var(--page-paper);
   color: var(--page-text);
-  font: 500 13px/1.2 var(--font-body);
-  color-scheme: dark;
+  font: 500 14px/1.2 var(--font-body);
+  color-scheme: light;
 }
 
 .calculatorField input:focus-visible {
-  outline: 2px solid var(--page-cyan);
-  outline-offset: 3px;
+  border-color: var(--page-violet);
 }
 
 .calculatorField input[aria-invalid="true"] {
-  border-color: var(--page-limited);
+  border-color: var(--page-danger);
 }
 
 .calculatorHint,
@@ -354,58 +379,57 @@
   line-height: 1.45;
 }
 
+.calculatorHint + .calculatorHint {
+  margin-top: 7px;
+}
+
 .errorMessage {
-  color: #f3c4b5;
+  margin-top: 8px;
+  color: var(--page-danger);
 }
 
 .estimate {
   min-width: 0;
-  margin-top: 20px;
-  border: 1px solid var(--page-line);
-  border-left: 3px solid var(--page-violet);
-  background: var(--page-surface);
+  margin-top: 24px;
+  border-top: 1px solid var(--page-line);
+  padding-top: 20px;
 }
 
 .estimateHeader {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 20px;
-  border-bottom: 1px solid var(--page-line);
-  padding: 16px 18px 14px;
+  gap: 16px;
 }
 
 .estimateHeader h3 {
   margin: 0;
   color: var(--page-text);
   font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
   line-height: 1.05;
 }
 
 .estimateHeader span {
+  flex-shrink: 0;
   color: var(--page-muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
   line-height: 1.3;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .estimateBreakdown {
-  margin: 0;
-  padding: 0 18px;
+  margin: 14px 0 0;
+  padding: 0;
 }
 
 .estimateBreakdown > div {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 20px;
-  border-bottom: 1px solid rgba(244, 241, 232, 0.1);
-  padding: 13px 0;
+  gap: 16px;
+  padding: 8px 0;
 }
 
 .estimateBreakdown dt,
@@ -416,52 +440,67 @@
 .estimateBreakdown dt {
   color: var(--page-muted);
   font-size: 12px;
+  line-height: 1.35;
 }
 
 .estimateBreakdown dd {
   color: var(--page-text);
   font-size: 13px;
+  line-height: 1.35;
   text-align: right;
   white-space: nowrap;
 }
 
 .estimateTotal {
-  border-bottom: 0 !important;
-  padding: 17px 0 16px !important;
+  margin-top: 6px;
+  border-top: 1px solid var(--page-line);
+  padding: 16px 0 10px !important;
 }
 
 .estimateTotal dt,
 .estimateTotal dd {
   color: var(--page-text);
   font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .estimateTotal dd {
-  color: var(--page-violet);
+  color: var(--page-violet-dark);
+  font-size: 27px;
+  letter-spacing: -0.045em;
 }
 
 .estimateFormula,
 .estimateAvailability {
   margin: 0;
-  border-top: 1px solid rgba(244, 241, 232, 0.1);
-  padding: 13px 18px;
   color: var(--page-muted);
   font-size: 11px;
   line-height: 1.45;
 }
 
+.estimateFormula {
+  padding-top: 2px;
+}
+
 .estimateAvailability {
-  border-top-color: var(--page-line);
   padding-top: 12px;
-  padding-bottom: 15px;
+}
+
+.accessNote {
+  grid-area: access;
+  max-width: 430px;
+  margin: -4px 0 0;
+  color: var(--page-muted);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .footer {
   border-top: 1px solid var(--page-line);
-  padding: 24px 0;
+  padding: 22px 0;
+  background: var(--page-paper);
   color: var(--page-muted);
   font-size: 12px;
 }
@@ -473,41 +512,40 @@
   gap: 24px;
 }
 
-@media (max-width: 960px) {
-  .productLayout {
-    grid-template-columns: 1fr;
-    align-items: start;
-    gap: 32px;
+@media (min-width: 901px) and (max-width: 1100px) {
+  .calculatorIntro {
+    display: grid;
+    gap: 12px;
   }
 
-  .productInfo {
-    order: -1;
-    border-top: 1px solid var(--page-line);
-    border-left: 0;
-    padding: 28px 0 0;
-  }
-
-  .productMedia {
-    aspect-ratio: 4 / 3;
-    max-width: 680px;
-    max-height: none;
-  }
-
-  .calculatorIntro,
-  .calculatorBody {
-    grid-template-columns: 1fr;
-  }
-
-  .calculatorBody {
-    gap: 0;
-  }
-
-  .estimate {
-    margin-top: 24px;
+  .calculatorIntro > p {
+    max-width: 360px;
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  .productLayout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "info"
+      "media"
+      "rental"
+      "access";
+    gap: 28px;
+  }
+
+  .productMedia {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 681px) and (max-width: 900px) {
+  .productMedia {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 680px) {
   .headerInner {
     gap: 12px;
     min-height: 64px;
@@ -516,8 +554,6 @@
 
   .backLink {
     font-size: 12px;
-    white-space: nowrap;
-    text-align: right;
   }
 
   .detailInner {
@@ -525,55 +561,65 @@
   }
 
   .breadcrumb {
-    padding: 22px 0 20px;
+    padding: 22px 0 18px;
   }
 
   .productLayout {
-    gap: 30px;
-    padding-bottom: 56px;
-  }
-
-  .productInfo {
-    padding-top: 24px;
+    gap: 26px;
+    padding-bottom: 48px;
   }
 
   .productInfo h1 {
-    margin: 8px 0 26px;
-    font-size: clamp(42px, 12vw, 58px);
+    margin: 8px 0 22px;
+    font-size: clamp(40px, 12vw, 54px);
   }
 
-  .productFacts > div {
-    min-height: 62px;
+  .productFacts {
+    gap: 14px 16px;
+    padding: 14px 0;
   }
 
   .priceValue {
-    font-size: 21px;
+    font-size: 22px;
+  }
+
+  .statusAvailable,
+  .statusLimited {
+    font-size: 10px;
   }
 
   .productMedia {
     aspect-ratio: 4 / 3;
-    max-width: none;
     padding: 16px;
   }
 
+  .mediaSpecimen {
+    padding: 18px 0;
+  }
+
+  .mediaName {
+    font-size: clamp(26px, 8vw, 36px);
+  }
+
   .calculatorSection {
-    padding: 30px 0 56px;
+    padding-top: 22px;
   }
 
   .calculatorIntro {
-    gap: 17px;
+    display: grid;
+    gap: 14px;
   }
 
   .calculatorIntro h2 {
-    font-size: clamp(30px, 9vw, 40px);
+    font-size: clamp(27px, 8.5vw, 34px);
   }
 
   .calculatorIntro > p {
-    font-size: 12px;
+    max-width: 300px;
   }
 
   .calculatorBody {
-    margin-top: 20px;
+    margin-top: 18px;
   }
 
   .calculatorFields {
@@ -581,39 +627,26 @@
     gap: 12px;
   }
 
+  .calculatorField:last-child {
+    grid-column: auto;
+    max-width: none;
+  }
+
   .calculatorField input {
-    min-height: 46px;
     font-size: 16px;
   }
 
-  .calculatorHint,
-  .errorMessage {
-    font-size: 11px;
-  }
-
   .estimate {
-    margin-top: 24px;
-  }
-
-  .estimateHeader,
-  .estimateBreakdown,
-  .estimateFormula,
-  .estimateAvailability {
-    padding-left: 14px;
-    padding-right: 14px;
+    margin-top: 22px;
+    padding-top: 18px;
   }
 
   .estimateHeader h3 {
-    font-size: 18px;
+    font-size: 19px;
   }
 
-  .mediaLabel {
-    font-size: 10px;
-  }
-
-  .mediaNote,
-  .prototypeNote {
-    font-size: 11px;
+  .estimateTotal dd {
+    font-size: 25px;
   }
 
   .footer {
@@ -623,7 +656,35 @@
   .footer .detailInner {
     align-items: flex-start;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .productFacts {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .headerInner {
+    gap: 8px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .logo {
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  .logoMark {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+
+  .backLink {
+    font-size: 11px;
   }
 }
 

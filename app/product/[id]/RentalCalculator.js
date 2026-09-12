@@ -34,12 +34,11 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
     <section className={styles.calculatorSection} aria-labelledby="calculator-title">
       <div className={styles.calculatorIntro}>
         <div>
-          <p className={styles.sectionLabel}>Simulasi biaya</p>
-          <h2 id="calculator-title">Hitung estimasi rental.</h2>
+          <p className={styles.sectionLabel}>Rental</p>
+          <h2 id="calculator-title">Atur periode rental</h2>
         </div>
         <p>
-          Atur tanggal dan jumlah item untuk melihat perkiraan biaya berdasarkan harga per
-          hari.
+          Pilih tanggal dan jumlah item untuk melihat estimasi biaya per hari.
         </p>
       </div>
 
@@ -105,7 +104,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
 
         <aside className={styles.estimate} aria-labelledby="estimate-title">
           <div className={styles.estimateHeader}>
-            <h3 id="estimate-title">Estimasi biaya rental</h3>
+            <h3 id="estimate-title">Rincian rental</h3>
             <span>{total === null ? "Belum lengkap" : "Simulasi"}</span>
           </div>
           <dl className={styles.estimateBreakdown}>
@@ -122,17 +121,17 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
               <dd>{quantity === null ? "—" : `${quantity} item`}</dd>
             </div>
             <div className={styles.estimateTotal}>
-              <dt>Estimasi biaya rental</dt>
+              <dt>Estimasi biaya</dt>
               <dd>{total === null ? "—" : formatRupiah(total)}</dd>
             </div>
           </dl>
           <p className={styles.estimateFormula} aria-live="polite">
             {total === null
-              ? "Lengkapi dua tanggal dan jumlah untuk melihat total estimasi."
+              ? "Lengkapi tanggal dan jumlah untuk melihat estimasi."
               : `${priceLabel} × ${duration} hari × ${quantity}`}
           </p>
           <p className={styles.estimateAvailability}>
-            Ini hanya simulasi biaya. Ketersediaan aktual akan diperiksa pada tahap berikutnya.
+            Ketersediaan aktual diperiksa saat pengajuan rental.
           </p>
         </aside>
       </div>

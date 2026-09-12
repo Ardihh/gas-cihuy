@@ -48,7 +48,7 @@ export default async function ProductPage({ params }) {
             <span>Cosplay Asik</span>
           </Link>
           <Link href="/#katalog" className={styles.backLink}>
-            ← Kembali ke katalog
+            <span aria-hidden="true">←</span> Kembali ke koleksi
           </Link>
         </div>
       </header>
@@ -62,14 +62,6 @@ export default async function ProductPage({ params }) {
           </nav>
 
           <div className={styles.productLayout}>
-            <div className={styles.productMediaColumn}>
-              <div className={styles.productMedia} data-category={product.category} aria-hidden="true">
-                <span className={styles.mediaNumber}>{String(product.id).padStart(2, "0")}</span>
-                <span className={styles.mediaLabel}>Foto produk menyusul</span>
-              </div>
-              <p className={styles.mediaNote}>Foto produk belum tersedia di prototipe ini.</p>
-            </div>
-
             <section className={styles.productInfo} aria-labelledby="product-title">
               <p className={styles.sectionLabel}>{product.category}</p>
               <h1 id="product-title">{product.name}</h1>
@@ -82,27 +74,42 @@ export default async function ProductPage({ params }) {
                   </dd>
                 </div>
                 <div>
-                  <dt>Status contoh</dt>
+                  <dt>Status</dt>
                   <dd className={isLimited ? styles.statusLimited : styles.statusAvailable}>
+                    <span className={styles.statusDot} aria-hidden="true" />
                     {getProductStatusLabel(product)}
                   </dd>
                 </div>
               </dl>
-
-              <p className={styles.prototypeNote}>
-                Pengajuan rental belum terhubung dalam prototipe ini.
-              </p>
             </section>
-          </div>
 
-          <RentalCalculator priceLabel={product.price} pricePerDay={pricePerDay} />
+            <div className={styles.productMediaColumn}>
+              <div className={styles.productMedia} data-category={product.category}>
+                <div className={styles.mediaMeta}>
+                  <span>{String(product.id).padStart(2, "0")}</span>
+                  <span>{product.category}</span>
+                </div>
+                <div className={styles.mediaSpecimen}>
+                  <p className={styles.mediaName}>{product.name}</p>
+                  <span className={styles.mediaCategory}>{product.category}</span>
+                </div>
+                <span className={styles.mediaLabel}>Foto produk belum tersedia.</span>
+              </div>
+            </div>
+
+            <RentalCalculator priceLabel={product.price} pricePerDay={pricePerDay} />
+
+            <p className={styles.accessNote}>
+              Pengajuan rental membutuhkan akses akun pelanggan.
+            </p>
+          </div>
         </div>
       </main>
 
       <footer className={styles.footer}>
         <div className={styles.detailInner}>
           <span>Rental kostum &amp; aksesori cosplay</span>
-          <Link href="/#katalog">Kembali ke katalog ↗</Link>
+          <Link href="/#katalog">Kembali ke koleksi ↗</Link>
         </div>
       </footer>
     </div>
