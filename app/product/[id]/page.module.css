@@ -1,0 +1,371 @@
+.page {
+  --page-bg: #0e0d13;
+  --page-surface: #17141d;
+  --page-text: #f4f1e8;
+  --page-muted: #b8b0bc;
+  --page-line: rgba(244, 241, 232, 0.16);
+  --page-violet: #a78bfa;
+  --page-cyan: #67e8f9;
+  --page-good: #a7e3b3;
+  --page-limited: #f1c66b;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--page-bg);
+  color: var(--page-text);
+  font-family: var(--font-body);
+}
+
+.page a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page a:focus-visible {
+  outline: 2px solid var(--page-cyan);
+  outline-offset: 4px;
+}
+
+.header {
+  border-bottom: 1px solid var(--page-line);
+  background: var(--page-bg);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 72px;
+  width: min(100%, 1248px);
+  margin: 0 auto;
+  padding: 12px 24px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 9px;
+  color: var(--page-text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logoMark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--page-violet);
+  color: var(--page-bg);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.backLink,
+.breadcrumb a,
+.footer a {
+  color: var(--page-muted);
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.backLink:hover,
+.breadcrumb a:hover,
+.footer a:hover {
+  color: var(--page-text);
+}
+
+.detailInner {
+  width: min(100%, 1248px);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 30px 0 26px;
+  color: var(--page-muted);
+  font-size: 12px;
+}
+
+.productLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.8fr);
+  align-items: center;
+  gap: 64px;
+  padding-bottom: 82px;
+}
+
+.productMediaColumn {
+  min-width: 0;
+}
+
+.productMedia {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 4 / 5;
+  max-height: 560px;
+  border: 1px solid rgba(33, 26, 43, 0.2);
+  padding: 24px;
+  background: #e5e0d4;
+  color: #211a2b;
+}
+
+.productMedia[data-category="Game"] {
+  background: #dce3d9;
+}
+
+.productMedia[data-category="Aksesoris"] {
+  background: #ddd7e5;
+}
+
+.mediaNumber,
+.mediaLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.mediaNumber {
+  opacity: 0.55;
+}
+
+.mediaLabel {
+  font-size: 12px;
+}
+
+.mediaNote {
+  margin: 12px 0 0;
+  color: var(--page-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.productInfo {
+  min-width: 0;
+  border-left: 1px solid var(--page-line);
+  padding: 12px 0 12px 32px;
+}
+
+.sectionLabel {
+  margin: 0;
+  color: var(--page-violet);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.productInfo h1 {
+  max-width: 620px;
+  margin: 9px 0 32px;
+  color: var(--page-text);
+  font-family: var(--font-display);
+  font-size: clamp(44px, 5.4vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.94;
+}
+
+.productFacts {
+  margin: 0;
+  border-top: 1px solid var(--page-line);
+  border-bottom: 1px solid var(--page-line);
+}
+
+.productFacts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 66px;
+  border-bottom: 1px solid rgba(244, 241, 232, 0.1);
+}
+
+.productFacts > div:last-child {
+  border-bottom: 0;
+}
+
+.productFacts dt {
+  color: var(--page-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.productFacts dd {
+  margin: 0;
+  text-align: right;
+}
+
+.priceValue {
+  color: var(--page-violet);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.priceValue span {
+  color: var(--page-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.statusAvailable,
+.statusLimited {
+  border: 1px solid currentColor;
+  padding: 4px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.statusAvailable {
+  color: var(--page-good);
+}
+
+.statusLimited {
+  color: var(--page-limited);
+}
+
+.prototypeNote {
+  max-width: 430px;
+  margin: 24px 0 0;
+  border-left: 2px solid var(--page-cyan);
+  padding-left: 12px;
+  color: var(--page-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.footer {
+  border-top: 1px solid var(--page-line);
+  padding: 24px 0;
+  color: var(--page-muted);
+  font-size: 12px;
+}
+
+.footer .detailInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .productLayout {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 32px;
+  }
+
+  .productInfo {
+    order: -1;
+    border-top: 1px solid var(--page-line);
+    border-left: 0;
+    padding: 28px 0 0;
+  }
+
+  .productMedia {
+    aspect-ratio: 4 / 3;
+    max-width: 680px;
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .headerInner {
+    gap: 12px;
+    min-height: 64px;
+    padding: 10px 16px;
+  }
+
+  .backLink {
+    font-size: 12px;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .detailInner {
+    padding: 0 16px;
+  }
+
+  .breadcrumb {
+    padding: 22px 0 20px;
+  }
+
+  .productLayout {
+    gap: 30px;
+    padding-bottom: 56px;
+  }
+
+  .productInfo {
+    padding-top: 24px;
+  }
+
+  .productInfo h1 {
+    margin: 8px 0 26px;
+    font-size: clamp(42px, 12vw, 58px);
+  }
+
+  .productFacts > div {
+    min-height: 62px;
+  }
+
+  .priceValue {
+    font-size: 21px;
+  }
+
+  .productMedia {
+    aspect-ratio: 4 / 3;
+    max-width: none;
+    padding: 16px;
+  }
+
+  .mediaLabel {
+    font-size: 10px;
+  }
+
+  .mediaNote,
+  .prototypeNote {
+    font-size: 11px;
+  }
+
+  .footer {
+    padding: 20px 0;
+  }
+
+  .footer .detailInner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page a {
+    transition: none;
+  }
+}

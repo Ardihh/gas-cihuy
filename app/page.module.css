@@ -387,6 +387,16 @@
   padding: 12px 0;
 }
 
+.productRowLink {
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 160ms ease;
+}
+
+.productRowLink:hover {
+  background: rgba(244, 241, 232, 0.04);
+}
+
 .heroMediaSlot,
 .catalogMediaSlot {
   display: flex;

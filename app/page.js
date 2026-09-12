@@ -1,57 +1,14 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 
-const featuredCostumes = [
-  {
-    id: 1,
-    name: "Costume Gojo Satoru",
-    category: "Anime",
-    price: "Rp100.000",
-    status: "available",
-  },
-  {
-    id: 2,
-    name: "Costume Mikasa Ackerman",
-    category: "Anime",
-    price: "Rp120.000",
-    status: "available",
-  },
-  {
-    id: 3,
-    name: "Costume Cloud Strife",
-    category: "Game",
-    price: "Rp150.000",
-    status: "available",
-  },
-  {
-    id: 4,
-    name: "Wig Rem (Blue)",
-    category: "Aksesoris",
-    price: "Rp60.000",
-    status: "limited",
-  },
-  {
-    id: 5,
-    name: "Props Nichirin Sword",
-    category: "Aksesoris",
-    price: "Rp50.000",
-    status: "available",
-  },
-  {
-    id: 6,
-    name: "Costume Naruto Uzumaki",
-    category: "Anime",
-    price: "Rp90.000",
-    status: "limited",
-  },
-];
+import { getProductStatusLabel, products } from "./data/products";
 
 const catalogGroups = ["Anime", "Game", "Aksesoris"].map((category) => ({
   category,
-  items: featuredCostumes.filter((item) => item.category === category),
+  items: products.filter((item) => item.category === category),
 }));
 
-const heroItems = [featuredCostumes[0], featuredCostumes[3], featuredCostumes[4]];
+const heroItems = [products[0], products[3], products[4]];
 
 const steps = [
   {
@@ -81,7 +38,7 @@ function StatusLabel({ item }) {
 
   return (
     <span className={isLimited ? styles.statusLimited : styles.statusAvailable}>
-      {isLimited ? "Contoh · stok terbatas" : "Contoh · tersedia"}
+      {getProductStatusLabel(item)}
     </span>
   );
 }
@@ -187,7 +144,11 @@ export default function LandingPage() {
               </div>
               <div className={styles.inventoryRows}>
                 {heroItems.map((item) => (
-                  <article className={styles.inventoryRow} key={item.id}>
+                  <Link
+                    href={`/product/${item.id}`}
+                    className={`${styles.inventoryRow} ${styles.productRowLink}`}
+                    key={item.id}
+                  >
                     <MediaSlot item={item} variant="hero" />
                     <div className={styles.inventoryIdentity}>
                       <span>{item.category}</span>
@@ -198,7 +159,7 @@ export default function LandingPage() {
                       <span>/ hari</span>
                       <StatusLabel item={item} />
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </div>
               <p className={styles.inventoryNote}>
@@ -241,7 +202,11 @@ export default function LandingPage() {
                   </div>
                   <div className={styles.rackRows}>
                     {group.items.map((item) => (
-                      <article className={styles.rackRow} key={item.id}>
+                      <Link
+                        href={`/product/${item.id}`}
+                        className={`${styles.rackRow} ${styles.productRowLink}`}
+                        key={item.id}
+                      >
                         <MediaSlot item={item} variant="catalog" />
                         <div className={styles.rackIdentity}>
                           <span>{item.category}</span>
@@ -254,7 +219,7 @@ export default function LandingPage() {
                         <div className={styles.rackStatus}>
                           <StatusLabel item={item} />
                         </div>
-                      </article>
+                      </Link>
                     ))}
                   </div>
                 </div>
