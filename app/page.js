@@ -46,68 +46,56 @@ const featuredCostumes = [
   },
 ];
 
+const catalogGroups = ["Anime", "Game", "Aksesoris"].map((category) => ({
+  category,
+  items: featuredCostumes.filter((item) => item.category === category),
+}));
+
+const heroItems = [featuredCostumes[0], featuredCostumes[3], featuredCostumes[4]];
+
 const steps = [
   {
     number: "01",
     title: "Jelajahi katalog",
     description: "Temukan kostum dan aksesori cosplay dari koleksi yang tersedia.",
-    cue: "Katalog",
   },
   {
     number: "02",
     title: "Atur detail sewa",
     description: "Tentukan item, jumlah, tanggal mulai, dan tanggal selesai.",
-    cue: "Tanggal",
   },
   {
     number: "03",
     title: "Ajukan rental",
     description: "Kirim pengajuan setelah detail dan total harga sudah sesuai.",
-    cue: "Pengajuan",
   },
   {
     number: "04",
     title: "Tunggu persetujuan",
     description: "Pemilik toko meninjau pengajuan sebelum rental berjalan.",
-    cue: "Approval",
   },
 ];
 
-const showcaseItems = [featuredCostumes[0], featuredCostumes[3], featuredCostumes[4]];
-
-function PhotoPlaceholder({ item, compact = false }) {
-  return (
-    <div className={compact ? styles.railPlaceholder : styles.photoPlaceholder} aria-hidden="true">
-      <span className={styles.placeholderLabel}>Slot foto</span>
-      <span className={styles.placeholderTitle}>{item.name}</span>
-      <span className={styles.placeholderNote}>Aset produk belum tersedia</span>
-    </div>
-  );
-}
-
-function ProductCard({ item, index }) {
+function StatusLabel({ item }) {
   const isLimited = item.status === "limited";
 
   return (
-    <article className={styles.productCard}>
-      <div className={styles.productMedia}>
-        <span className={styles.productIndex}>0{index + 1}</span>
-        <span className={isLimited ? styles.statusLimited : styles.statusAvailable}>
-          {isLimited ? "Contoh · stok terbatas" : "Contoh · tersedia"}
-        </span>
-        <PhotoPlaceholder item={item} />
-      </div>
-      <div className={styles.productInfo}>
-        <div className={styles.productKicker}>
-          <span>{item.category}</span>
-          <span>Per hari</span>
-        </div>
-        <h3 className={styles.productName}>{item.name}</h3>
-        <p className={styles.productPrice}>
-          {item.price} <span>/ hari</span>
-        </p>
-      </div>
-    </article>
+    <span className={isLimited ? styles.statusLimited : styles.statusAvailable}>
+      {isLimited ? "Contoh · stok terbatas" : "Contoh · tersedia"}
+    </span>
+  );
+}
+
+function MediaSlot({ item, variant }) {
+  return (
+    <div
+      className={variant === "hero" ? styles.heroMediaSlot : styles.catalogMediaSlot}
+      data-category={item.category}
+      aria-hidden="true"
+    >
+      <span className={styles.mediaSlotNumber}>{String(item.id).padStart(2, "0")}</span>
+      <span className={styles.mediaSlotLabel}>Foto menyusul</span>
+    </div>
   );
 }
 
@@ -152,113 +140,143 @@ export default function LandingPage() {
 
       <main>
         <section className={styles.hero}>
-          <div className={`${styles.sectionInner} ${styles.heroGrid}`}>
+          <div className={`${styles.sectionInner} ${styles.heroInner}`}>
             <div className={styles.heroCopy}>
-              <p className={styles.eyebrow}>Rental kostum &amp; aksesori cosplay</p>
+              <p className={styles.heroKicker}>
+                <span aria-hidden="true">CA</span> Rental kostum &amp; aksesori cosplay
+              </p>
               <h1>
                 Sewa kostum.
                 <span className={styles.heroTitleAccent}>Jadi karakter.</span>
               </h1>
               <p className={styles.heroDescription}>
                 Pilih karakter anime, game, atau film favoritmu. Cek harga per hari dan
-                ketersediaan item sebelum mengajukan rental.
+                status item sebelum mengajukan rental.
               </p>
               <div className={styles.heroActions}>
                 <a href="#katalog" className={styles.primaryButton}>
                   Jelajahi katalog <span aria-hidden="true">↗</span>
                 </a>
-                <a href="#cara-kerja" className={styles.secondaryButton}>
-                  Lihat cara sewa
+                <a href="#cara-kerja" className={styles.heroTextLink}>
+                  Lihat alurnya <span aria-hidden="true">→</span>
                 </a>
               </div>
               <dl className={styles.heroFacts}>
                 <div>
-                  <dt>Yang bisa disewa</dt>
+                  <dt>Yang disewa</dt>
                   <dd>Kostum &amp; aksesori</dd>
                 </div>
                 <div>
                   <dt>Harga mulai</dt>
-                  <dd>Rp50.000 <span>/ hari</span></dd>
+                  <dd>
+                    Rp50.000 <span>/ hari</span>
+                  </dd>
                 </div>
               </dl>
             </div>
 
-            <div className={styles.heroShowcase} aria-label="Contoh koleksi">
-              <div className={styles.showcaseHeader}>
-                <span>Contoh koleksi</span>
-                <span>Foto produk menyusul</span>
-              </div>
-              <div className={styles.showcaseCanvas}>
-                <div className={styles.showcaseMain}>
-                  <PhotoPlaceholder item={showcaseItems[0]} />
-                  <div className={styles.showcaseCaption}>
-                    <div>
-                      <span className={styles.showcaseCategory}>{showcaseItems[0].category}</span>
-                      <p>{showcaseItems[0].name}</p>
-                    </div>
-                    <strong>{showcaseItems[0].price}<span> / hari</span></strong>
-                  </div>
+            <aside className={styles.heroInventory} aria-labelledby="hero-inventory-title">
+              <div className={styles.inventoryHeading}>
+                <div>
+                  <p className={styles.sectionLabel}>Contoh rak</p>
+                  <h2 id="hero-inventory-title">Item untuk mulai.</h2>
                 </div>
-                <div className={styles.showcaseRail}>
-                  {showcaseItems.slice(1).map((item) => (
-                    <div className={styles.railItem} key={item.id}>
-                      <PhotoPlaceholder item={item} compact />
-                      <div className={styles.railCaption}>
-                        <span>{item.category}</span>
-                        <strong>{item.price}<small> / hari</small></strong>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <a href="#katalog" className={styles.inventoryLink}>
+                  Lihat katalog <span aria-hidden="true">↗</span>
+                </a>
               </div>
-              <p className={styles.showcaseNote}>
-                Struktur visual ini siap menerima foto produk saat aset tersedia.
+              <div className={styles.inventoryRows}>
+                {heroItems.map((item) => (
+                  <article className={styles.inventoryRow} key={item.id}>
+                    <MediaSlot item={item} variant="hero" />
+                    <div className={styles.inventoryIdentity}>
+                      <span>{item.category}</span>
+                      <h3>{item.name}</h3>
+                    </div>
+                    <div className={styles.inventoryDetails}>
+                      <strong>{item.price}</strong>
+                      <span>/ hari</span>
+                      <StatusLabel item={item} />
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <p className={styles.inventoryNote}>
+                Data contoh dari koleksi saat ini. Foto produk menyusul.
               </p>
-            </div>
+            </aside>
           </div>
         </section>
 
-        <section id="katalog" className={styles.section}>
+        <section id="katalog" className={`${styles.section} ${styles.catalogSection}`}>
           <div className={styles.sectionInner}>
-            <div className={styles.sectionHeader}>
+            <div className={styles.catalogIntro}>
               <div>
-                <p className={styles.eyebrow}>01 / Katalog</p>
+                <p className={styles.sectionLabel}>01 / Katalog</p>
                 <h2>Pilih item untuk penampilan berikutnya.</h2>
               </div>
-              <p className={styles.sectionLead}>
-                Lihat contoh koleksi, kategori, harga sewa per hari, dan status stok dalam
-                satu pandangan.
-              </p>
+              <div className={styles.catalogContext}>
+                <p>
+                  Susunan contoh koleksi berdasarkan karakter, kategori, harga sewa per hari,
+                  dan status item.
+                </p>
+                <a href="#harga" className={styles.inlineLink}>
+                  Lihat cara hitung <span aria-hidden="true">→</span>
+                </a>
+              </div>
             </div>
 
-            <div className={styles.catalogLegend} aria-label="Keterangan katalog">
-              <span><i className={styles.legendDot} /> Contoh koleksi</span>
+            <div className={styles.catalogMeta} aria-label="Keterangan katalog">
+              <span>Koleksi contoh</span>
               <span>Harga / hari</span>
               <span>Status contoh</span>
             </div>
 
-            <div className={styles.productGrid}>
-              {featuredCostumes.map((item, index) => (
-                <ProductCard item={item} index={index} key={item.id} />
+            <div className={styles.rack}>
+              {catalogGroups.map((group) => (
+                <div className={styles.rackGroup} key={group.category}>
+                  <div className={styles.rackGroupHeader}>
+                    <h3>{group.category}</h3>
+                    <span>Contoh item</span>
+                  </div>
+                  <div className={styles.rackRows}>
+                    {group.items.map((item) => (
+                      <article className={styles.rackRow} key={item.id}>
+                        <MediaSlot item={item} variant="catalog" />
+                        <div className={styles.rackIdentity}>
+                          <span>{item.category}</span>
+                          <h4>{item.name}</h4>
+                        </div>
+                        <div className={styles.rackPrice}>
+                          <strong>{item.price}</strong>
+                          <span>/ hari</span>
+                        </div>
+                        <div className={styles.rackStatus}>
+                          <StatusLabel item={item} />
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
 
             <p className={styles.implementationNote}>
-              Catatan prototipe: foto produk dan pengajuan rental belum terhubung. Layout
-              ini sengaja disiapkan untuk aset dan data asli.
+              Catatan prototipe: foto produk dan pengajuan rental belum terhubung. Status di
+              atas adalah contoh dari data yang ada.
             </p>
           </div>
         </section>
 
         <section id="cara-kerja" className={`${styles.section} ${styles.processSection}`}>
           <div className={styles.sectionInner}>
-            <div className={styles.sectionHeader}>
+            <div className={styles.processIntro}>
               <div>
-                <p className={styles.eyebrow}>02 / Cara sewa</p>
+                <p className={styles.sectionLabel}>02 / Cara sewa</p>
                 <h2>Alurnya singkat dan jelas.</h2>
               </div>
-              <p className={styles.sectionLead}>
-                Mulai dari memilih item sampai pengajuan ditinjau oleh pemilik toko.
+              <p>
+                Pilih item, atur tanggal, lalu tunggu pengajuan ditinjau oleh pemilik toko.
               </p>
             </div>
 
@@ -270,35 +288,34 @@ export default function LandingPage() {
                     <h3>{step.title}</h3>
                     <p>{step.description}</p>
                   </div>
-                  <span className={styles.processCue}>{step.cue}</span>
                 </li>
               ))}
             </ol>
 
             <p className={styles.processNote}>
-              Setelah disetujui, rental berjalan sesuai tanggal dan barang dikembalikan
-              setelah selesai. Feedback bersifat opsional.
+              Setelah disetujui, rental berjalan sesuai tanggal dan barang dikembalikan setelah
+              selesai. Feedback bersifat opsional.
             </p>
           </div>
         </section>
 
-        <section id="harga" className={styles.section}>
+        <section id="harga" className={`${styles.section} ${styles.pricingSection}`}>
           <div className={styles.sectionInner}>
-            <div className={styles.sectionHeader}>
+            <div className={styles.pricingIntro}>
               <div>
-                <p className={styles.eyebrow}>03 / Harga</p>
-                <h2>Hitung dari harga per hari.</h2>
+                <p className={styles.sectionLabel}>03 / Harga</p>
+                <h2>Harga per hari.</h2>
               </div>
-              <p className={styles.sectionLead}>
-                Total mengikuti harga item, jumlah hari, dan jumlah barang yang disewa.
-              </p>
+              <p>Total mengikuti harga item, jumlah hari, dan jumlah barang yang disewa.</p>
             </div>
 
             <div className={styles.pricingGrid}>
               <div className={styles.pricingFormula}>
                 <span className={styles.formulaLabel}>Rumus rental</span>
                 <p>Harga / hari × jumlah hari × jumlah barang</p>
-                <span className={styles.formulaMinimum}>Item termurah di contoh koleksi: Rp50.000 / hari</span>
+                <span className={styles.formulaMinimum}>
+                  Item termurah di contoh koleksi: Rp50.000 / hari
+                </span>
               </div>
               <div className={styles.pricingExample}>
                 <div className={styles.exampleHeader}>
@@ -306,10 +323,22 @@ export default function LandingPage() {
                   <span>1 item · 3 hari</span>
                 </div>
                 <dl>
-                  <div><dt>Kostum Gojo</dt><dd>Rp100.000 / hari</dd></div>
-                  <div><dt>Jumlah</dt><dd>1 pcs</dd></div>
-                  <div><dt>Durasi</dt><dd>3 hari</dd></div>
-                  <div className={styles.exampleTotal}><dt>Total</dt><dd>Rp300.000</dd></div>
+                  <div>
+                    <dt>Kostum Gojo</dt>
+                    <dd>Rp100.000 / hari</dd>
+                  </div>
+                  <div>
+                    <dt>Jumlah</dt>
+                    <dd>1 pcs</dd>
+                  </div>
+                  <div>
+                    <dt>Durasi</dt>
+                    <dd>3 hari</dd>
+                  </div>
+                  <div className={styles.exampleTotal}>
+                    <dt>Total</dt>
+                    <dd>Rp300.000</dd>
+                  </div>
                 </dl>
               </div>
             </div>
@@ -320,17 +349,12 @@ export default function LandingPage() {
           <div className={styles.sectionInner}>
             <div className={styles.finalCtaInner}>
               <div>
-                <p className={styles.eyebrow}>Mulai dari sini</p>
-                <h2>Pilih karakter yang ingin kamu bawa ke dunia nyata.</h2>
+                <p className={styles.sectionLabel}>Berikutnya</p>
+                <h2>Mulai dari katalog.</h2>
               </div>
-              <div className={styles.finalCtaActions}>
-                <a href="#katalog" className={styles.primaryButton}>
-                  Jelajahi katalog <span aria-hidden="true">↗</span>
-                </a>
-                <Link href="/dashboard" className={styles.secondaryButton}>
-                  Buka dashboard
-                </Link>
-              </div>
+              <a href="#katalog" className={styles.primaryButton}>
+                Jelajahi katalog <span aria-hidden="true">↗</span>
+              </a>
             </div>
           </div>
         </section>
@@ -341,10 +365,14 @@ export default function LandingPage() {
           <div className={styles.footerTop}>
             <div>
               <Link href="/" className={styles.logo} aria-label="Cosplay Asik beranda">
-                <span className={styles.logoMark} aria-hidden="true">CA</span>
+                <span className={styles.logoMark} aria-hidden="true">
+                  CA
+                </span>
                 <span>Cosplay Asik</span>
               </Link>
-              <p className={styles.footerTagline}>Sistem penyewaan kostum dan aksesori cosplay.</p>
+              <p className={styles.footerTagline}>
+                Sistem penyewaan kostum dan aksesori cosplay.
+              </p>
             </div>
             <nav className={styles.footerNav} aria-label="Navigasi footer">
               <a href="#katalog">Katalog</a>
