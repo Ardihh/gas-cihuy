@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import Link from "next/link";
 
 /* ───── static data ───── */
 const featuredCostumes = [
@@ -136,10 +137,10 @@ export default function LandingPage() {
       {/* ═══ NAVIGATION ═══ */}
       <nav className={styles.navbar}>
         <div className={styles.navInner}>
-          <a href="/" className={styles.logo}>
+          <Link href="/" className={styles.logo}>
             <span className={styles.logoIcon}>🎭</span>
             <span className={styles.logoText}>COSPLAY ASIK</span>
-          </a>
+          </Link>
 
           <div className={styles.navLinks}>
             <a href="#katalog" className={styles.navLink}>
@@ -248,12 +249,12 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <div className={styles.productActions}>
-                    <a href="#" className={styles.btnCardPrimary}>
+                    <Link href="#" className={styles.btnCardPrimary}>
                       Sewa Sekarang
-                    </a>
-                    <a href="#" className={styles.btnCardGhost}>
+                    </Link>
+                    <Link href="#" className={styles.btnCardGhost}>
                       Detail
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -311,11 +312,11 @@ export default function LandingPage() {
 
           <div className={styles.categoriesGrid}>
             {categories.map((cat, i) => (
-              <a key={i} href="#" className={styles.categoryCard}>
+              <Link key={i} href="#" className={styles.categoryCard}>
                 <span className={styles.categoryIcon}>{cat.icon}</span>
                 <span className={styles.categoryName}>{cat.name}</span>
                 <span className={styles.categoryCount}>{cat.count} item</span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -380,7 +381,7 @@ export default function LandingPage() {
           <div className={styles.testimonialGrid}>
             {testimonials.map((t) => (
               <div key={t.id} className={styles.testimonialCard}>
-                <div className={styles.testimonialQuote}>"</div>
+                <div className={styles.testimonialQuote}>&quot;</div>
                 <p className={styles.testimonialMsg}>{t.message}</p>
                 <div className={styles.testimonialAuthor}>
                   <div className={styles.testimonialAvatar}>
