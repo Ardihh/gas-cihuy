@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getProductById, getProductStatusLabel, products } from "../../data/products";
+import RentalCalculator from "./RentalCalculator";
 import styles from "./page.module.css";
 
 export function generateStaticParams() {
@@ -34,6 +35,7 @@ export default async function ProductPage({ params }) {
   }
 
   const isLimited = product.status === "limited";
+  const pricePerDay = Number(product.price.replace(/\D/g, ""));
 
   return (
     <div className={styles.page}>
@@ -92,6 +94,8 @@ export default async function ProductPage({ params }) {
               </p>
             </section>
           </div>
+
+          <RentalCalculator priceLabel={product.price} pricePerDay={pricePerDay} />
         </div>
       </main>
 
