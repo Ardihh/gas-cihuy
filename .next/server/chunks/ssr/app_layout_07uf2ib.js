@@ -1,0 +1,3 @@
+module.exports=[62925,a=>{"use strict";var b=a.i(7997);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"id",children:(0,b.jsx)("body",{children:a})})},"metadata",0,{title:"Cosplay Asik — Dashboard",description:"Sistem penyewaan kostum dan aksesoris cosplay. Kelola katalog, rental, dan approval dengan mudah."}])},19325,function(a){a.n(a.i(62925))}];
+
+//# sourceMappingURL=app_layout_07uf2ib.js.map
