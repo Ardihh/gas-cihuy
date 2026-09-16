@@ -91,7 +91,7 @@ const rentals = [
 const filters = ["Semua", "Aktif", "Menunggu", "Selesai"];
 
 const statusLabels = {
-  PENDING: "Menunggu",
+  PENDING: "Menunggu persetujuan",
   APPROVED: "Disetujui",
   ONGOING: "Sedang disewa",
   COMPLETED: "Selesai",
@@ -104,6 +104,12 @@ const statusStyles = {
   COMPLETED: styles.statusCompleted,
 };
 
+const attentionStatuses = [
+  { status: "PENDING", label: "Menunggu persetujuan" },
+  { status: "APPROVED", label: "Sudah disetujui" },
+  { status: "ONGOING", label: "Sedang disewa" },
+];
+
 function isActive(rental) {
   return rental.status === "APPROVED" || rental.status === "ONGOING";
 }
@@ -115,27 +121,127 @@ function matchesFilter(rental, filter) {
   return true;
 }
 
-function getSummary() {
-  return [
-    {
-      label: "Rental Aktif",
-      value: rentals.filter(isActive).length,
-      icon: "🎭",
-      note: "Sedang berjalan",
-    },
-    {
-      label: "Menunggu Approval",
-      value: rentals.filter((rental) => rental.status === "PENDING").length,
-      icon: "⏳",
-      note: "Perlu ditinjau",
-    },
-    {
-      label: "Selesai",
-      value: rentals.filter((rental) => rental.status === "COMPLETED").length,
-      icon: "✓",
-      note: "Total rental selesai",
-    },
-  ];
+function isCompleted(rental) {
+  return rental.status === "COMPLETED";
+}
+
+function getAttentionGroups() {
+  return attentionStatuses
+    .map(({ status, label }) => ({
+      count: rentals.filter((rental) => rental.status === status).length,
+      label,
+    }))
+    .filter((group) => group.count > 0);
+}
+
+function FeedbackForm({ rental, feedbackText, onChange, onSubmit }) {
+  return (
+    <div className={styles.feedbackForm} id={`feedback-form-${rental.id}`}>
+      <p className={styles.formEyebrow}>Feedback untuk</p>
+      <h4 id={`feedback-title-${rental.id}`}>{rental.name}</h4>
+      <form onSubmit={onSubmit} aria-labelledby={`feedback-title-${rental.id}`}>
+        <label className={styles.formLabel} htmlFor="feedbackText">
+          Ceritakan pengalamanmu
+        </label>
+        <textarea
+          className={styles.textarea}
+          id="feedbackText"
+          maxLength={500}
+          onChange={onChange}
+          placeholder="Contoh: Costume-nya masih bagus dan proses rental juga mudah..."
+          required
+          rows={4}
+          value={feedbackText}
+        />
+        <div className={styles.formFooter}>
+          <span>{feedbackText.length}/500</span>
+          <button className={styles.submitButton} type="submit">
+            Kirim feedback →
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function RentalRecord({
+  rental,
+  selectedRentalId,
+  sentFeedback,
+  onChooseFeedback,
+  feedbackText,
+  onFeedbackChange,
+  onFeedbackSubmit,
+}) {
+  const completed = isCompleted(rental);
+  const selected = selectedRentalId === rental.id;
+  const hasFeedback = rental.feedbackSubmitted || sentFeedback.includes(rental.id);
+
+  return (
+    <li className={`${styles.record} ${selected ? styles.recordSelected : ""}`}>
+      <div className={styles.recordGrid}>
+        <div className={styles.recordIdentity}>
+          <h3>{rental.name}</h3>
+          <p>{rental.category}</p>
+        </div>
+
+        <div className={styles.recordStatus}>
+          <span
+            className={`${styles.statusDot} ${statusStyles[rental.status] || ""}`}
+            aria-hidden="true"
+          />
+          <span>{statusLabels[rental.status] || rental.status}</span>
+        </div>
+
+        <div className={styles.recordDate}>
+          <span className={styles.recordLabel}>Periode rental</span>
+          <span>{rental.date}</span>
+        </div>
+
+        <div className={styles.recordPrice}>
+          <span className={styles.recordLabel}>Total rental</span>
+          <strong>{rental.price}</strong>
+        </div>
+
+        {completed && (
+          <div className={styles.recordAction}>
+            {hasFeedback ? (
+              <span className={styles.feedbackDone}>Feedback sudah dikirim</span>
+            ) : (
+              <button
+                className={styles.feedbackButton}
+                type="button"
+                onClick={() => onChooseFeedback(rental.id)}
+                aria-expanded={selected}
+                aria-controls={`feedback-form-${rental.id}`}
+              >
+                {selected ? "Tutup feedback" : "Beri feedback"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {selected && (
+        <FeedbackForm
+          rental={rental}
+          feedbackText={feedbackText}
+          onChange={onFeedbackChange}
+          onSubmit={onFeedbackSubmit}
+        />
+      )}
+    </li>
+  );
+}
+
+function RentalRecordList({ records, ...recordProps }) {
+  return (
+    <ul className={styles.recordList}>
+      {records.map((rental) => (
+        <RentalRecord key={rental.id} rental={rental} {...recordProps} />
+      ))}
+    </ul>
+  );
 }
 
 export default function CustomerDashboard() {
@@ -148,14 +254,21 @@ export default function CustomerDashboard() {
   const filteredRentals = rentals.filter((rental) =>
     matchesFilter(rental, activeFilter),
   );
-  const completedRentals = rentals.filter(
-    (rental) => rental.status === "COMPLETED",
-  );
-  const selectedRental = completedRentals.find(
-    (rental) => rental.id === selectedRentalId,
+  const currentRentals = filteredRentals.filter((rental) => !isCompleted(rental));
+  const historyRentals = filteredRentals.filter(isCompleted);
+  const attentionGroups = getAttentionGroups();
+  const attentionCount = attentionGroups.reduce(
+    (total, group) => total + group.count,
+    0,
   );
 
   function chooseFeedback(rentalId) {
+    if (selectedRentalId === rentalId) {
+      setSelectedRentalId(null);
+      setFeedbackText("");
+      return;
+    }
+
     setSelectedRentalId(rentalId);
     setFeedbackText("");
     setSuccessMessage("");
@@ -168,223 +281,181 @@ export default function CustomerDashboard() {
     setSentFeedback((current) => [...current, selectedRentalId]);
     setSelectedRentalId(null);
     setFeedbackText("");
-    setSuccessMessage("Feedback berhasil disimpan untuk rental kamu.");
+    setSuccessMessage("Feedback sudah dikirim untuk rental kamu.");
   }
+
+  const recordProps = {
+    selectedRentalId,
+    sentFeedback,
+    onChooseFeedback: chooseFeedback,
+    feedbackText,
+    onFeedbackChange: (event) => setFeedbackText(event.target.value),
+    onFeedbackSubmit: submitFeedback,
+  };
 
   return (
     <main className={styles.page}>
-      <div className={styles.shell}>
-        <aside className={styles.sidebar}>
-          <Link href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>🎭</span>
-            <span className={styles.logoText}>COSPLAY ASIK</span>
+      <header className={styles.topbar}>
+        <div className={styles.topbarInner}>
+          <Link href="/" className={styles.logo} aria-label="Cosplay Asik beranda">
+            <span className={styles.logoMark} aria-hidden="true">
+              CA
+            </span>
+            <span>Cosplay Asik</span>
           </Link>
 
-          <p className={styles.menuTitle}>Menu pelanggan</p>
-          <nav className={styles.nav} aria-label="Menu pelanggan">
-            <a className={`${styles.navItem} ${styles.navItemActive}`} href="#dashboard">
-              <span>⌂</span>
-              <span>Dashboard</span>
+          <nav className={styles.primaryNav} aria-label="Navigasi pelanggan">
+            <a
+              className={`${styles.navLink} ${styles.navLinkActive}`}
+              href="#dashboard"
+              aria-current="page"
+            >
+              Dashboard
             </a>
-            <Link className={styles.navItem} href="/#katalog">
-              <span>▦</span>
-              <span>Katalog</span>
+            <Link className={styles.navLink} href="/#katalog">
+              Katalog
             </Link>
-            <a className={styles.navItem} href="#rental">
-              <span>▣</span>
-              <span>Rental Saya</span>
-            </a>
-            <a className={styles.navItem} href="#rental">
-              <span>↺</span>
-              <span>Riwayat Rental</span>
-            </a>
-            <a className={styles.navItem} href="#feedback">
-              <span>💬</span>
-              <span>Feedback</span>
-            </a>
-            <a className={styles.navItem} href="#profile">
-              <span>◎</span>
-              <span>Profile</span>
+            <a className={styles.navLink} href="#rental">
+              Rental saya
             </a>
           </nav>
 
-          <div className={styles.sidebarBottom} id="profile">
-            <div className={styles.avatar}>A</div>
-            <div className={styles.profileInfo}>
+          <div className={styles.customerIdentity}>
+            <span className={styles.customerMark} aria-hidden="true">
+              AK
+            </span>
+            <span className={styles.customerDetails}>
               <strong>AniKun</strong>
               <span>Pelanggan</span>
-            </div>
-            <span className={styles.profileMore}>•••</span>
+            </span>
           </div>
-        </aside>
+        </div>
+      </header>
 
-        <section className={styles.content}>
-          <header className={styles.header}>
-            <div>
-              <p className={styles.eyebrow}>AREA PELANGGAN</p>
-              <h1 id="dashboard">Dashboard Pelanggan</h1>
-              <p className={styles.headerDesc}>
-                Pantau rental dan bagikan pengalaman cosplay kamu.
-              </p>
-            </div>
-            <div className={styles.headerActions}>
-              <button className={styles.notification} type="button" aria-label="Notifikasi">
-                ♢<span className={styles.notificationDot} />
-              </button>
-              <div className={styles.headerAvatar}>AK</div>
-            </div>
-          </header>
+      <div className={styles.pageInner}>
+        <header className={styles.pageIntro} id="dashboard">
+          <div>
+            <p className={styles.eyebrow}>Ruang pelanggan</p>
+            <h1>Halo, AniKun.</h1>
+            <p className={styles.introDescription}>
+              Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
+            </p>
+          </div>
+          <Link className={styles.catalogLink} href="/#katalog">
+            Cari kostum lagi <span aria-hidden="true">↗</span>
+          </Link>
+        </header>
 
-          <div className={styles.mainContent}>
-            <section className={styles.summaryGrid} aria-label="Ringkasan rental">
-              {getSummary().map((item) => (
-                <article className={styles.summaryCard} key={item.label}>
-                  <div className={styles.summaryIcon}>{item.icon}</div>
-                  <div>
-                    <p className={styles.summaryLabel}>{item.label}</p>
-                    <strong className={styles.summaryValue}>{item.value}</strong>
-                    <span className={styles.summaryNote}>{item.note}</span>
-                  </div>
-                </article>
+        <section className={styles.attention} aria-labelledby="attention-title">
+          <div className={styles.attentionCopy}>
+            <p className={styles.attentionLabel}>Perlu perhatian</p>
+            <h2 id="attention-title">
+              {attentionCount > 0
+                ? `${attentionCount} rental perlu dipantau.`
+                : "Tidak ada rental yang perlu dipantau."}
+            </h2>
+            <p>
+              {attentionGroups.length > 0
+                ? attentionGroups
+                    .map((group) => `${group.count} ${group.label.toLowerCase()}`)
+                    .join(" · ")
+                : "Semua rental di daftar kamu sudah selesai."}
+            </p>
+          </div>
+
+          {attentionGroups.length > 0 && (
+            <dl className={styles.attentionDetails} aria-label="Ringkasan status rental">
+              {attentionGroups.map((group) => (
+                <div className={styles.attentionDetail} key={group.label}>
+                  <dt>{group.count}</dt>
+                  <dd>{group.label}</dd>
+                </div>
               ))}
-            </section>
+            </dl>
+          )}
+        </section>
 
-            <section className={styles.section} id="rental">
-              <div className={styles.sectionHeading}>
-                <div>
-                  <p className={styles.eyebrow}>AKTIVITAS KAMU</p>
-                  <h2>Rental Saya</h2>
-                </div>
-                <a className={styles.textLink} href="#feedback">
-                  Lihat feedback →
-                </a>
-              </div>
+        <section className={styles.rentalSection} id="rental" aria-labelledby="rental-title">
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className={styles.eyebrow}>Aktivitas rental</p>
+              <h2 id="rental-title">Rental kamu</h2>
+            </div>
+            <p className={styles.sectionCount}>
+              {filteredRentals.length} rental di tampilan ini
+            </p>
+          </div>
 
-              <div className={styles.filterRow} role="group" aria-label="Filter rental">
-                {filters.map((filter) => (
-                  <button
-                    className={`${styles.filterButton} ${activeFilter === filter ? styles.filterButtonActive : ""}`}
-                    key={filter}
-                    type="button"
-                    aria-pressed={activeFilter === filter}
-                    onClick={() => setActiveFilter(filter)}
-                  >
-                    {filter}
-                  </button>
-                ))}
-              </div>
+          <div className={styles.filterRow} role="group" aria-label="Filter rental">
+            {filters.map((filter) => (
+              <button
+                className={`${styles.filterButton} ${activeFilter === filter ? styles.filterButtonActive : ""}`}
+                key={filter}
+                type="button"
+                aria-pressed={activeFilter === filter}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
 
-              <div className={styles.rentalList}>
-                {filteredRentals.length > 0 ? (
-                  filteredRentals.map((rental) => (
-                    <article className={styles.rentalCard} key={rental.id}>
-                      <div className={styles.rentalIcon}>{rental.icon}</div>
-                      <div className={styles.rentalMain}>
-                        <div className={styles.rentalTop}>
-                          <div>
-                            <h3>{rental.name}</h3>
-                            <p>{rental.category}</p>
-                          </div>
-                          <span className={`${styles.status} ${statusStyles[rental.status]}`}>
-                            {statusLabels[rental.status]}
-                          </span>
-                        </div>
-                        <div className={styles.rentalBottom}>
-                          <span>▣ {rental.date}</span>
-                          <strong>{rental.price}</strong>
-                        </div>
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <p className={styles.emptyState}>Belum ada rental di filter ini.</p>
-                )}
-              </div>
-            </section>
+          {activeFilter === "Aktif" && (
+            <p className={styles.filterHint}>
+              Aktif menampilkan rental yang sudah disetujui atau sedang disewa.
+            </p>
+          )}
 
-            <section className={`${styles.section} ${styles.feedbackSection}`} id="feedback">
-              <div className={styles.sectionHeading}>
-                <div>
-                  <p className={styles.eyebrow}>CERITAKAN PENGALAMANMU</p>
-                  <h2>Customer Feedback</h2>
-                </div>
-                <span className={styles.optionalLabel}>Opsional · Tanpa rating bintang</span>
-              </div>
+          {successMessage && (
+            <p className={styles.successMessage} aria-live="polite">
+              ✓ {successMessage}
+            </p>
+          )}
 
-              {successMessage && (
-                <p className={styles.successMessage} aria-live="polite">
-                  ✓ {successMessage}
-                </p>
+          {activeFilter !== "Selesai" && (
+            <>
+              {currentRentals.length > 0 ? (
+                <RentalRecordList records={currentRentals} {...recordProps} />
+              ) : (
+                <p className={styles.emptyState}>Belum ada rental yang sesuai filter ini.</p>
               )}
 
-              <div className={styles.feedbackGrid}>
-                <div className={styles.feedbackList}>
-                  <p className={styles.feedbackIntro}>
-                    Feedback hanya tersedia untuk rental yang sudah selesai.
-                  </p>
-                  {completedRentals.map((rental) => {
-                    const hasFeedback =
-                      rental.feedbackSubmitted || sentFeedback.includes(rental.id);
-
-                    return (
-                      <article className={styles.feedbackItem} key={rental.id}>
-                        <div className={styles.feedbackItemIcon}>{rental.icon}</div>
-                        <div className={styles.feedbackItemInfo}>
-                          <strong>{rental.name}</strong>
-                          <span>{rental.date}</span>
-                        </div>
-                        {hasFeedback ? (
-                          <span className={styles.feedbackDone}>Sudah dikirim</span>
-                        ) : (
-                          <button
-                            className={styles.feedbackButton}
-                            type="button"
-                            onClick={() => chooseFeedback(rental.id)}
-                          >
-                            {selectedRentalId === rental.id ? "Dipilih" : "Beri feedback"}
-                          </button>
-                        )}
-                      </article>
-                    );
-                  })}
+              {activeFilter === "Semua" && historyRentals.length > 0 && (
+                <div className={styles.historyBlock}>
+                  <div className={styles.historyHeading}>
+                    <h3>Riwayat terbaru</h3>
+                    <span>{historyRentals.length} rental selesai</span>
+                  </div>
+                  <RentalRecordList records={historyRentals} {...recordProps} />
                 </div>
+              )}
+            </>
+          )}
 
-                <div className={styles.formCard}>
-                  {selectedRental ? (
-                    <form onSubmit={submitFeedback}>
-                      <p className={styles.formEyebrow}>FEEDBACK UNTUK</p>
-                      <h3>{selectedRental.name}</h3>
-                      <label className={styles.formLabel} htmlFor="feedbackText">
-                        Ceritakan pengalamanmu
-                      </label>
-                      <textarea
-                        className={styles.textarea}
-                        id="feedbackText"
-                        maxLength={500}
-                        onChange={(event) => setFeedbackText(event.target.value)}
-                        placeholder="Contoh: Costume-nya masih bagus dan proses rental juga mudah..."
-                        required
-                        rows={5}
-                        value={feedbackText}
-                      />
-                      <div className={styles.formFooter}>
-                        <span>{feedbackText.length}/500</span>
-                        <button className={styles.submitButton} type="submit">
-                          Kirim Feedback →
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className={styles.formEmpty}>
-                      <span className={styles.formEmptyIcon}>💬</span>
-                      <h3>Punya cerita?</h3>
-                      <p>Pilih rental selesai di samping untuk menulis feedback.</p>
-                    </div>
-                  )}
-                </div>
+          {activeFilter === "Selesai" && (
+            <div className={styles.historyBlock}>
+              <div className={styles.historyHeading}>
+                <h3>Riwayat terbaru</h3>
+                <span>{historyRentals.length} rental selesai</span>
               </div>
-            </section>
+              {historyRentals.length > 0 ? (
+                <RentalRecordList records={historyRentals} {...recordProps} />
+              ) : (
+                <p className={styles.emptyState}>Belum ada rental yang selesai.</p>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.catalogContinuation} aria-labelledby="catalog-title">
+          <div>
+            <p className={styles.eyebrow}>Berikutnya</p>
+            <h2 id="catalog-title">Cari kostum lagi</h2>
+            <p>Jelajahi koleksi saat kamu siap menyiapkan karakter berikutnya.</p>
           </div>
+          <Link className={styles.secondaryAction} href="/#katalog">
+            Buka koleksi <span aria-hidden="true">↗</span>
+          </Link>
         </section>
       </div>
     </main>
