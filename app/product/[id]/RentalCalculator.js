@@ -35,15 +35,16 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
       <div className={styles.calculatorIntro}>
         <div>
           <p className={styles.sectionLabel}>Rental</p>
-          <h2 id="calculator-title">Atur periode rental</h2>
+          <h2 id="calculator-title">Hitung estimasi rental</h2>
         </div>
         <p>
-          Pilih tanggal dan jumlah item untuk melihat estimasi biaya per hari.
+          Masukkan periode dan jumlah item untuk melihat simulasi biaya.
         </p>
       </div>
 
       <div className={styles.calculatorBody}>
         <div className={styles.calculatorForm}>
+          <p className={styles.panelLabel}>Input</p>
           <div className={styles.calculatorFields}>
             <div className={styles.calculatorField}>
               <label htmlFor="rental-start-date">Tanggal mulai</label>
@@ -85,7 +86,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
           </div>
 
           <p id="rental-date-help" className={styles.calculatorHint}>
-            Tanggal dihitung inklusif: tanggal yang sama berarti 1 hari sewa.
+            Rentang tanggal menghitung hari mulai dan hari selesai; tanggal yang sama berarti 1 hari sewa.
           </p>
           {dateError ? (
             <p id="rental-date-error" className={styles.errorMessage} role="alert">
@@ -93,7 +94,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
             </p>
           ) : null}
           <p id="rental-quantity-help" className={styles.calculatorHint}>
-            Jumlah adalah simulasi unit dan belum memeriksa stok aktual.
+            Jumlah adalah simulasi unit; ketersediaan aktual diperiksa saat pengajuan.
           </p>
           {quantityError ? (
             <p id="rental-quantity-error" className={styles.errorMessage} role="alert">
@@ -104,7 +105,10 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
 
         <aside className={styles.estimate} aria-labelledby="estimate-title">
           <div className={styles.estimateHeader}>
-            <h3 id="estimate-title">Rincian rental</h3>
+            <div>
+              <p className={styles.panelLabel}>Hasil</p>
+              <h3 id="estimate-title">Rincian rental</h3>
+            </div>
             <span>{total === null ? "Belum lengkap" : "Simulasi"}</span>
           </div>
           <dl className={styles.estimateBreakdown}>
@@ -131,7 +135,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
               : `${priceLabel} × ${duration} hari × ${quantity}`}
           </p>
           <p className={styles.estimateAvailability}>
-            Ketersediaan aktual diperiksa saat pengajuan rental.
+            Estimasi ini bukan konfirmasi rental.
           </p>
         </aside>
       </div>
