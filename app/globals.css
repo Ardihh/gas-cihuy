@@ -18,6 +18,17 @@
   --color-vivid-cyan: #38bdf8;
   --color-pure-white: #ffffff;
 
+  /* Current shared visual system */
+  --color-surface: #faf8f2;
+  --color-surface-muted: #eeebe2;
+  --color-text: #282525;
+  --color-text-muted: #66605a;
+  --color-border: #d1ccc1;
+  --color-accent: #a63e2c;
+  --color-status-positive: #356447;
+  --color-status-caution: #8b5a1c;
+  --motion-fast: 160ms;
+
   /* Typography */
   --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
