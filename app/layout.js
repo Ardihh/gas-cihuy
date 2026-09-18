@@ -1,14 +1,14 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Cosplay Asik — Dashboard",
+  title: "Cosplay Asik — Rental Kostum & Aksesori Cosplay",
   description:
-    "Sistem penyewaan kostum dan aksesoris cosplay. Kelola katalog, rental, dan approval dengan mudah.",
+    "Jelajahi katalog kostum dan aksesori cosplay, cek harga per hari, dan pahami alur rental dengan mudah.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
+    <html lang="id" data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );

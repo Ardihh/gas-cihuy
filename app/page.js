@@ -1,473 +1,140 @@
+﻿"use client";
+
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { products } from "./data/products";
 import styles from "./page.module.css";
 
-/* ───── static data ───── */
-const featuredCostumes = [
-  {
-    id: 1,
-    name: "Costume Gojo Satoru",
-    category: "Anime",
-    price: "Rp100.000",
-    priceNote: "/ hari",
-    status: "available",
-    image: "🧿",
-  },
-  {
-    id: 2,
-    name: "Costume Mikasa Ackerman",
-    category: "Anime",
-    price: "Rp120.000",
-    priceNote: "/ hari",
-    status: "available",
-    image: "⚔️",
-  },
-  {
-    id: 3,
-    name: "Costume Cloud Strife",
-    category: "Game",
-    price: "Rp150.000",
-    priceNote: "/ hari",
-    status: "available",
-    image: "🗡️",
-  },
-  {
-    id: 4,
-    name: "Wig Rem (Blue)",
-    category: "Aksesoris",
-    price: "Rp60.000",
-    priceNote: "/ hari",
-    status: "limited",
-    image: "💇",
-  },
-  {
-    id: 5,
-    name: "Props Nichirin Sword",
-    category: "Aksesoris",
-    price: "Rp50.000",
-    priceNote: "/ hari",
-    status: "available",
-    image: "🔥",
-  },
-  {
-    id: 6,
-    name: "Costume Naruto Uzumaki",
-    category: "Anime",
-    price: "Rp90.000",
-    priceNote: "/ hari",
-    status: "limited",
-    image: "🍥",
-  },
+const featured = products[0];
+const categories = ["Semua", ...new Set(products.map((item) => item.category))];
+const journey = [
+  ["Pilih", "Temukan kostum atau aksesori yang ingin kamu pakai."],
+  ["Atur tanggal", "Masuk ke akun, tentukan periode sewa dan jumlah item."],
+  ["Ajukan", "Kirim pengajuan. Tunggu persetujuan pemilik toko."],
+  ["Pakai", "Jadi karakter pilihanmu selama periode rental yang disetujui."],
+  ["Kembalikan", "Kembalikan item setelah periode rental selesai."],
 ];
+const navigation = [["#katalog", "Koleksi"], ["#cara-kerja", "Cara rental"], ["#harga", "Harga"]];
 
-const categories = [
-  { name: "Anime", icon: "🎌", count: 24 },
-  { name: "Game", icon: "🎮", count: 12 },
-  { name: "Film", icon: "🎬", count: 8 },
-  { name: "Character", icon: "👤", count: 6 },
-  { name: "Wig", icon: "💇", count: 15 },
-  { name: "Props", icon: "⚔️", count: 10 },
-  { name: "Sepatu", icon: "👢", count: 8 },
-  { name: "Senjata Cosplay", icon: "🗡️", count: 7 },
-];
+function Brand() {
+  return <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">cosplay<span>asik.</span></Link>;
+}
 
-const steps = [
-  {
-    number: "01",
-    title: "Jelajahi Katalog",
-    desc: "Temukan kostum dan aksesoris cosplay favoritmu dari koleksi kami yang lengkap.",
-    icon: "🔍",
-  },
-  {
-    number: "02",
-    title: "Pilih & Pesan",
-    desc: "Tentukan tanggal sewa, jumlah, dan ajukan penyewaan dengan mudah.",
-    icon: "📝",
-  },
-  {
-    number: "03",
-    title: "Tunggu Approval",
-    desc: "Pemilik toko akan me-review dan menyetujui pengajuan rental kamu.",
-    icon: "✅",
-  },
-  {
-    number: "04",
-    title: "Cosplay & Return",
-    desc: "Tampil maksimal! Kembalikan setelah selesai dan berikan feedback.",
-    icon: "🎭",
-  },
-];
+// Replace only this specimen with a real portrait image; retain the adjacent caption.
+function Specimen({ item }) {
+  return (
+    <div className={styles.specimen} aria-hidden="true">
+      <span className={styles.specimenIndex}>{String(item.id).padStart(2, "0")}</span>
+      <span className={styles.specimenName}>{item.name}</span>
+      <span className={styles.photoNote}>Foto menyusul</span>
+    </div>
+  );
+}
 
-const testimonials = [
-  {
-    id: 1,
-    name: "AniKun",
-    message:
-      "Costume-nya masih bagus dan proses rental juga cukup mudah. Terima kasih!",
-    costume: "Costume Gojo Satoru",
-  },
-  {
-    id: 2,
-    name: "CosplayQueen",
-    message:
-      "Wig-nya super halus, warnanya sesuai foto. Pasti sewa lagi!",
-    costume: "Wig Rem (Blue)",
-  },
-  {
-    id: 3,
-    name: "DemonSlayerFan",
-    message:
-      "Props-nya detail banget, semua teman cosplay saya kagum. Recommended!",
-    costume: "Props Nichirin Sword",
-  },
-];
-
-const stats = [
-  { value: "500+", label: "Kostum & Aksesoris" },
-  { value: "1.200+", label: "Rental Selesai" },
-  { value: "98%", label: "Pelanggan Puas" },
-  { value: "24jam", label: "Proses Approval" },
-];
-
-/* ═══════════════════════════════════════════
-   LANDING PAGE
-   ═══════════════════════════════════════════ */
 export default function LandingPage() {
+  const [category, setCategory] = useState("Semua");
+  const menu = useRef(null);
+  const visibleProducts = products.filter((item) => category === "Semua" || item.category === category);
+
+  function closeMenu() {
+    if (menu.current) menu.current.open = false;
+  }
+
   return (
     <div className={styles.page}>
-      {/* ═══ NAVIGATION ═══ */}
-      <nav className={styles.navbar}>
-        <div className={styles.navInner}>
-          <a href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>🎭</span>
-            <span className={styles.logoText}>COSPLAY ASIK</span>
-          </a>
-
-          <div className={styles.navLinks}>
-            <a href="#katalog" className={styles.navLink}>
-              Katalog
-            </a>
-            <a href="#cara-kerja" className={styles.navLink}>
-              Cara Kerja
-            </a>
-            <a href="#kategori" className={styles.navLink}>
-              Kategori
-            </a>
-            <a href="#testimoni" className={styles.navLink}>
-              Testimoni
-            </a>
-          </div>
-
-          <div className={styles.navActions}>
-            <a href="#" className={styles.btnGhost}>
-              Masuk
-            </a>
-            <a href="#" className={styles.btnPrimary}>
-              Daftar Sekarang
-              <span className={styles.btnArrow}>→</span>
-            </a>
-          </div>
+      <a href="#main" className={styles.skipLink}>Lewati navigasi</a>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <Brand />
+          <nav className={styles.desktopNav} aria-label="Navigasi utama">
+            {navigation.map(([href, label]) => <a href={href} key={href}>{label}</a>)}
+          </nav>
+          <Link href="/dashboard" className={styles.accountLink}>Lihat dashboard <span>demo</span></Link>
+          <details ref={menu} className={styles.mobileMenu} onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+          }} onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              closeMenu();
+              menu.current?.querySelector("summary")?.focus();
+            }
+          }}>
+            <summary>Menu <span aria-hidden="true">+</span></summary>
+            <nav aria-label="Navigasi seluler" onClick={closeMenu}>
+              {navigation.map(([href, label]) => <a href={href} key={href}>{label}<span aria-hidden="true">↗</span></a>)}
+              <Link href="/dashboard">Lihat dashboard demo <span aria-hidden="true">↗</span></Link>
+            </nav>
+          </details>
         </div>
-      </nav>
+      </header>
 
-      {/* ═══ HERO ═══ */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>◂ RENTAL COSPLAY TERPERCAYA ▸</p>
-          <h1 className={styles.heroTitle}>
-            SEWA KOSTUM
-            <br />
-            <span className={styles.heroTitleAccent}>(JADI KARAKTER)</span>
-          </h1>
-          <p className={styles.heroDesc}>
-            Wujudkan karakter anime, game, dan film favoritmu. Koleksi lengkap,
-            harga terjangkau, proses mudah.
-          </p>
-          <div className={styles.heroCtas}>
-            <a href="#katalog" className={styles.btnPrimary}>
-              Jelajahi Katalog
-              <span className={styles.btnArrow}>→</span>
-            </a>
-            <a href="#cara-kerja" className={styles.btnGhost}>
-              <span className={styles.btnPinIcon}>▶</span>
-              Cara Kerja
-            </a>
+      <main id="main" tabIndex={-1}>
+        <section className={styles.hero} aria-labelledby="hero-title">
+          <div>
+            <p className={styles.eyebrow}>Ruang ganti karakter</p>
+            <h1 id="hero-title">Karakter pilihanmu.<br /><span>Giliranmu<br className={styles.desktopBreak} /> memakainya.</span></h1>
+            <p className={styles.heroDescription}>Sewa kostum &amp; aksesori cosplay per hari.</p>
+            <a href="#katalog" className={styles.primaryAction}>Jelajahi kostum <span aria-hidden="true">↗</span></a>
           </div>
-        </div>
-
-        {/* Hero stats strip */}
-        <div className={styles.heroStats}>
-          {stats.map((s, i) => (
-            <div key={i} className={styles.heroStatItem}>
-              <span className={styles.heroStatValue}>{s.value}</span>
-              <span className={styles.heroStatLabel}>{s.label}</span>
+          <Link href={`/product/${featured.id}`} className={styles.featured}>
+            <div className={styles.featuredMedia}><Specimen item={featured} /></div>
+            <div className={styles.featuredCaption}>
+              <div><span className={styles.eyebrow}>{featured.category}</span><h2>{featured.name}</h2></div>
+              <p><strong>{featured.price}</strong><span> / hari <span aria-hidden="true">↗</span></span></p>
             </div>
-          ))}
-        </div>
-      </section>
+          </Link>
+          <p className={styles.heroFootnote}><span>Kostum. Kamu. Karaktermu.</span><span>Koleksi contoh · foto menyusul</span></p>
+        </section>
 
-      {/* ═══ FEATURED CATALOG ═══ */}
-      <section id="katalog" className={styles.section}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>◂ KOLEKSI TERBAIK ▸</p>
-            <h2 className={styles.sectionTitle}>KOSTUM POPULER</h2>
-            <p className={styles.sectionDesc}>
-              Pilihan kostum dan aksesoris paling diminati oleh para cosplayer
-            </p>
+        <section id="katalog" tabIndex={-1} className={styles.collection} aria-labelledby="collection-title">
+          <div className={styles.collectionHeading}>
+            <h2 id="collection-title">Mau jadi siapa?</h2>
+            <p>Pilih dunianya. Temukan kostumnya.</p>
           </div>
-
-          {/* Filter pills */}
-          <div className={styles.filterPills}>
-            <button className={`${styles.pill} ${styles.pillActive}`}>
-              Semua
-            </button>
-            <button className={styles.pill}>Kostum</button>
-            <button className={styles.pill}>Aksesoris</button>
-            <button className={styles.pill}>Wig</button>
-            <button className={styles.pill}>Props</button>
-          </div>
-
-          {/* Product grid */}
-          <div className={styles.productGrid}>
-            {featuredCostumes.map((item) => (
-              <div key={item.id} className={styles.productCard}>
-                <div className={styles.productImgWrap}>
-                  <span className={styles.productEmoji}>{item.image}</span>
-                  {item.status === "limited" && (
-                    <span className={styles.productBadgeLimited}>
-                      Stok Terbatas
-                    </span>
-                  )}
-                  <span className={styles.productCategory}>{item.category}</span>
-                </div>
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productName}>{item.name}</h3>
-                  <div className={styles.productPriceRow}>
-                    <span className={styles.productPrice}>{item.price}</span>
-                    <span className={styles.productPriceNote}>
-                      {item.priceNote}
-                    </span>
-                  </div>
-                  <div className={styles.productActions}>
-                    <a href="#" className={styles.btnCardPrimary}>
-                      Sewa Sekarang
-                    </a>
-                    <a href="#" className={styles.btnCardGhost}>
-                      Detail
-                    </a>
-                  </div>
-                </div>
-              </div>
+          <div className={styles.categoryIndex} role="group" aria-label="Pilih kategori koleksi">
+            {categories.map((name) => (
+              <button key={name} type="button" aria-pressed={category === name} aria-controls="collection-products" onClick={() => setCategory(name)}>
+                {name}<span>{String(name === "Semua" ? products.length : products.filter((item) => item.category === name).length).padStart(2, "0")}</span>
+              </button>
             ))}
           </div>
-
-          <div className={styles.sectionCta}>
-            <a href="#" className={styles.btnPrimary}>
-              Lihat Semua Koleksi
-              <span className={styles.btnArrow}>→</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section id="cara-kerja" className={styles.sectionAlt}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>◂ MUDAH & CEPAT ▸</p>
-            <h2 className={styles.sectionTitle}>CARA KERJA</h2>
-            <p className={styles.sectionDesc}>
-              Empat langkah mudah untuk tampil sebagai karakter favoritmu
-            </p>
-          </div>
-
-          <div className={styles.stepsGrid}>
-            {steps.map((step, i) => (
-              <div key={i} className={styles.stepCard}>
-                <div className={styles.stepNumber}>{step.number}</div>
-                <span className={styles.stepIcon}>{step.icon}</span>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
-                <p className={styles.stepDesc}>{step.desc}</p>
-                {i < steps.length - 1 && (
-                  <div className={styles.stepConnector}>
-                    <span>→</span>
+          <p className={styles.collectionStatus} role="status" aria-live="polite" aria-atomic="true">{category === "Semua" ? "Seluruh koleksi" : category} <span aria-hidden="true">/</span> {visibleProducts.length} item contoh</p>
+          <ul className={styles.productRack} id="collection-products">
+            {visibleProducts.map((item) => (
+              <li key={item.id}>
+                <Link href={`/product/${item.id}`} className={styles.product}>
+                  <Specimen item={item} />
+                  <div className={styles.productCaption}>
+                    <h3>{item.name}<span className={styles.productArrow} aria-hidden="true">↗</span></h3>
+                    <p className={styles.productCategory}>{item.category}</p>
+                    <p className={styles.price}><strong>{item.price}</strong><span> / hari</span></p>
                   </div>
-                )}
-              </div>
+                </Link>
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
+          </ul>
+          <p className={styles.collectionNote}>Koleksi ini menggunakan data contoh. Buka item untuk melihat detail dan mencoba estimasi rental.</p>
+        </section>
 
-      {/* ═══ CATEGORIES ═══ */}
-      <section id="kategori" className={styles.section}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>◂ JELAJAHI ▸</p>
-            <h2 className={styles.sectionTitle}>KATEGORI</h2>
-            <p className={styles.sectionDesc}>
-              Temukan perlengkapan cosplay berdasarkan kategori
-            </p>
-          </div>
+        <section id="cara-kerja" tabIndex={-1} className={styles.journey} aria-labelledby="journey-title">
+          <div className={styles.journeyIntro}><p className={styles.eyebrow}>Dari pilihan jadi penampilan</p><h2 id="journey-title">Pinjam. Pakai.<br />Jadi karaktermu.</h2><p>Rental membutuhkan akun dan persetujuan pemilik toko.</p></div>
+          <ol className={styles.journeyList}>{journey.map(([title, description], index) => <li key={title}><span className={styles.stepNumber}>{String(index + 1).padStart(2, "0")}</span><div><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
+        </section>
 
-          <div className={styles.categoriesGrid}>
-            {categories.map((cat, i) => (
-              <a key={i} href="#" className={styles.categoryCard}>
-                <span className={styles.categoryIcon}>{cat.icon}</span>
-                <span className={styles.categoryName}>{cat.name}</span>
-                <span className={styles.categoryCount}>{cat.count} item</span>
-              </a>
-            ))}
+        <section id="harga" tabIndex={-1} className={styles.pricing} aria-labelledby="price-title">
+          <div><p className={styles.eyebrow}>Sesuai lama kamu memakainya</p><h2 id="price-title">Sewa per hari.<br />Hitung sebelum pilih tanggal.</h2><p>Harga per hari × hari sewa × jumlah item. Tanggal mulai dan selesai ikut dihitung; tanggal yang sama berarti satu hari.</p><a href={`/product/${featured.id}#calculator-title`} className={styles.textLink}>Coba estimasi {featured.name} <span aria-hidden="true">↗</span></a></div>
+          <div className={styles.estimate}>
+            <p className={styles.estimateLabel}>Contoh estimasi <span>01</span></p>
+            <h3>{featured.name}</h3>
+            <p>{featured.price} / hari <span aria-hidden="true">×</span> 3 hari <span aria-hidden="true">×</span> 1 item</p>
+            <div className={styles.estimateTotal}><span>Estimasi biaya</span><strong>Rp{new Intl.NumberFormat("id-ID").format(Number(featured.price.replace(/\D/g, "")) * 3)}</strong></div>
+            <p className={styles.estimateNote}>Simulasi biaya, bukan konfirmasi rental. Ketersediaan aktual diperiksa saat pengajuan.</p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ═══ PRICING HIGHLIGHT ═══ */}
-      <section className={styles.sectionAlt}>
-        <div className={styles.sectionInner}>
-          <div className={styles.pricingBanner}>
-            <div className={styles.pricingLeft}>
-              <p className={styles.eyebrow}>◂ HARGA TRANSPARAN ▸</p>
-              <h2 className={styles.pricingTitle}>
-                MULAI DARI
-                <br />
-                <span className={styles.pricingAmount}>RP50.000</span>
-                <span className={styles.pricingUnit}>/ HARI</span>
-              </h2>
-              <p className={styles.pricingDesc}>
-                Harga sewa dihitung per hari. Semakin lama sewa, semakin hemat.
-                Tidak ada biaya tersembunyi.
-              </p>
-              <div className={styles.pricingFormula}>
-                <code>Total = Harga/Hari × Jumlah Hari × Jumlah Barang</code>
-              </div>
-            </div>
-            <div className={styles.pricingRight}>
-              <div className={styles.pricingExample}>
-                <p className={styles.pricingExTitle}>Contoh Kalkulasi</p>
-                <div className={styles.pricingExRow}>
-                  <span>Kostum Gojo</span>
-                  <span>Rp100.000/hari</span>
-                </div>
-                <div className={styles.pricingExRow}>
-                  <span>Jumlah</span>
-                  <span>1 pcs</span>
-                </div>
-                <div className={styles.pricingExRow}>
-                  <span>Durasi</span>
-                  <span>3 hari</span>
-                </div>
-                <div className={`${styles.pricingExRow} ${styles.pricingExTotal}`}>
-                  <span>Total</span>
-                  <span>Rp300.000</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        <section className={styles.closing} aria-labelledby="closing-title"><h2 id="closing-title">Sudah tahu<br />ingin jadi siapa?</h2><a href="#katalog" className={styles.primaryAction}>Temukan kostummu <span aria-hidden="true">↗</span></a></section>
+      </main>
 
-      {/* ═══ TESTIMONIALS ═══ */}
-      <section id="testimoni" className={styles.section}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>◂ KATA MEREKA ▸</p>
-            <h2 className={styles.sectionTitle}>TESTIMONI</h2>
-            <p className={styles.sectionDesc}>
-              Cerita dari pelanggan yang sudah menggunakan layanan kami
-            </p>
-          </div>
-
-          <div className={styles.testimonialGrid}>
-            {testimonials.map((t) => (
-              <div key={t.id} className={styles.testimonialCard}>
-                <div className={styles.testimonialQuote}>"</div>
-                <p className={styles.testimonialMsg}>{t.message}</p>
-                <div className={styles.testimonialAuthor}>
-                  <div className={styles.testimonialAvatar}>
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className={styles.testimonialName}>{t.name}</p>
-                    <p className={styles.testimonialCostume}>
-                      Menyewa: {t.costume}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ CTA SECTION ═══ */}
-      <section className={styles.ctaSection}>
-        <div className={styles.sectionInner}>
-          <div className={styles.ctaContent}>
-            <p className={styles.eyebrow}>◂ GABUNG SEKARANG ▸</p>
-            <h2 className={styles.ctaTitle}>
-              SIAP JADI
-              <br />
-              KARAKTER FAVORITMU?
-            </h2>
-            <p className={styles.ctaDesc}>
-              Daftar sekarang dan mulai jelajahi koleksi kostum cosplay terlengkap.
-              Proses mudah, harga terjangkau.
-            </p>
-            <div className={styles.ctaButtons}>
-              <a href="#" className={styles.btnPrimaryLg}>
-                Daftar Gratis
-                <span className={styles.btnArrow}>→</span>
-              </a>
-              <a href="#katalog" className={styles.btnGhostLg}>
-                Lihat Katalog
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ FOOTER ═══ */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.footerBrand}>
-            <div className={styles.footerLogo}>
-              <span>🎭</span>
-              <span className={styles.footerLogoText}>COSPLAY ASIK</span>
-            </div>
-            <p className={styles.footerTagline}>
-              Sistem penyewaan kostum dan aksesoris cosplay terpercaya.
-            </p>
-          </div>
-
-          <div className={styles.footerLinks}>
-            <div className={styles.footerCol}>
-              <h4 className={styles.footerColTitle}>LAYANAN</h4>
-              <a href="#">Katalog Kostum</a>
-              <a href="#">Aksesoris</a>
-              <a href="#">Paket Bundling</a>
-              <a href="#">Custom Order</a>
-            </div>
-            <div className={styles.footerCol}>
-              <h4 className={styles.footerColTitle}>BANTUAN</h4>
-              <a href="#">Cara Sewa</a>
-              <a href="#">FAQ</a>
-              <a href="#">Syarat & Ketentuan</a>
-              <a href="#">Kontak Kami</a>
-            </div>
-            <div className={styles.footerCol}>
-              <h4 className={styles.footerColTitle}>IKUTI KAMI</h4>
-              <a href="#">Instagram</a>
-              <a href="#">Twitter / X</a>
-              <a href="#">TikTok</a>
-              <a href="#">Discord</a>
-            </div>
-          </div>
-
-          <div className={styles.footerBottom}>
-            <p>© 2026 Cosplay Asik. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <footer className={styles.footer}><div><Brand /><p>Sewa kostum &amp; aksesori cosplay per hari.</p></div><nav aria-label="Navigasi footer">{navigation.map(([href, label]) => <a href={href} key={href}>{label}</a>)}<Link href="/dashboard">Lihat dashboard demo</Link></nav><p className={styles.copyright}>© 2026 Cosplay Asik</p></footer>
     </div>
   );
 }
