@@ -1,0 +1,247 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page :is(a, button, input):focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 5px;
+}
+
+.skipLink {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 50;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.skipLink:focus {
+  top: 12px;
+}
+
+.header {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerInner {
+  width: min(100%, 1280px);
+  min-height: 76px;
+  margin-inline: auto;
+  padding-inline: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.brand span {
+  color: var(--color-accent);
+}
+
+.backLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.backLink:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.shell {
+  width: min(100%, 1120px);
+  margin-inline: auto;
+  padding: 84px 40px 96px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+  gap: 80px;
+  align-items: start;
+}
+
+.intro {
+  max-width: 560px;
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.intro h1 {
+  max-width: 9ch;
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-size: clamp(44px, 6vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 1.04;
+}
+
+.description {
+  max-width: 340px;
+  margin-top: 26px;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.formPanel {
+  padding: 28px 0 0 28px;
+  border-top: 1px solid var(--color-border);
+  border-left: 2px solid var(--color-accent);
+}
+
+.form {
+  display: grid;
+  gap: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.field input:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.error {
+  padding: 12px 14px;
+  border-left: 2px solid var(--color-accent);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.submit {
+  min-height: 48px;
+  padding: 14px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--color-accent);
+  color: var(--color-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--motion-fast) ease;
+}
+
+.submit:hover {
+  background: #813020;
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.formNote {
+  margin-top: 20px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+  .headerInner {
+    padding-inline: 24px;
+  }
+
+  .shell {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 56px 24px 72px;
+  }
+
+  .intro h1 {
+    max-width: 11ch;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerInner {
+    min-height: 64px;
+    padding-inline: 20px;
+  }
+
+  .brand {
+    font-size: 24px;
+  }
+
+  .backLink {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .shell {
+    gap: 36px;
+    padding: 40px 20px 56px;
+  }
+
+  .intro h1 {
+    margin-top: 14px;
+    font-size: clamp(38px, 11vw, 54px);
+  }
+
+  .description {
+    margin-top: 18px;
+  }
+
+  .formPanel {
+    padding: 22px 0 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page * {
+    transition: none !important;
+  }
+}

@@ -1,45 +1,67 @@
-// app/actions/auth.js
-'use server';
+"use server";
 
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const PROJECT = process.env.NEXT_PUBLIC_PROJECT_ID;
+import { AuthServiceError, login, logout } from "../../lib/auth.js";
 
-export async function loginAction(formData) {
-  const email = formData.get('email');
-  const password = formData.get('password');
+const SESSION_COOKIE = "session_token";
+const LEGACY_PROFILE_COOKIE = "user_profile";
 
-  const res = await fetch(`${BASE_URL}/${PROJECT}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-    cache: 'no-store',
-  });
+function getLoginErrorMessage(error) {
+  if (error instanceof AuthServiceError && error.code === "AUTH_SERVICE_UNAVAILABLE") {
+    return "Layanan autentikasi sedang tidak tersedia. Coba lagi nanti.";
+  }
 
-  const data = await res.json();
-  if (!res.ok || !data.success || !data.token) {
-    return { error: data.message || 'Login gagal.' };
+  return "Email atau password tidak sesuai.";
+}
+
+function getSessionCookieOptions(expiresIn) {
+  const options = {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  if (Number.isInteger(expiresIn) && expiresIn > 0) {
+    options.maxAge = expiresIn;
+  }
+
+  return options;
+}
+
+export async function loginAction(_previousState, formData) {
+  const emailValue = formData?.get("email");
+  const passwordValue = formData?.get("password");
+  const email = typeof emailValue === "string" ? emailValue : "";
+  const password = typeof passwordValue === "string" ? passwordValue : "";
+
+  let session;
+
+  try {
+    session = await login(email, password);
+  } catch (error) {
+    return { error: getLoginErrorMessage(error) };
   }
 
   const cookieStore = await cookies();
-  cookieStore.set('session_token', data.token, {
-    httpOnly: true,
-    maxAge: 60 * 60 * 24 * 7,
-    path: '/',
-  });
-  cookieStore.set('user_profile', JSON.stringify(data.user), {
-    maxAge: 60 * 60 * 24 * 7,
-    path: '/',
-  });
+  cookieStore.delete(LEGACY_PROFILE_COOKIE);
+  cookieStore.set(SESSION_COOKIE, session.token, getSessionCookieOptions(session.expiresIn));
 
-  redirect('/dashboard');
+  redirect("/dashboard");
 }
 
 export async function logoutAction() {
+  try {
+    await logout();
+  } catch {
+    // Local session cleanup must still happen when remote logout is unavailable.
+  }
+
   const cookieStore = await cookies();
-  cookieStore.delete('session_token');
-  cookieStore.delete('user_profile');
-  redirect('/login');
+  cookieStore.delete(SESSION_COOKIE);
+  cookieStore.delete(LEGACY_PROFILE_COOKIE);
+
+  redirect("/login");
 }
