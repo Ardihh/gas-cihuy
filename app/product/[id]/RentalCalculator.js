@@ -2,16 +2,13 @@
 
 import { useState } from "react";
 
+import { formatRupiah } from "../../../lib/format-currency.mjs";
 import {
   calculateEstimatedTotal,
   calculateInclusiveRentalDays,
   parseQuantity,
 } from "../../../lib/rental-calculation.mjs";
 import styles from "./page.module.css";
-
-function formatRupiah(value) {
-  return `Rp${new Intl.NumberFormat("id-ID").format(value)}`;
-}
 
 export default function RentalCalculator({ priceLabel, pricePerDay }) {
   const [startDate, setStartDate] = useState("");
