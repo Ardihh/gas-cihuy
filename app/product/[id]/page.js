@@ -178,7 +178,11 @@ export default async function ProductPage({ params }) {
           </div>
         </div>
 
-        <RentalCalculator priceLabel={priceLabel} pricePerDay={product.pricePerDay} />
+        <RentalCalculator
+          itemId={product.id}
+          priceLabel={priceLabel}
+          pricePerDay={product.pricePerDay}
+        />
 
         <aside className={styles.accessNote} aria-label="Langkah setelah estimasi">
           <p className={styles.sectionLabel}>Setelah estimasi</p>

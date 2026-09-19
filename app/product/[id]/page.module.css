@@ -588,6 +588,121 @@
   padding-top: 12px;
 }
 
+.submissionArea {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 16px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  border: 1px solid var(--color-accent);
+  border-radius: 2px;
+  padding: 11px 14px;
+  background: var(--color-accent);
+  color: var(--color-surface);
+  cursor: pointer;
+  font: 700 12px/1.2 var(--font-body);
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease;
+}
+
+.submitButton span {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform var(--motion-fast) ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  border-color: var(--color-text);
+  background: var(--color-text);
+}
+
+.submitButton:hover:not(:disabled) span {
+  transform: translateX(3px);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 5px;
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.submissionHint,
+.submissionError,
+.submissionSuccess {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.submissionHint {
+  color: var(--color-text-muted);
+}
+
+.submissionError,
+.submissionSuccess {
+  grid-column: 1 / -1;
+}
+
+.submissionError {
+  color: var(--danger);
+}
+
+.submissionError a {
+  border-bottom: 1px solid currentColor;
+  color: inherit;
+}
+
+.submissionSuccess {
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+}
+
+.submissionSuccess > p:not(.panelLabel) {
+  margin-top: 7px;
+  color: var(--color-text);
+}
+
+.submissionDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin: 14px 0 0;
+}
+
+.submissionDetails > div {
+  display: grid;
+  gap: 4px;
+}
+
+.submissionDetails dt,
+.submissionDetails dd {
+  margin: 0;
+}
+
+.submissionDetails dt {
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.submissionDetails dd {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .accessNote {
   grid-area: context;
   max-width: 520px;
@@ -798,6 +913,14 @@
 
   .estimateTotal dd {
     font-size: 24px;
+  }
+
+  .submissionArea {
+    grid-template-columns: 1fr;
+  }
+
+  .submissionHint {
+    grid-column: auto;
   }
 
   .accessNote {
