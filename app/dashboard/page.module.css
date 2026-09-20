@@ -118,6 +118,32 @@
   line-height: 1.2;
 }
 
+.logoutForm {
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.logoutButton {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color var(--motion-fast) ease, color var(--motion-fast) ease;
+  white-space: nowrap;
+}
+
+.logoutButton:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .pageInner {
   width: min(calc(100% - 48px), 1120px);
   margin: 0 auto;
@@ -160,7 +186,7 @@
   line-height: 1.55;
 }
 
-.prototypeNote {
+.sessionNote {
   max-width: 420px;
   margin-top: 14px;
   padding-left: 10px;
@@ -385,6 +411,7 @@
 
 .recordIdentity p {
   margin-top: 5px;
+  overflow-wrap: anywhere;
   color: var(--color-text-muted);
   font-size: 11px;
   line-height: 1.3;
@@ -394,6 +421,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  overflow-wrap: anywhere;
   color: var(--color-text);
   font-size: 12px;
   font-weight: 600;
@@ -549,6 +577,26 @@
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font-size: 13px;
+}
+
+.serviceState {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 18px 16px;
+  border-left: 2px solid var(--color-status-caution);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.serviceState strong {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .historyBlock {
@@ -806,7 +854,7 @@
     font-size: 14px;
   }
 
-  .prototypeNote {
+  .sessionNote {
     max-width: 290px;
   }
 
