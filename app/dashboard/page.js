@@ -40,7 +40,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      currentUser={currentUser.user}
+      currentUserName={currentUser.user.name}
       rentalState={rentalState}
       rentals={rentals}
       reviewState={reviewState}

@@ -355,16 +355,6 @@
   color: var(--accent-dark);
 }
 
-.successMessage {
-  margin: 18px 0 0;
-  padding: 10px 12px;
-  border-left: 2px solid var(--color-status-positive);
-  background: var(--color-surface-muted);
-  color: var(--color-status-positive);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 .recordList {
   list-style: none;
   margin: 0;

@@ -197,7 +197,7 @@ function RentalRecordList({ records, ...recordProps }) {
 }
 
 export default function DashboardClient({
-  currentUser,
+  currentUserName,
   rentalState,
   rentals,
   reviewState = "ready",
@@ -271,10 +271,10 @@ export default function DashboardClient({
 
           <div className={styles.customerIdentity}>
             <span className={styles.customerMark} aria-hidden="true">
-              {getUserInitials(currentUser.name)}
+              {getUserInitials(currentUserName)}
             </span>
             <span className={styles.customerDetails}>
-              <strong>{currentUser.name}</strong>
+              <strong>{currentUserName}</strong>
               <span>Pelanggan</span>
             </span>
             <form className={styles.logoutForm} action={logoutAction}>
@@ -290,7 +290,7 @@ export default function DashboardClient({
         <header className={styles.pageIntro} id="dashboard">
           <div>
             <p className={styles.eyebrow}>Meja rental</p>
-            <h1>Rental kamu, {currentUser.name}.</h1>
+            <h1>Rental kamu, {currentUserName}.</h1>
             <p className={styles.introDescription}>
               Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
             </p>
