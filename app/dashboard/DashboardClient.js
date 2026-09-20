@@ -294,9 +294,6 @@ export default function DashboardClient({
             <p className={styles.introDescription}>
               Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
             </p>
-            <p className={styles.sessionNote}>
-              Data rental dan feedback berasal dari layanan live.
-            </p>
           </div>
           <Link className={styles.catalogLink} href="/#katalog">
             Lihat koleksi <span aria-hidden="true">↗</span>
@@ -399,6 +396,8 @@ export default function DashboardClient({
                 <p className={styles.emptyState} role="status">
                   {counts.total === 0
                     ? "Belum ada pengajuan sewa."
+                    : activeFilter === "Semua" && historyRentals.length > 0
+                      ? "Belum ada rental aktif. Lihat riwayat terbaru di bawah."
                     : "Belum ada rental yang sesuai filter ini."}
                 </p>
               )}

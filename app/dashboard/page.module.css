@@ -374,7 +374,8 @@
 
 .recordGrid {
   display: grid;
-  grid-template-columns: minmax(260px, 2.1fr) minmax(190px, 1.2fr) minmax(180px, 1.1fr) minmax(150px, 0.9fr) minmax(150px, auto);
+  grid-template-columns: minmax(260px, 2.1fr) minmax(190px, 1.2fr) minmax(180px, 1.1fr) minmax(150px, 0.9fr) minmax(150px, 1fr);
+  grid-template-areas: "identity status date price action";
   align-items: center;
   gap: 12px 24px;
   min-width: 0;
@@ -387,6 +388,22 @@
 .recordPrice,
 .recordAction {
   min-width: 0;
+}
+
+.recordIdentity {
+  grid-area: identity;
+}
+
+.recordStatus {
+  grid-area: status;
+}
+
+.recordDate {
+  grid-area: date;
+}
+
+.recordPrice {
+  grid-area: price;
 }
 
 .recordIdentity h3 {
@@ -465,11 +482,12 @@
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .recordAction {
-  justify-self: end;
+  grid-area: action;
+  justify-self: start;
 }
 
 .feedbackButton,
@@ -743,18 +761,19 @@
   }
 
   .recordGrid {
-    grid-template-columns: minmax(220px, 1.65fr) minmax(150px, 1fr) minmax(170px, 1.15fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-areas:
+      "identity status"
+      "date price"
+      "action action";
+    align-items: start;
     gap: 10px 20px;
   }
 
+  .recordStatus,
   .recordPrice {
-    grid-column: 1;
-  }
-
-  .recordAction {
-    grid-column: 2 / -1;
-    grid-row: 2;
-    justify-self: end;
+    justify-self: start;
+    text-align: left;
   }
 }
 
@@ -842,39 +861,34 @@
   }
 
   .recordGrid {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "identity"
+      "status"
+      "date"
+      "price"
+      "action";
+    align-items: start;
     gap: 12px;
     padding: 16px 0;
   }
 
-  .recordIdentity {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
   .recordStatus {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
-    max-width: 140px;
-    text-align: right;
+    justify-self: start;
+    max-width: none;
+    text-align: left;
   }
 
   .recordDate {
-    grid-column: 1;
-    grid-row: 2;
+    justify-self: start;
   }
 
   .recordPrice {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
-    text-align: right;
+    justify-self: start;
+    text-align: left;
   }
 
   .recordAction {
-    grid-column: 1 / -1;
-    grid-row: 3;
     justify-self: start;
   }
 
