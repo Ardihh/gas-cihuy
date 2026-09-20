@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { getCatalogItem } from "../../../lib/catalog.js";
 import { formatRupiah } from "../../../lib/format-currency.mjs";
+import CatalogImage from "../../CatalogImage";
 import RentalCalculator from "./RentalCalculator";
 import styles from "./page.module.css";
 
@@ -160,16 +161,20 @@ export default async function ProductPage({ params }) {
               <span>Ruang ganti / {productIndex}</span>
               <span>{product.category}</span>
             </div>
-            <div
-              className={styles.mediaVisual}
-              role="img"
-              aria-label={`Area spesimen untuk ${product.name}; foto produk belum tersedia`}
-            >
+            <div className={styles.mediaVisual}>
+              <CatalogImage
+                alt={`Foto produk ${product.name}`}
+                className={styles.catalogImage}
+                fallbackClassName={styles.mediaNote}
+                fallbackLabel="Foto menyusul"
+                priority
+                sizes="(max-width: 900px) min(100vw - 40px, 600px), 46vw"
+                src={product.imageUrl}
+              />
               <div className={styles.mediaSpecimen}>
                 <p className={styles.mediaName}>{product.name}</p>
                 <span className={styles.mediaCategory}>{product.category}</span>
               </div>
-              <span className={styles.mediaNote}>Foto menyusul</span>
             </div>
             <div className={styles.mediaFooter}>
               <span>Specimen placeholder</span>

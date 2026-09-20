@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { formatRupiah } from "../lib/format-currency.mjs";
+import CatalogImage from "./CatalogImage";
 import styles from "./page.module.css";
 
 const categories = ["Semua", "Anime", "Game", "Aksesoris"];
@@ -20,13 +21,21 @@ function Brand() {
   return <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">cosplay<span>asik.</span></Link>;
 }
 
-// Keep the specimen fallback until a real product image can be rendered safely.
-function Specimen({ item }) {
+// Render verified catalog images while keeping the specimen fallback available.
+function Specimen({ item, priority = false, sizes }) {
   return (
     <div className={styles.specimen} aria-hidden="true">
+      <CatalogImage
+        alt=""
+        fallbackClassName={styles.photoNote}
+        fallbackLabel="Foto menyusul"
+        priority={priority}
+        sizes={sizes}
+        src={item.imageUrl}
+        className={styles.catalogImage}
+      />
       <span className={styles.specimenIndex}>{String(item.id).padStart(2, "0")}</span>
       <span className={styles.specimenName}>{item.name}</span>
-      <span className={styles.photoNote}>Foto menyusul</span>
     </div>
   );
 }
@@ -103,7 +112,13 @@ export default function LandingClient({ products = [], catalogState = "ready" })
           </div>
           {featured ? (
             <Link href={`/product/${featured.id}`} className={styles.featured}>
-              <div className={styles.featuredMedia}><Specimen item={featured} /></div>
+              <div className={styles.featuredMedia}>
+                <Specimen
+                  item={featured}
+                  priority
+                  sizes="(max-width: 720px) 100vw, 315px"
+                />
+              </div>
               <div className={styles.featuredCaption}>
                 <div><span className={styles.eyebrow}>{featured.category}</span><h2>{featured.name}</h2></div>
                 <p><strong>{formatRupiah(featured.pricePerDay)}</strong><span> / hari <span aria-hidden="true">↗</span></span></p>
@@ -134,7 +149,10 @@ export default function LandingClient({ products = [], catalogState = "ready" })
                 {visibleProducts.map((item) => (
                   <li key={item.id}>
                     <Link href={`/product/${item.id}`} className={styles.product}>
-                      <Specimen item={item} />
+                      <Specimen
+                        item={item}
+                        sizes="(max-width: 720px) 50vw, (max-width: 1100px) 30vw, 220px"
+                      />
                       <div className={styles.productCaption}>
                         <h3>{item.name}<span className={styles.productArrow} aria-hidden="true">↗</span></h3>
                         <p className={styles.productCategory}>{item.category}</p>
