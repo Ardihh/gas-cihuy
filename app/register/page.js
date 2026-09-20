@@ -2,23 +2,20 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "../../lib/auth.js";
-import LoginForm from "./LoginForm";
-import styles from "./page.module.css";
+import RegisterForm from "./RegisterForm";
+import styles from "../login/page.module.css";
 
-export default async function LoginPage({ searchParams }) {
+export default async function RegisterPage() {
   const currentUser = await getCurrentUser();
 
   if (currentUser.status === "authenticated") {
     redirect("/dashboard");
   }
 
-  const resolvedSearchParams = searchParams ? await searchParams : {};
-  const registrationComplete = resolvedSearchParams?.registered === "1";
-
   return (
     <main className={styles.page}>
-      <a className={styles.skipLink} href="#login-title">
-        Lewati ke form masuk
+      <a className={styles.skipLink} href="#register-title">
+        Lewati ke form pendaftaran
       </a>
 
       <header className={styles.header}>
@@ -32,24 +29,19 @@ export default async function LoginPage({ searchParams }) {
         </div>
       </header>
 
-      <section className={styles.shell} aria-labelledby="login-title">
+      <section className={styles.shell} aria-labelledby="register-title">
         <div className={styles.intro}>
           <p className={styles.eyebrow}>Meja rental</p>
-          <h1 id="login-title">Masuk untuk melihat rental kamu.</h1>
+          <h1 id="register-title">Buat akun untuk mulai menyewa.</h1>
           <p className={styles.description}>
-            Gunakan akunmu untuk memantau pengajuan, jadwal, dan langkah berikutnya.
+            Daftar untuk mengajukan rental dan memantau jadwal kostum pilihanmu.
           </p>
         </div>
 
         <div className={styles.formPanel}>
-          <LoginForm />
-          {registrationComplete && (
-            <p className={styles.success} role="status">
-              Registrasi berhasil. Silakan masuk.
-            </p>
-          )}
+          <RegisterForm />
           <p className={styles.formNote}>
-            Belum punya akun? <Link href="/register">Daftar</Link>
+            Sudah punya akun? <Link href="/login">Masuk</Link>
           </p>
         </div>
       </section>

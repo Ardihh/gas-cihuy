@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { AuthServiceError, login, logout } from "../../lib/auth.js";
+import { AuthServiceError, login, logout, registerUser } from "../../lib/auth.js";
 
 const SESSION_COOKIE = "session_token";
 const LEGACY_PROFILE_COOKIE = "user_profile";
@@ -14,6 +14,23 @@ function getLoginErrorMessage(error) {
   }
 
   return "Email atau password tidak sesuai.";
+}
+
+function getRegistrationErrorMessage(error) {
+  if (error instanceof AuthServiceError && error.code === "REGISTRATION_INVALID_INPUT") {
+    return "Periksa kembali nama, email, dan password yang kamu masukkan.";
+  }
+
+  if (error instanceof AuthServiceError && error.code === "AUTH_SERVICE_UNAVAILABLE") {
+    return "Layanan pendaftaran sedang tidak tersedia. Coba lagi nanti.";
+  }
+
+  return "Pendaftaran belum berhasil. Coba lagi.";
+}
+
+function readFormValue(formData, field) {
+  const value = formData?.get(field);
+  return typeof value === "string" ? value : "";
 }
 
 function getSessionCookieOptions(expiresIn) {
@@ -50,6 +67,26 @@ export async function loginAction(_previousState, formData) {
   cookieStore.set(SESSION_COOKIE, session.token, getSessionCookieOptions(session.expiresIn));
 
   redirect("/dashboard");
+}
+
+export async function registerAction(_previousState, formData) {
+  const input = {
+    name: readFormValue(formData, "name"),
+    email: readFormValue(formData, "email"),
+    password: readFormValue(formData, "password"),
+    phone: readFormValue(formData, "phone"),
+  };
+
+  try {
+    await registerUser(input);
+  } catch (error) {
+    return {
+      status: "error",
+      error: getRegistrationErrorMessage(error),
+    };
+  }
+
+  redirect("/login?registered=1");
 }
 
 export async function logoutAction() {
