@@ -5,7 +5,9 @@ import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
 import { getRentals } from "../../lib/rentals.js";
 import {
   ReviewAuthorizationError,
+  ReviewDuplicateError,
   createReview,
+  getReviews,
 } from "../../lib/reviews.js";
 import { ReviewInputError, validateReviewInput } from "../../lib/review-adapter.mjs";
 
@@ -69,6 +71,13 @@ function mapReviewRequestError(error) {
     return serviceUnavailableState();
   }
 
+  if (error instanceof ReviewDuplicateError) {
+    return {
+      status: "request_error",
+      error: "Feedback untuk rental ini sudah tersimpan.",
+    };
+  }
+
   return serviceUnavailableState();
 }
 
@@ -107,9 +116,10 @@ export async function createReviewAction(_previousState, formData) {
   }
 
   let rentals;
+  let reviews;
 
   try {
-    rentals = await getRentals();
+    [rentals, reviews] = await Promise.all([getRentals(), getReviews()]);
   } catch (error) {
     return mapReviewRequestError(error);
   }
@@ -118,6 +128,7 @@ export async function createReviewAction(_previousState, formData) {
     await createReview({
       currentUser,
       rentals,
+      reviews,
       input: normalizedInput,
     });
 

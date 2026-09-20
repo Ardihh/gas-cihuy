@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { logoutAction } from "../actions/auth.js";
+import { createReviewAction } from "../actions/reviews.js";
 import { formatRupiah } from "../../lib/format-currency.mjs";
+import { getReviewPresentation } from "../../lib/review-adapter.mjs";
 import {
   RENTAL_FILTERS,
   deriveRentalCounts,
   formatRentalPeriod,
   getAttentionGroups,
   getRentalStatusLabel,
-  isFeedbackEligible,
   isHistoryRental,
   matchesRentalFilter,
 } from "../../lib/rental-presentation.mjs";
@@ -27,6 +29,9 @@ const statusStyles = {
   cancelled: styles.statusCompleted,
 };
 
+const REVIEW_RATINGS = [1, 2, 3, 4, 5];
+const initialReviewState = { status: "idle", error: "" };
+
 function getUserInitials(name) {
   return name
     .trim()
@@ -37,19 +42,37 @@ function getUserInitials(name) {
     .toUpperCase();
 }
 
-function FeedbackForm({ rental, feedbackText, onChange, onSubmit }) {
+function FeedbackForm({ rental, action, actionState, pending }) {
   return (
     <div className={styles.feedbackForm} id={`feedback-form-${rental.id}`}>
       <p className={styles.formEyebrow}>Feedback untuk</p>
       <h4 id={`feedback-title-${rental.id}`}>{rental.itemName}</h4>
       <p className={styles.feedbackNote} id={`feedback-note-${rental.id}`}>
-        Feedback hanya tersimpan selama sesi demo ini.
+        Bagikan pengalamanmu agar tersimpan di akunmu.
       </p>
       <form
-        onSubmit={onSubmit}
+        action={action}
         aria-labelledby={`feedback-title-${rental.id}`}
-        aria-describedby={`feedback-note-${rental.id}`}
+        aria-describedby={actionState?.error ? `feedback-error-${rental.id} feedback-note-${rental.id}` : `feedback-note-${rental.id}`}
+        aria-busy={pending}
       >
+        <input name="rentalId" type="hidden" value={rental.id} />
+        <fieldset className={styles.ratingFieldset}>
+          <legend className={styles.formLabel}>Rating</legend>
+          <div className={styles.ratingOptions}>
+            {REVIEW_RATINGS.map((rating) => (
+              <label className={styles.ratingOption} key={rating}>
+                <input
+                  name="rating"
+                  required={rating === 1}
+                  type="radio"
+                  value={rating}
+                />
+                <span>{rating}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <label className={styles.formLabel} htmlFor={`feedback-text-${rental.id}`}>
           Ceritakan pengalamanmu
         </label>
@@ -57,16 +80,20 @@ function FeedbackForm({ rental, feedbackText, onChange, onSubmit }) {
           className={styles.textarea}
           id={`feedback-text-${rental.id}`}
           maxLength={500}
-          onChange={onChange}
+          name="comment"
           placeholder="Contoh: Costume-nya masih bagus dan proses rental juga mudah..."
           required
           rows={4}
-          value={feedbackText}
         />
+        {actionState?.error && (
+          <p className={styles.errorMessage} id={`feedback-error-${rental.id}`} role="alert">
+            {actionState.error}
+          </p>
+        )}
         <div className={styles.formFooter}>
-          <span>{feedbackText.length}/500</span>
-          <button className={styles.submitButton} type="submit">
-            Simpan feedback →
+          <span>Maksimal 500 karakter</span>
+          <button className={styles.submitButton} disabled={pending} type="submit">
+            {pending ? "Menyimpan…" : "Simpan feedback →"}
           </button>
         </div>
       </form>
@@ -74,18 +101,31 @@ function FeedbackForm({ rental, feedbackText, onChange, onSubmit }) {
   );
 }
 
+function PersistedReview({ review }) {
+  return (
+    <div className={styles.persistedReview} aria-label="Feedback tersimpan">
+      <span className={styles.feedbackDone}>Feedback tersimpan</span>
+      <span className={styles.persistedRating}>Rating {review.rating} dari 5</span>
+      {review.comment && <p>{review.comment}</p>}
+    </div>
+  );
+}
+
 function RentalRecord({
   rental,
   selectedRentalId,
-  sentFeedback,
+  reviews,
+  reviewState,
+  reviewActionState,
+  reviewAction,
+  reviewPending,
   onChooseFeedback,
-  feedbackText,
-  onFeedbackChange,
-  onFeedbackSubmit,
 }) {
+  const reviewPresentation = getReviewPresentation(rental, reviews, reviewState);
   const selected = selectedRentalId === rental.id;
-  const hasFeedback = sentFeedback.includes(rental.id);
-  const feedbackAvailable = isFeedbackEligible(rental);
+  const feedbackAvailable = reviewPresentation.status !== "ineligible";
+  const persistedReview = reviewPresentation.review;
+  const feedbackReady = reviewPresentation.status === "available";
 
   return (
     <li className={`${styles.record} ${selected ? styles.recordSelected : ""}`}>
@@ -115,8 +155,10 @@ function RentalRecord({
 
         {feedbackAvailable && (
           <div className={styles.recordAction}>
-            {hasFeedback ? (
-              <span className={styles.feedbackDone}>Feedback tercatat di sesi ini</span>
+            {persistedReview ? (
+              <PersistedReview review={persistedReview} />
+            ) : !feedbackReady ? (
+              <span className={styles.feedbackUnavailable}>Feedback belum dapat dimuat</span>
             ) : (
               <button
                 className={styles.feedbackButton}
@@ -132,12 +174,12 @@ function RentalRecord({
         )}
       </div>
 
-      {selected && (
+      {selected && feedbackAvailable && feedbackReady && !persistedReview && (
         <FeedbackForm
           rental={rental}
-          feedbackText={feedbackText}
-          onChange={onFeedbackChange}
-          onSubmit={onFeedbackSubmit}
+          action={reviewAction}
+          actionState={reviewActionState}
+          pending={reviewPending}
         />
       )}
     </li>
@@ -154,12 +196,26 @@ function RentalRecordList({ records, ...recordProps }) {
   );
 }
 
-export default function DashboardClient({ currentUser, rentalState, rentals }) {
+export default function DashboardClient({
+  currentUser,
+  rentalState,
+  rentals,
+  reviewState = "ready",
+  reviews = [],
+}) {
+  const router = useRouter();
+  const [reviewActionState, reviewAction, reviewPending] = useActionState(
+    createReviewAction,
+    initialReviewState,
+  );
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [selectedRentalId, setSelectedRentalId] = useState(null);
-  const [feedbackText, setFeedbackText] = useState("");
-  const [sentFeedback, setSentFeedback] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (reviewActionState?.status === "success") {
+      router.refresh();
+    }
+  }, [reviewActionState?.status, router]);
 
   const filteredRentals = rentals.filter((rental) =>
     matchesRentalFilter(rental, activeFilter),
@@ -173,32 +229,20 @@ export default function DashboardClient({ currentUser, rentalState, rentals }) {
   function chooseFeedback(rentalId) {
     if (selectedRentalId === rentalId) {
       setSelectedRentalId(null);
-      setFeedbackText("");
       return;
     }
 
     setSelectedRentalId(rentalId);
-    setFeedbackText("");
-    setSuccessMessage("");
-  }
-
-  function submitFeedback(event) {
-    event.preventDefault();
-    if (!feedbackText.trim() || !selectedRentalId) return;
-
-    setSentFeedback((current) => [...current, selectedRentalId]);
-    setSelectedRentalId(null);
-    setFeedbackText("");
-    setSuccessMessage("Feedback tersimpan di sesi demo ini.");
   }
 
   const recordProps = {
     selectedRentalId,
-    sentFeedback,
+    reviews,
+    reviewState,
+    reviewActionState: selectedRentalId === null ? initialReviewState : reviewActionState,
+    reviewAction,
+    reviewPending,
     onChooseFeedback: chooseFeedback,
-    feedbackText,
-    onFeedbackChange: (event) => setFeedbackText(event.target.value),
-    onFeedbackSubmit: submitFeedback,
   };
 
   return (
@@ -251,7 +295,7 @@ export default function DashboardClient({ currentUser, rentalState, rentals }) {
               Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
             </p>
             <p className={styles.sessionNote}>
-              Data rental berasal dari layanan live; feedback hanya tersimpan di sesi ini.
+              Data rental dan feedback berasal dari layanan live.
             </p>
           </div>
           <Link className={styles.catalogLink} href="/#katalog">
@@ -344,12 +388,6 @@ export default function DashboardClient({ currentUser, rentalState, rentals }) {
           {activeFilter === "Aktif" && (
             <p className={styles.filterHint}>
               Aktif menampilkan rental yang sudah disetujui atau sedang disewa.
-            </p>
-          )}
-
-          {successMessage && (
-            <p className={styles.successMessage} aria-live="polite">
-              ✓ {successMessage}
             </p>
           )}
 
