@@ -1,439 +1,287 @@
 # 🎭 Cosplay Asik
 
-> **Cosplay Asik** adalah sistem berbasis web untuk mengelola penyewaan kostum dan aksesoris cosplay.
+Cosplay Asik adalah platform web untuk penyewaan kostum dan aksesoris cosplay. Sistem ini menghubungkan pelanggan dengan operasional penyewaan melalui katalog produk, pengajuan rental, persetujuan, pemantauan status, pengembalian, dan customer feedback.
 
-Sistem ini mempertemukan **pelanggan** yang ingin menyewa perlengkapan cosplay dengan **pemilik toko** yang mengelola koleksi kostum dan aksesoris.
+## 1. Project Overview
 
-## 📌 Tentang Project
+Cosplay Asik membantu pelanggan menemukan kostum karakter, memeriksa detail dan ketersediaan produk, mengajukan penyewaan, serta memantau perjalanan rental sampai selesai. Di sisi operasional, pemilik toko atau admin mengelola katalog, stok, pengajuan rental, progres penyewaan, dan feedback pelanggan.
 
-**Cosplay Asik** dibuat untuk membantu proses penyewaan kostum dan aksesoris cosplay, mulai dari melihat katalog, mengecek ketersediaan barang, melakukan pengajuan penyewaan, hingga proses persetujuan dan pengembalian. Sistem juga menyediakan dashboard bagi pelanggan dan pemilik toko untuk memantau aktivitas penyewaan.
+Aplikasi menggunakan Cosplay API v3 sebagai sumber data dan layanan utama untuk katalog, autentikasi, rental, dan review.
 
-# 👥 Role Pengguna
+## 2. Main Features
 
-Sistem memiliki dua role utama:
+### Catalog Kostum & Aksesoris
 
-### 👤 Pelanggan
+- Menampilkan katalog kostum dan aksesoris cosplay.
+- Menyediakan detail produk, kategori, deskripsi, ukuran, harga per hari, stok, status ketersediaan, dan gambar.
+- Mendukung kategori `Anime`, `Game`, dan `Aksesoris`.
+- Gambar remote menggunakan allowlist host terverifikasi dan fallback saat gambar kosong, tidak valid, atau gagal dimuat.
 
-Pelanggan dapat:
+### Stock Management
 
-* Membuat akun
-* Login
-* Melihat katalog kostum dan aksesoris
-* Melihat detail barang
-* Melihat harga sewa per hari
-* Melihat stok/ketersediaan
-* Mengajukan penyewaan
-* Melihat status penyewaan
-* Melihat riwayat penyewaan
-* Memberikan feedback setelah rental selesai
+- Menjadikan stok dan status ketersediaan sebagai bagian dari informasi utama produk.
+- Menggunakan data stok dari layanan katalog untuk membantu keputusan penyewaan.
+- Menempatkan pengelolaan stok sebagai bagian dari operasional pemilik toko/admin.
 
-### 🏪 Pemilik Toko
+### Rental System
 
-Pemilik toko dapat:
+- Menghitung durasi dan estimasi biaya berdasarkan periode rental.
+- Menerima tanggal mulai, tanggal selesai, dan jumlah item.
+- Mengirim pengajuan rental melalui alur server-side.
+- Menggunakan total harga dari backend sebagai hasil authoritative.
 
-* Login
-* Mengelola profil toko
-* Menambahkan kostum dan aksesoris
-* Mengubah informasi barang
-* Mengatur harga sewa
-* Mengatur stok
-* Melihat daftar penyewaan
-* Menyetujui atau menolak pengajuan rental
-* Mengubah status penyewaan
-* Melihat riwayat rental
-* Melihat feedback pelanggan
+### Approval Rental
 
+Pengajuan rental masuk ke proses operasional untuk ditinjau oleh pemilik toko/admin sebelum rental dilanjutkan ke tahap berikutnya.
 
-# 🚀 Fitur Utama
+### Status Penyewaan
 
-## 🔐 1. Authentication
+Rental memiliki status yang menunjukkan posisi pengajuan dan progres operasional, mulai dari menunggu persetujuan sampai barang dikembalikan.
 
-Pengguna dapat membuat akun dan masuk ke sistem.
+### Dashboard Pelanggan
 
-Data akun meliputi:
+Pelanggan dapat melihat rental miliknya, jumlah rental, status, periode, total harga, riwayat, serta filter berdasarkan kelompok status.
 
-* Nama
-* Email
-* Password
-* Nomor telepon
-* Role pengguna
+### Dashboard Pemilik Toko
 
-Setelah login, pengguna akan diarahkan ke dashboard sesuai role.
+Pemilik toko/admin menggunakan area operasional untuk memantau aktivitas rental, meninjau pengajuan, mengelola progres penyewaan, dan melihat kebutuhan operasional stok.
 
+### Customer Feedback
 
-## 🎭 2. Katalog Kostum & Aksesoris
+Pelanggan dapat memberikan rating dan komentar untuk rental yang telah selesai dikembalikan. Feedback dikaitkan dengan pelanggan, rental, dan item yang disewa.
 
-Pelanggan dapat melihat berbagai perlengkapan cosplay yang tersedia.
+## 3. User Roles
 
-Setiap barang memiliki informasi:
+### Customer
 
-* Nama barang
-* Kategori
-* Foto
-* Deskripsi
-* Harga sewa per hari
-* Stok
-* Status ketersediaan
+- Browse katalog kostum dan aksesoris.
+- Memeriksa detail produk dan ketersediaan.
+- Mengajukan rental.
+- Memantau status dan riwayat rental.
+- Memberikan feedback setelah rental selesai atau dikembalikan.
 
-Contoh kategori:
+### Owner/Admin
+
+- Mengelola produk dan stok.
+- Meninjau pengajuan rental.
+- Menyetujui atau menolak rental.
+- Mengelola progres rental sampai pengembalian.
+- Memantau aktivitas penyewaan.
+- Memeriksa feedback pelanggan.
+
+## 4. Business Flow
+
+Alur utama pelanggan:
 
 ```text
-Kostum
-├── Anime
-├── Game
-├── Film
-└── Character
-
-Aksesoris
-├── Wig
-├── Senjata Cosplay
-├── Sepatu
-├── Props
-└── Aksesoris lainnya
+Customer
+  → Catalog
+  → Product Detail
+  → Rental Submission
+  → Owner Approval
+  → Rental Status Progression
+  → Return
+  → Feedback
 ```
 
+Alur operasional pemilik toko/admin:
 
-## 📦 3. Stock Management
+1. Mengelola data produk, kategori, harga, ukuran, dan stok.
+2. Meninjau pengajuan rental yang masuk.
+3. Menyetujui atau menolak pengajuan sesuai kondisi operasional.
+4. Memantau rental yang sedang berlangsung dan proses pengembalian.
+5. Menggunakan feedback untuk memantau pengalaman pelanggan dan kualitas layanan.
 
-Pemilik toko dapat mengelola jumlah stok setiap barang.
+## 5. Tech Stack
 
-Contoh:
+- Next.js 16.3.4 App Router
+- React 19.2.8
+- JavaScript
+- CSS Modules dan global CSS
+- Webpack development mode
+- Node.js built-in test runner
+- ESLint
+- Cosplay API v3 sebagai backend eksternal
+
+## 6. Design Direction
+
+### Ruang Ganti Karakter
+
+Arah visual Cosplay Asik adalah studio fitting kostum yang kontemporer dengan karakter editorial dan operasional:
+
+- warm white / chalk
+- ink
+- rust accent
+- Outfit Display dan Inter
+- separator tipis dan hierarchy yang mudah dipindai
+- tanpa gradient, glow, glassmorphism, atau purple SaaS styling
+
+## 7. Architecture
+
+Aplikasi menggunakan App Router dengan pemisahan yang jelas antara komposisi halaman server, interaksi client, Server Actions, dan service domain.
 
 ```text
-Nama       : Costume Gojo
-Kategori   : Kostum
-Harga      : Rp100.000 / hari
-Stok       : 3
-Tersedia   : 2
-Disewa     : 1
+app/
+├── page.js                         landing page
+├── LandingClient.js                katalog dan interaksi landing
+├── product/[id]/page.js            detail produk
+├── product/[id]/RentalCalculator.js kalkulator dan submit rental
+├── dashboard/page.js               data dashboard server-side
+├── dashboard/layout.js             proteksi dashboard
+├── dashboard/DashboardClient.js    filter dan interaksi dashboard
+└── actions/                        Server Actions auth, rental, review
+
+lib/
+├── api.js                          API client server-only
+├── auth.js                         autentikasi dan session
+├── catalog.js                      service katalog
+├── rentals.js                      service rental
+├── reviews.js                      service review dan ownership checks
+├── *-adapter.mjs                   normalisasi dan validasi domain
+├── rental-presentation.mjs         label, filter, count, dan tanggal
+└── format-currency.mjs             format Rupiah terpusat
 ```
 
-Stok akan disesuaikan berdasarkan rental yang sedang berlangsung.
+Pemanggilan API eksternal dilakukan dari server. Client menerima data domain yang sudah dinormalisasi dan menangani interaksi presentasi seperti filter dashboard, form rental, dan form review.
 
-### Status Barang
+## 8. API Integration
 
-| Status         | Keterangan      |
-| -------------- | --------------- |
-| 🟢 Available   | Barang tersedia |
-| 🟡 Limited     | Stok terbatas   |
-| 🔴 Unavailable | Tidak tersedia  |
+Cosplay Asik terhubung ke [Cosplay API v3](https://hmif.if.unram.ac.id/api/v3).
 
+- **Base:** `https://hmif.if.unram.ac.id/api/v3`
+- **Project:** `cosplay`
 
-# 📅 4. Rental System
+Resource utama yang digunakan:
 
-Pelanggan dapat mengajukan penyewaan dengan menentukan:
+| Method | Endpoint | Peran |
+| --- | --- | --- |
+| GET | `/cosplay/items` | katalog produk |
+| GET | `/cosplay/items/{id}` | detail produk |
+| POST | `/cosplay/register` | registrasi customer |
+| POST | `/cosplay/login` | login customer |
+| GET | `/cosplay/me` | identitas user terautentikasi |
+| POST | `/cosplay/logout` | logout remote |
+| GET | `/cosplay/rentals` | daftar rental |
+| POST | `/cosplay/rentals` | pengajuan rental |
+| GET | `/cosplay/reviews` | daftar review |
+| POST | `/cosplay/reviews` | pembuatan review |
 
-* Barang yang ingin disewa
-* Jumlah barang
-* Tanggal mulai
-* Tanggal selesai
-* Durasi sewa
+API client membentuk URL berdasarkan `API_BASE_URL`, `API_PROJECT_ID`, dan endpoint resource. Response API dinormalisasi melalui adapter sebelum digunakan oleh domain service atau UI.
 
-Harga rental dihitung berdasarkan:
+## 9. Domain / Rental Status
+
+Vocabulary status rental:
+
+| Status | Makna |
+| --- | --- |
+| `pending` | Pengajuan menunggu peninjauan atau keputusan. |
+| `approved` | Pengajuan telah disetujui untuk diproses. |
+| `rejected` | Pengajuan tidak disetujui. |
+| `ongoing` | Rental sedang berlangsung. |
+| `returned` | Barang telah dikembalikan dan rental selesai. |
+| `cancelled` | Rental dibatalkan. |
+
+Pada dashboard, status backend tetap menggunakan vocabulary di atas. Label presentasi seperti `Aktif`, `Menunggu`, dan `Selesai` digunakan untuk membantu pelanggan membaca kelompok status.
+
+## 10. Environment Variables
+
+Buat file `.env.local` secara lokal:
+
+```env
+API_BASE_URL=https://hmif.if.unram.ac.id/api/v3
+API_PROJECT_ID=cosplay
+API_KEY=<server-only-api-key>
+```
+
+Jangan menaruh nilai secret aktual di README, source code, log, atau browser bundle. Jangan gunakan `NEXT_PUBLIC_API_KEY`. File environment lokal digunakan oleh runtime server dan tidak boleh di-commit.
+
+## 11. Getting Started
+
+Prasyarat: Node.js dan npm.
+
+1. Install dependency:
+
+   ```bash
+   npm.cmd install
+   ```
+
+2. Buat `.env.local` dan isi `API_BASE_URL`, `API_PROJECT_ID`, dan `API_KEY`.
+
+3. Jalankan development server:
+
+   ```bash
+   npm.cmd run dev
+   ```
+
+4. Buka [http://localhost:3000](http://localhost:3000).
+
+## 12. Scripts
+
+| Command | Kegunaan |
+| --- | --- |
+| `npm.cmd run dev` | menjalankan development server |
+| `npm.cmd run build` | membuat production build |
+| `npm.cmd run start` | menjalankan production build |
+| `npm.cmd run lint` | menjalankan ESLint |
+| `npm.cmd test` | menjalankan test suite Node.js |
+
+## 13. Testing
+
+Test suite mencakup adapter, validasi, normalisasi response, filter dan count rental, ownership filtering, serta payload server-derived untuk review dan rental.
+
+Test dijalankan tanpa live network sehingga hasilnya deterministik dan tidak membuat perubahan pada data eksternal.
+
+```bash
+npm.cmd test
+npm.cmd run lint
+npm.cmd run build
+```
+
+## 14. Security
+
+- API key hanya digunakan pada API client server-side.
+- Session autentikasi disimpan dalam cookie `session_token` HttpOnly.
+- Cookie session menggunakan `SameSite=Lax` dan `Secure` pada production.
+- Integrasi API eksternal tidak dilakukan langsung dari browser.
+- Rental difilter berdasarkan user terautentikasi sebelum data dikirim ke Client Component.
+- Review difilter berdasarkan user terautentikasi dan rental miliknya.
+- `user_id` review berasal dari session server-side.
+- `item_id` review berasal dari data rental authoritative.
+- Validasi input dan authorization dilakukan kembali pada server.
+- Error backend tidak diteruskan mentah kepada user.
+- `NEXT_PUBLIC_API_KEY` tidak digunakan.
+
+## 15. Project Structure
 
 ```text
-Total Harga = Harga Sewa per Hari × Jumlah Hari × Jumlah Barang
+app/
+├── actions/
+│   ├── auth.js
+│   ├── rentals.js
+│   └── reviews.js
+├── dashboard/
+│   ├── DashboardClient.js
+│   ├── layout.js
+│   ├── page.js
+│   └── page.module.css
+├── login/
+├── register/
+├── product/[id]/
+├── CatalogImage.js
+├── LandingClient.js
+├── globals.css
+└── page.js
+
+lib/
+├── api.js
+├── auth.js
+├── catalog.js
+├── rentals.js
+├── reviews.js
+├── format-currency.mjs
+├── rental-presentation.mjs
+└── *-adapter.mjs / *-test.mjs
+
+next.config.mjs
+package.json
 ```
-
-Contoh:
-
-```text
-Kostum        : Rp100.000 / hari
-Jumlah        : 1
-Durasi        : 3 hari
-
-Total         : Rp300.000
-```
-
-
-# ✅ 5. Approval Rental
-
-Setiap pengajuan rental harus melalui proses persetujuan dari pemilik toko.
-
-Alurnya:
-
-```text
-Pelanggan
-    │
-    ▼
-Pilih Barang
-    │
-    ▼
-Isi Form Rental
-    │
-    ▼
-Rental Request
-    │
-    ▼
-Pending
-    │
-    ▼
-Pemilik Toko
-    │
- ┌──┴──────────┐
- ▼             ▼
-Approve       Reject
- │             │
- ▼             ▼
-Approved     Rejected
- │
- ▼
-Rental
-```
-
-Pemilik toko dapat melihat detail pengajuan sebelum memberikan keputusan.
-
-
-# 📋 6. Status Penyewaan
-
-Setiap rental memiliki status untuk memudahkan pemantauan.
-
-Status utama:
-
-```text
-PENDING
-APPROVED
-REJECTED
-ONGOING
-COMPLETED
-CANCELLED
-```
-
-Alur normal:
-
-```text
-PENDING
-   ↓
-APPROVED
-   ↓
-ONGOING
-   ↓
-COMPLETED
-```
-
-Jika pengajuan ditolak:
-
-```text
-PENDING
-   ↓
-REJECTED
-```
-
-
-# 📊 7. Dashboard Pelanggan
-
-Dashboard pelanggan digunakan untuk melihat aktivitas rental.
-
-Informasi yang ditampilkan:
-
-```text
-┌─────────────────────────────────────┐
-│         CUSTOMER DASHBOARD          │
-├─────────────────────────────────────┤
-│ Rental Aktif       : 1              │
-│ Menunggu Approval  : 2              │
-│ Selesai            : 5              │
-├─────────────────────────────────────┤
-│ Rental Terbaru                      │
-│                                     │
-│ Costume Naruto                      │
-│ 10 Sep - 12 Sep                     │
-│ Status: APPROVED                    │
-└─────────────────────────────────────┘
-```
-
-Menu:
-
-* Dashboard
-* Katalog
-* Rental Saya
-* Riwayat Rental
-* Feedback
-* Profile
-
-
-# 🏪 8. Dashboard Pemilik Toko
-
-Pemilik toko dapat memantau kondisi toko melalui dashboard.
-
-Informasi yang ditampilkan:
-
-```text
-┌─────────────────────────────────────┐
-│          OWNER DASHBOARD            │
-├─────────────────────────────────────┤
-│ Total Produk       : 50             │
-│ Rental Aktif       : 12             │
-│ Pending Request    : 5              │
-│ Produk Terbatas    : 4              │
-├─────────────────────────────────────┤
-│ Rental Terbaru                      │
-│                                     │
-│ Costume Mikasa                      │
-│ Customer: User123                   │
-│ Status: PENDING                     │
-│                                     │
-│        [Approve] [Reject]            │
-└─────────────────────────────────────┘
-```
-
-Menu:
-
-* Dashboard
-* Produk
-* Stok
-* Rental
-* Approval
-* Feedback
-* Profile Toko
-
-
-# 💬 9. Customer Feedback
-
-Setelah rental selesai, pelanggan dapat memberikan **feedback secara opsional**.
-
-Feedback dapat berupa:
-
-* Komentar
-* Saran
-* Pengalaman menggunakan layanan
-
-Contoh:
-
-```text
-"Costume-nya masih bagus dan proses rental
-juga cukup mudah. Terima kasih!"
-```
-
-Feedback **tidak menggunakan sistem rating**, sehingga tidak ada penilaian bintang terhadap produk maupun pelanggan.
-
-
-# 🔄 System Flow
-
-Alur utama sistem:
-
-```text
-              ┌───────────────┐
-              │   Pelanggan   │
-              └───────┬───────┘
-                      │
-                   Login
-                      │
-                      ▼
-                Lihat Katalog
-                      │
-                      ▼
-              Pilih Kostum/Barang
-                      │
-                      ▼
-              Cek Ketersediaan
-                      │
-                      ▼
-               Ajukan Rental
-                      │
-                      ▼
-                  PENDING
-                      │
-                      ▼
-             Pemilik Toko Review
-                      │
-               ┌──────┴──────┐
-               │             │
-            APPROVE        REJECT
-               │
-               ▼
-            ONGOING
-               │
-               ▼
-           Pengembalian
-               │
-               ▼
-           COMPLETED
-               │
-               ▼
-       Feedback (Opsional)
-```
-
-
-# 🗄️ Database
-
-Gambaran tabel utama:
-
-```text
-users
-├── id
-├── name
-├── email
-├── password
-├── phone
-├── role
-└── created_at
-
-products
-├── id
-├── name
-├── category
-├── description
-├── price_per_day
-├── stock
-├── image
-└── created_at
-
-rentals
-├── id
-├── user_id
-├── rental_date
-├── return_date
-├── total_price
-├── status
-└── created_at
-
-rental_items
-├── id
-├── rental_id
-├── product_id
-├── quantity
-├── price_per_day
-└── subtotal
-
-feedbacks
-├── id
-├── rental_id
-├── user_id
-├── message
-└── created_at
-```
-
-### Relasi Sederhana
-
-```text
-USER
- │
- └──────< RENTAL
-             │
-             └──────< RENTAL_ITEMS
-                          │
-                          └────── PRODUCT
-
-RENTAL
-  │
-  └──────< FEEDBACK
-```
-
-
-# 🔒 Business Rules
-
-Beberapa aturan utama sistem:
-
-1. Pelanggan harus memiliki akun untuk melakukan rental.
-2. Produk harus memiliki stok yang tersedia untuk dapat disewa.
-3. Setiap rental harus menentukan tanggal mulai dan tanggal selesai.
-4. Harga rental dihitung berdasarkan harga per hari.
-5. Pengajuan rental harus mendapatkan approval dari pemilik toko.
-6. Rental yang ditolak tidak mengurangi stok.
-7. Rental yang telah disetujui akan memengaruhi stok barang.
-8. Barang yang stoknya habis tidak dapat disewa.
-9. Feedback hanya dapat diberikan setelah rental selesai.
-10. Feedback bersifat opsional.
-11. Satu rental dapat berisi lebih dari satu jenis barang.
-12. Sistem harus mencegah penyewaan melebihi stok yang tersedia.
