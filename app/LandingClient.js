@@ -105,7 +105,6 @@ export default function LandingClient({ products = [], catalogState = "ready" })
       <main id="main" tabIndex={-1}>
         <section className={styles.hero} aria-labelledby="hero-title">
           <div>
-            <p className={styles.eyebrow}>Ruang ganti karakter</p>
             <h1 id="hero-title">Karakter pilihanmu.<br /><span>Giliranmu<br className={styles.desktopBreak} /> memakainya.</span></h1>
             <p className={styles.heroDescription}>Sewa kostum &amp; aksesori cosplay per hari.</p>
             <a href="#katalog" className={styles.primaryAction}>Jelajahi kostum <span aria-hidden="true">↗</span></a>
