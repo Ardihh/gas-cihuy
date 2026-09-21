@@ -3,21 +3,6 @@
    ═══════════════════════════════════════════════════════════ */
 
 .page {
-  --chalk: #faf8f2;
-  --paper: #eeebe2;
-  --ink: #282525;
-  --muted: #66605a;
-  --line: #d1ccc1;
-  --accent: #a63e2c;
-  --accent-dark: #813020;
-  --good: #356447;
-  --good-bg: #edf5ed;
-  --warn: #8b5a1c;
-  --warn-bg: #fef6e8;
-  --danger: #963333;
-  --danger-bg: #fceaea;
-  --blue: #4b6776;
-
   min-height: 100vh;
   background: var(--chalk);
   color: var(--ink);

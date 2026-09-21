@@ -1,10 +1,4 @@
-﻿.page {
-  --chalk: #faf8f2;
-  --paper: #eeebe2;
-  --ink: #282525;
-  --muted: #66605a;
-  --line: #d1ccc1;
-  --accent: #a63e2c;
+.page {
   min-height: 100vh;
   background: var(--chalk);
   color: var(--ink);
