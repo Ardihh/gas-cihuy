@@ -7,7 +7,6 @@
   --accent: #a63e2c;
   --accent-dark: #813020;
   --status-available: #2f6a4b;
-  --status-limited: #8a5a16;
   --status-unavailable: #9a3d37;
   min-height: 100vh;
   background: var(--chalk);
@@ -84,13 +83,14 @@
 .productImage { position: relative; display: flex; flex-direction: column; justify-content: space-between; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--line); padding: 16px; background: #e4e0d5; color: var(--ink); }
 .productImage[data-category="Game"] { background: #dfe8dc; }
 .productImage[data-category="Aksesoris"] { background: #ded4e7; }
-.imageMeta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
+.catalogImage { z-index: 0; object-fit: cover; opacity: .74; }
+.imageMeta { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
 .imageName { max-width: 9ch; margin: auto 0; font-family: var(--font-display); font-size: clamp(28px, 3.1vw, 45px); letter-spacing: -.05em; line-height: .98; overflow-wrap: anywhere; }
+.imageName, .imageNote { position: relative; z-index: 1; }
 .imageNote { color: var(--muted); font-size: 11px; }
 .availabilityBadge { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid currentColor; padding: 6px 8px; background: var(--chalk); font-size: 11px; font-weight: 600; line-height: 1; }
 .statusMark, .inlineStatus { color: var(--muted); font-size: 9px; }
 .availabilityBadge[data-status="available"], .inlineStatus[data-status="available"] { color: var(--status-available); }
-.availabilityBadge[data-status="limited"], .inlineStatus[data-status="limited"] { color: var(--status-limited); }
 .availabilityBadge[data-status="unavailable"], .inlineStatus[data-status="unavailable"] { color: var(--status-unavailable); }
 .productCard[data-status="unavailable"] .productImage { filter: grayscale(.8); opacity: .7; }
 .cardBody { padding-top: 16px; }
@@ -108,6 +108,9 @@
 .emptyState h2 { margin-top: 12px; font-size: 34px; letter-spacing: -.045em; }
 .emptyState > p:not(.eyebrow) { margin-top: 10px; color: var(--muted); font-size: 14px; }
 .emptyState .resetButton { margin-top: 18px; }
+.serviceMessage { min-height: 300px; display: grid; align-content: center; border-top: 1px solid var(--line); padding: 30px 0; }
+.serviceMessage h2 { margin-top: 12px; font-size: 34px; letter-spacing: -.045em; }
+.serviceMessage p:last-child { max-width: 420px; margin-top: 10px; color: var(--muted); font-size: 14px; }
 
 .footer { display: grid; grid-template-columns: 1fr auto; gap: 20px; border-top: 1px solid var(--line); padding-top: 28px; padding-bottom: 20px; }
 .footer > div > p { margin-top: 8px; color: var(--muted); font-size: 12px; }
