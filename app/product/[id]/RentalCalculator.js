@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useActionState, useMemo, useState } from "react";
 
+import { createRentalAction } from "../../../app/actions/rentals.js";
+import { formatRupiah } from "../../../lib/format-currency.mjs";
 import {
   calculateEstimatedTotal,
   calculateInclusiveRentalDays,
@@ -9,14 +12,25 @@ import {
 } from "../../../lib/rental-calculation.mjs";
 import styles from "./page.module.css";
 
-function formatRupiah(value) {
-  return `Rp${new Intl.NumberFormat("id-ID").format(value)}`;
+const initialSubmissionState = {
+  status: "idle",
+  error: "",
+  result: null,
+};
+
+function getRentalStatusLabel(status) {
+  return status === "pending" ? "Menunggu persetujuan" : status;
 }
 
-export default function RentalCalculator({ priceLabel, pricePerDay }) {
+export default function RentalCalculator({ itemId, priceLabel, pricePerDay }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [quantityInput, setQuantityInput] = useState("1");
+  const submitAction = useMemo(() => createRentalAction.bind(null, itemId), [itemId]);
+  const [submissionState, formAction, pending] = useActionState(
+    submitAction,
+    initialSubmissionState,
+  );
 
   const duration = calculateInclusiveRentalDays(startDate, endDate);
   const quantity = parseQuantity(quantityInput);
@@ -35,20 +49,22 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
       <div className={styles.calculatorIntro}>
         <div>
           <p className={styles.sectionLabel}>Rental</p>
-          <h2 id="calculator-title">Atur periode rental</h2>
+          <h2 id="calculator-title">Hitung estimasi rental</h2>
         </div>
         <p>
-          Pilih tanggal dan jumlah item untuk melihat estimasi biaya per hari.
+          Masukkan periode dan jumlah item untuk melihat simulasi biaya.
         </p>
       </div>
 
-      <div className={styles.calculatorBody}>
+      <form className={styles.calculatorBody} action={formAction} aria-busy={pending}>
         <div className={styles.calculatorForm}>
+          <p className={styles.panelLabel}>Input</p>
           <div className={styles.calculatorFields}>
             <div className={styles.calculatorField}>
               <label htmlFor="rental-start-date">Tanggal mulai</label>
               <input
                 id="rental-start-date"
+                name="startDate"
                 type="date"
                 value={startDate}
                 onChange={(event) => setStartDate(event.target.value)}
@@ -60,6 +76,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
               <label htmlFor="rental-end-date">Tanggal selesai</label>
               <input
                 id="rental-end-date"
+                name="endDate"
                 type="date"
                 value={endDate}
                 onChange={(event) => setEndDate(event.target.value)}
@@ -72,6 +89,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
               <label htmlFor="rental-quantity">Jumlah</label>
               <input
                 id="rental-quantity"
+                name="quantity"
                 type="number"
                 min="1"
                 step="1"
@@ -85,7 +103,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
           </div>
 
           <p id="rental-date-help" className={styles.calculatorHint}>
-            Tanggal dihitung inklusif: tanggal yang sama berarti 1 hari sewa.
+            Rentang tanggal menghitung hari mulai dan hari selesai; tanggal yang sama berarti 1 hari sewa.
           </p>
           {dateError ? (
             <p id="rental-date-error" className={styles.errorMessage} role="alert">
@@ -93,7 +111,7 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
             </p>
           ) : null}
           <p id="rental-quantity-help" className={styles.calculatorHint}>
-            Jumlah adalah simulasi unit dan belum memeriksa stok aktual.
+            Jumlah adalah simulasi unit; ketersediaan aktual diperiksa saat pengajuan.
           </p>
           {quantityError ? (
             <p id="rental-quantity-error" className={styles.errorMessage} role="alert">
@@ -104,7 +122,10 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
 
         <aside className={styles.estimate} aria-labelledby="estimate-title">
           <div className={styles.estimateHeader}>
-            <h3 id="estimate-title">Rincian rental</h3>
+            <div>
+              <p className={styles.panelLabel}>Hasil</p>
+              <h3 id="estimate-title">Rincian rental</h3>
+            </div>
             <span>{total === null ? "Belum lengkap" : "Simulasi"}</span>
           </div>
           <dl className={styles.estimateBreakdown}>
@@ -131,10 +152,57 @@ export default function RentalCalculator({ priceLabel, pricePerDay }) {
               : `${priceLabel} × ${duration} hari × ${quantity}`}
           </p>
           <p className={styles.estimateAvailability}>
-            Ketersediaan aktual diperiksa saat pengajuan rental.
+            Estimasi ini bukan konfirmasi rental.
           </p>
         </aside>
-      </div>
+
+        <div className={styles.submissionArea}>
+          <button
+            className={styles.submitButton}
+            disabled={pending || total === null}
+            type="submit"
+          >
+            {pending ? "Mengajukan\u2026" : "Ajukan Sewa"}
+            <span aria-hidden="true">{"\u2192"}</span>
+          </button>
+          <p className={styles.submissionHint}>
+            Pengajuan akan diperiksa dan belum menjadi konfirmasi rental.
+          </p>
+
+          {submissionState?.error ? (
+            <p className={styles.submissionError} role="alert">
+              {submissionState.error}
+              {submissionState.status === "unauthenticated" ? (
+                <>
+                  {" "}
+                  <Link href="/login">Masuk ke akun</Link>
+                </>
+              ) : null}
+            </p>
+          ) : null}
+
+          {submissionState?.status === "success" && submissionState.result ? (
+            <div className={styles.submissionSuccess} role="status" aria-live="polite">
+              <p className={styles.panelLabel}>Pengajuan terkirim</p>
+              <p>{submissionState.result.message}</p>
+              <dl className={styles.submissionDetails}>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{getRentalStatusLabel(submissionState.result.rental.status)}</dd>
+                </div>
+                <div>
+                  <dt>Durasi terverifikasi</dt>
+                  <dd>{submissionState.result.calculation.days} hari</dd>
+                </div>
+                <div>
+                  <dt>Total rental</dt>
+                  <dd>{formatRupiah(submissionState.result.calculation.totalPrice)}</dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
+        </div>
+      </form>
     </section>
   );
 }
