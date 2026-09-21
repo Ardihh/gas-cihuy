@@ -2,19 +2,30 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand & Neutral Palette (from page.module.css) */
-  --chalk: #faf8f2;
-  --paper: #eeebe2;
-  --ink: #282525;
-  --muted: #66605a;
-  --line: #d1ccc1;
-  --accent: #a63e2c;
+  /* Current shared visual system */
+  --color-surface: #faf8f2;
+  --color-surface-muted: #eeebe2;
+  --color-text: #282525;
+  --color-text-muted: #66605a;
+  --color-border: #d1ccc1;
+  --color-accent: #a63e2c;
+  --color-status-positive: #356447;
+  --color-status-caution: #8b5a1c;
+  --motion-fast: 160ms;
+
+  /* Aliases for page.module & dashboard compatibility */
+  --chalk: var(--color-surface);
+  --paper: var(--color-surface-muted);
+  --ink: var(--color-text);
+  --muted: var(--color-text-muted);
+  --line: var(--color-border);
+  --accent: var(--color-accent);
   --accent-dark: #813020;
 
   /* Status Colors */
-  --good: #356447;
+  --good: var(--color-status-positive);
   --good-bg: #edf5ed;
-  --warn: #8b5a1c;
+  --warn: var(--color-status-caution);
   --warn-bg: #fef6e8;
   --danger: #963333;
   --danger-bg: #fceaea;
@@ -29,13 +40,19 @@
 }
 
 @theme inline {
+  --color-surface: #faf8f2;
+  --color-surface-muted: #eeebe2;
+  --color-text: #282525;
+  --color-text-muted: #66605a;
+  --color-border: #d1ccc1;
+  --color-accent: #a63e2c;
+  --color-status-positive: #356447;
+  --color-status-caution: #8b5a1c;
   --color-chalk: #faf8f2;
   --color-paper: #eeebe2;
   --color-ink: #282525;
   --color-muted: #66605a;
   --color-line: #d1ccc1;
-  --color-accent: #a63e2c;
-  --color-accent-dark: #813020;
   --color-good: #356447;
   --color-warn: #8b5a1c;
   --color-danger: #963333;
@@ -54,9 +71,15 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
-  background: var(--chalk);
-  color: var(--ink);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
@@ -71,14 +94,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--chalk);
+  background: var(--color-surface-muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--line);
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--color-accent);
 }
