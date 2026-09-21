@@ -295,7 +295,7 @@ export default function DashboardClient({
               Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
             </p>
           </div>
-          <Link className={styles.catalogLink} href="/#katalog">
+          <Link className={styles.catalogLink} href="/catalog">
             Lihat koleksi <span aria-hidden="true">↗</span>
           </Link>
         </header>

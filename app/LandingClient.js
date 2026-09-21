@@ -15,7 +15,7 @@ const journey = [
   ["Pakai", "Jadi karakter pilihanmu selama periode rental yang disetujui."],
   ["Kembalikan", "Kembalikan item setelah periode rental selesai."],
 ];
-const navigation = [["#katalog", "Koleksi"], ["#cara-kerja", "Cara rental"], ["#harga", "Harga"]];
+const navigation = [["/catalog", "Koleksi"], ["#cara-kerja", "Cara rental"], ["#harga", "Harga"]];
 
 function Brand() {
   return <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">cosplay<span>asik.</span></Link>;
