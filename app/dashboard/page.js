@@ -2,462 +2,363 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { products } from "../data/products";
+import { rentals as initialRentals, formatRupiah } from "../data/rentals";
 import styles from "./page.module.css";
 
-// Data contoh untuk tampilan statis. Belum terhubung ke database.
-const rentals = [
-  {
-    id: 1,
-    name: "Costume Naruto Uzumaki",
-    category: "Kostum / Anime",
-    date: "10 Sep - 12 Sep 2026",
-    price: "Rp270.000",
-    status: "APPROVED",
-    icon: "🍥",
-    feedbackSubmitted: false,
-  },
-  {
-    id: 2,
-    name: "Wig Rem (Blue)",
-    category: "Aksesoris / Wig",
-    date: "18 Sep - 20 Sep 2026",
-    price: "Rp120.000",
-    status: "PENDING",
-    icon: "💇",
-    feedbackSubmitted: false,
-  },
-  {
-    id: 3,
-    name: "Props Nichirin Sword",
-    category: "Aksesoris / Props",
-    date: "25 Sep - 27 Sep 2026",
-    price: "Rp150.000",
-    status: "PENDING",
-    icon: "🔥",
-    feedbackSubmitted: false,
-  },
-  {
-    id: 4,
-    name: "Costume Gojo Satoru",
-    category: "Kostum / Anime",
-    date: "02 Sep - 04 Sep 2026",
-    price: "Rp300.000",
-    status: "COMPLETED",
-    icon: "🧿",
-    feedbackSubmitted: false,
-  },
-  {
-    id: 5,
-    name: "Costume Mikasa Ackerman",
-    category: "Kostum / Anime",
-    date: "20 Agu - 22 Agu 2026",
-    price: "Rp360.000",
-    status: "COMPLETED",
-    icon: "⚔️",
-    feedbackSubmitted: true,
-  },
-  {
-    id: 6,
-    name: "Costume Cloud Strife",
-    category: "Kostum / Game",
-    date: "12 Agu - 14 Agu 2026",
-    price: "Rp450.000",
-    status: "COMPLETED",
-    icon: "🗡️",
-    feedbackSubmitted: true,
-  },
-  {
-    id: 7,
-    name: "Wig Sakura",
-    category: "Aksesoris / Wig",
-    date: "05 Agu - 07 Agu 2026",
-    price: "Rp180.000",
-    status: "COMPLETED",
-    icon: "🌸",
-    feedbackSubmitted: true,
-  },
-  {
-    id: 8,
-    name: "Props Captain Shield",
-    category: "Aksesoris / Props",
-    date: "28 Jul - 30 Jul 2026",
-    price: "Rp210.000",
-    status: "COMPLETED",
-    icon: "🛡️",
-    feedbackSubmitted: true,
-  },
-];
-
-const filters = ["Semua", "Aktif", "Menunggu", "Selesai"];
+// ── Status helpers ──────────────────────────────────────────
 
 const statusLabels = {
-  PENDING: "Menunggu persetujuan",
+  PENDING: "Menunggu",
   APPROVED: "Disetujui",
   ONGOING: "Sedang disewa",
   COMPLETED: "Selesai",
+  REJECTED: "Ditolak",
 };
 
-const statusStyles = {
-  PENDING: styles.statusPending,
-  APPROVED: styles.statusApproved,
-  ONGOING: styles.statusOngoing,
-  COMPLETED: styles.statusCompleted,
+const dotStyles = {
+  PENDING: styles.dotPending,
+  APPROVED: styles.dotApproved,
+  ONGOING: styles.dotOngoing,
+  COMPLETED: styles.dotCompleted,
+  REJECTED: styles.dotRejected,
 };
 
-const attentionStatuses = [
-  { status: "PENDING", label: "Menunggu persetujuan" },
-  { status: "APPROVED", label: "Sudah disetujui" },
-  { status: "ONGOING", label: "Sedang disewa" },
+const filterDefs = [
+  { key: "Semua",    match: () => true },
+  { key: "Menunggu", match: (r) => r.status === "PENDING" },
+  { key: "Aktif",    match: (r) => r.status === "APPROVED" || r.status === "ONGOING" },
+  { key: "Selesai",  match: (r) => r.status === "COMPLETED" },
+  { key: "Ditolak",  match: (r) => r.status === "REJECTED" },
 ];
 
-function isActive(rental) {
-  return rental.status === "APPROVED" || rental.status === "ONGOING";
+// ── Stats computation ───────────────────────────────────────
+
+function computeStats(list) {
+  const thisMonth = list.filter(
+    (r) => r.status === "COMPLETED" || r.status === "ONGOING" || r.status === "APPROVED",
+  );
+  const revenue = thisMonth
+    .filter((r) => r.status === "COMPLETED")
+    .reduce((sum, r) => sum + r.totalPrice, 0);
+  const active = list.filter((r) => r.status === "APPROVED" || r.status === "ONGOING").length;
+  const pending = list.filter((r) => r.status === "PENDING").length;
+  const available = products.filter((p) => p.status === "available").length;
+
+  return { revenue, active, pending, available };
 }
 
-function matchesFilter(rental, filter) {
-  if (filter === "Aktif") return isActive(rental);
-  if (filter === "Menunggu") return rental.status === "PENDING";
-  if (filter === "Selesai") return rental.status === "COMPLETED";
-  return true;
-}
+// ── Components ──────────────────────────────────────────────
 
-function isCompleted(rental) {
-  return rental.status === "COMPLETED";
-}
-
-function getAttentionGroups() {
-  return attentionStatuses
-    .map(({ status, label }) => ({
-      count: rentals.filter((rental) => rental.status === status).length,
-      label,
-    }))
-    .filter((group) => group.count > 0);
-}
-
-function FeedbackForm({ rental, feedbackText, onChange, onSubmit }) {
+function Brand() {
   return (
-    <div className={styles.feedbackForm} id={`feedback-form-${rental.id}`}>
-      <p className={styles.formEyebrow}>Feedback untuk</p>
-      <h4 id={`feedback-title-${rental.id}`}>{rental.name}</h4>
-      <form onSubmit={onSubmit} aria-labelledby={`feedback-title-${rental.id}`}>
-        <label className={styles.formLabel} htmlFor="feedbackText">
-          Ceritakan pengalamanmu
-        </label>
-        <textarea
-          className={styles.textarea}
-          id="feedbackText"
-          maxLength={500}
-          onChange={onChange}
-          placeholder="Contoh: Costume-nya masih bagus dan proses rental juga mudah..."
-          required
-          rows={4}
-          value={feedbackText}
-        />
-        <div className={styles.formFooter}>
-          <span>{feedbackText.length}/500</span>
-          <button className={styles.submitButton} type="submit">
-            Kirim feedback →
-          </button>
-        </div>
-      </form>
+    <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">
+      cosplay<span>asik.</span>
+    </Link>
+  );
+}
+
+function StatCard({ label, value, note, accent }) {
+  return (
+    <div className={`${styles.statCard} ${accent || ""}`}>
+      <span className={styles.statLabel}>{label}</span>
+      <strong className={styles.statValue}>{value}</strong>
+      {note && <p className={styles.statNote}>{note}</p>}
     </div>
   );
 }
 
-function RentalRecord({
-  rental,
-  selectedRentalId,
-  sentFeedback,
-  onChooseFeedback,
-  feedbackText,
-  onFeedbackChange,
-  onFeedbackSubmit,
-}) {
-  const completed = isCompleted(rental);
-  const selected = selectedRentalId === rental.id;
-  const hasFeedback = rental.feedbackSubmitted || sentFeedback.includes(rental.id);
+function StatusBadge({ status }) {
+  return (
+    <div className={styles.recordStatus}>
+      <span className={`${styles.statusDot} ${dotStyles[status] || ""}`} aria-hidden="true" />
+      <span>{statusLabels[status] || status}</span>
+    </div>
+  );
+}
+
+function RentalRecord({ rental, onApprove, onReject, decisions }) {
+  const decision = decisions[rental.id];
+  const isPending = rental.status === "PENDING" && !decision;
 
   return (
-    <li className={`${styles.record} ${selected ? styles.recordSelected : ""}`}>
+    <li className={styles.record}>
       <div className={styles.recordGrid}>
-        <div className={styles.recordIdentity}>
-          <h3>{rental.name}</h3>
-          <p>{rental.category}</p>
+        <div className={styles.recordCustomer}>
+          <h3>{rental.customerName}</h3>
+          <p>Diajukan {rental.submittedAt}</p>
         </div>
 
-        <div className={styles.recordStatus}>
-          <span
-            className={`${styles.statusDot} ${statusStyles[rental.status] || ""}`}
-            aria-hidden="true"
-          />
-          <span>{statusLabels[rental.status] || rental.status}</span>
+        <div className={styles.recordItem}>
+          <strong>{rental.item}</strong>
+          <span>{rental.category} · {rental.quantity}×</span>
         </div>
 
-        <div className={styles.recordDate}>
-          <span className={styles.recordLabel}>Periode rental</span>
-          <span>{rental.date}</span>
+        <div className={styles.recordPeriod}>
+          <span className={styles.recordLabel}>Periode</span>
+          <span>{rental.period}</span>
         </div>
 
         <div className={styles.recordPrice}>
-          <span className={styles.recordLabel}>Total rental</span>
-          <strong>{rental.price}</strong>
+          <span className={styles.recordLabel}>Total</span>
+          <strong>{formatRupiah(rental.totalPrice)}</strong>
         </div>
 
-        {completed && (
-          <div className={styles.recordAction}>
-            {hasFeedback ? (
-              <span className={styles.feedbackDone}>Feedback sudah dikirim</span>
-            ) : (
-              <button
-                className={styles.feedbackButton}
-                type="button"
-                onClick={() => onChooseFeedback(rental.id)}
-                aria-expanded={selected}
-                aria-controls={`feedback-form-${rental.id}`}
-              >
-                {selected ? "Tutup feedback" : "Beri feedback"}
-              </button>
-            )}
+        {!decision && <StatusBadge status={rental.status} />}
+
+        {decision === "APPROVED" && (
+          <span className={`${styles.actionDone} ${styles.actionDoneApproved}`}>✓ Disetujui</span>
+        )}
+
+        {decision === "REJECTED" && (
+          <span className={`${styles.actionDone} ${styles.actionDoneRejected}`}>✗ Ditolak</span>
+        )}
+
+        {isPending && (
+          <div className={styles.recordActions}>
+            <button
+              className={styles.btnApprove}
+              type="button"
+              onClick={() => onApprove(rental.id)}
+            >
+              Terima
+            </button>
+            <button
+              className={styles.btnReject}
+              type="button"
+              onClick={() => onReject(rental.id)}
+            >
+              Tolak
+            </button>
           </div>
         )}
       </div>
 
-      {selected && (
-        <FeedbackForm
-          rental={rental}
-          feedbackText={feedbackText}
-          onChange={onFeedbackChange}
-          onSubmit={onFeedbackSubmit}
-        />
+      {rental.notes && (
+        <div className={styles.noteRow}>
+          <strong>Catatan:</strong>{rental.notes}
+        </div>
       )}
     </li>
   );
 }
 
-function RentalRecordList({ records, ...recordProps }) {
-  return (
-    <ul className={styles.recordList}>
-      {records.map((rental) => (
-        <RentalRecord key={rental.id} rental={rental} {...recordProps} />
-      ))}
-    </ul>
-  );
-}
+// ── Main Page ───────────────────────────────────────────────
 
-export default function CustomerDashboard() {
-  const [activeFilter, setActiveFilter] = useState("Semua");
-  const [selectedRentalId, setSelectedRentalId] = useState(null);
-  const [feedbackText, setFeedbackText] = useState("");
-  const [sentFeedback, setSentFeedback] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
+export default function OwnerDashboard() {
+  const [filter, setFilter] = useState("Semua");
+  const [decisions, setDecisions] = useState({});
+  const [toast, setToast] = useState(null);
 
-  const filteredRentals = rentals.filter((rental) =>
-    matchesFilter(rental, activeFilter),
-  );
-  const currentRentals = filteredRentals.filter((rental) => !isCompleted(rental));
-  const historyRentals = filteredRentals.filter(isCompleted);
-  const attentionGroups = getAttentionGroups();
-  const attentionCount = attentionGroups.reduce(
-    (total, group) => total + group.count,
-    0,
-  );
+  // Apply local decisions on top of initial data
+  const rentals = initialRentals.map((r) => {
+    if (decisions[r.id]) return { ...r, status: decisions[r.id] };
+    return r;
+  });
 
-  function chooseFeedback(rentalId) {
-    if (selectedRentalId === rentalId) {
-      setSelectedRentalId(null);
-      setFeedbackText("");
-      return;
-    }
+  const stats = computeStats(rentals);
+  const currentFilter = filterDefs.find((f) => f.key === filter) || filterDefs[0];
+  const filtered = rentals.filter(currentFilter.match);
 
-    setSelectedRentalId(rentalId);
-    setFeedbackText("");
-    setSuccessMessage("");
+  function approve(id) {
+    setDecisions((prev) => ({ ...prev, [id]: "APPROVED" }));
+    setToast({ type: "success", text: "Permintaan rental telah disetujui." });
   }
 
-  function submitFeedback(event) {
-    event.preventDefault();
-    if (!feedbackText.trim() || !selectedRentalId) return;
-
-    setSentFeedback((current) => [...current, selectedRentalId]);
-    setSelectedRentalId(null);
-    setFeedbackText("");
-    setSuccessMessage("Feedback sudah dikirim untuk rental kamu.");
+  function reject(id) {
+    setDecisions((prev) => ({ ...prev, [id]: "REJECTED" }));
+    setToast({ type: "reject", text: "Permintaan rental ditolak." });
   }
 
-  const recordProps = {
-    selectedRentalId,
-    sentFeedback,
-    onChooseFeedback: chooseFeedback,
-    feedbackText,
-    onFeedbackChange: (event) => setFeedbackText(event.target.value),
-    onFeedbackSubmit: submitFeedback,
-  };
+  // Split filtered into sections
+  const pendingList = filtered.filter((r) => r.status === "PENDING" && !decisions[r.id]);
+  const activeList = filtered.filter((r) => r.status === "APPROVED" || r.status === "ONGOING");
+  const historyList = filtered.filter((r) => r.status === "COMPLETED" || r.status === "REJECTED");
 
   return (
-    <main className={styles.page}>
-      <header className={styles.topbar}>
-        <div className={styles.topbarInner}>
-          <Link href="/" className={styles.logo} aria-label="Cosplay Asik beranda">
-            <span className={styles.logoMark} aria-hidden="true">
-              CA
-            </span>
-            <span>Cosplay Asik</span>
-          </Link>
-
-          <nav className={styles.primaryNav} aria-label="Navigasi pelanggan">
-            <a
-              className={`${styles.navLink} ${styles.navLinkActive}`}
-              href="#dashboard"
-              aria-current="page"
-            >
-              Dashboard
-            </a>
-            <Link className={styles.navLink} href="/#katalog">
-              Katalog
-            </Link>
-            <a className={styles.navLink} href="#rental">
-              Rental saya
-            </a>
+    <div className={styles.page}>
+      {/* ── Header ── */}
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <Brand />
+          <nav className={styles.ownerNav} aria-label="Navigasi pemilik toko">
+            <a href="#dashboard" className={styles.navActive} aria-current="page">Dashboard</a>
+            <a href="#permintaan">Permintaan</a>
+            <a href="#riwayat">Riwayat</a>
           </nav>
-
-          <div className={styles.customerIdentity}>
-            <span className={styles.customerMark} aria-hidden="true">
-              AK
-            </span>
-            <span className={styles.customerDetails}>
-              <strong>AniKun</strong>
-              <span>Pelanggan</span>
+          <div className={styles.ownerBadge}>
+            <span className={styles.ownerAvatar} aria-hidden="true">CA</span>
+            <span className={styles.ownerInfo}>
+              <strong>CosplayAsik</strong>
+              <span>Pemilik Toko</span>
             </span>
           </div>
         </div>
       </header>
 
-      <div className={styles.pageInner}>
-        <header className={styles.pageIntro} id="dashboard">
+      <div className={styles.pageBody}>
+        {/* ── Intro ── */}
+        <header className={styles.intro} id="dashboard">
           <div>
-            <p className={styles.eyebrow}>Ruang pelanggan</p>
-            <h1>Halo, AniKun.</h1>
-            <p className={styles.introDescription}>
-              Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
+            <p className={styles.eyebrow}>Panel pemilik toko</p>
+            <h1>Dashboard Toko</h1>
+            <p className={styles.introDesc}>
+              Kelola permintaan penyewaan, pantau rental aktif, dan lihat riwayat transaksi dari satu tempat.
             </p>
           </div>
-          <Link className={styles.catalogLink} href="/#katalog">
-            Cari kostum lagi <span aria-hidden="true">↗</span>
+          <Link href="/" className={styles.backLink}>
+            ← Kembali ke beranda
           </Link>
         </header>
 
-        <section className={styles.attention} aria-labelledby="attention-title">
-          <div className={styles.attentionCopy}>
-            <p className={styles.attentionLabel}>Perlu perhatian</p>
-            <h2 id="attention-title">
-              {attentionCount > 0
-                ? `${attentionCount} rental perlu dipantau.`
-                : "Tidak ada rental yang perlu dipantau."}
-            </h2>
-            <p>
-              {attentionGroups.length > 0
-                ? attentionGroups
-                    .map((group) => `${group.count} ${group.label.toLowerCase()}`)
-                    .join(" · ")
-                : "Semua rental di daftar kamu sudah selesai."}
+        {/* ── Stats ── */}
+        <div className={styles.statsGrid}>
+          <StatCard
+            label="Pendapatan (selesai)"
+            value={formatRupiah(stats.revenue)}
+            note="Dari rental berstatus selesai"
+            accent={styles.statAccent}
+          />
+          <StatCard
+            label="Rental aktif"
+            value={stats.active}
+            note="Disetujui & sedang disewa"
+            accent={styles.statGood}
+          />
+          <StatCard
+            label="Menunggu persetujuan"
+            value={stats.pending}
+            note="Perlu ditinjau"
+            accent={styles.statWarn}
+          />
+          <StatCard
+            label="Item tersedia"
+            value={stats.available}
+            note={`Dari ${products.length} total item`}
+          />
+        </div>
+
+        {/* ── Toast ── */}
+        {toast && (
+          <p
+            className={`${styles.toast} ${toast.type === "success" ? styles.toastSuccess : styles.toastReject}`}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.text}
+          </p>
+        )}
+
+        {/* ── Permintaan Masuk ── */}
+        <section className={styles.section} id="permintaan" aria-labelledby="pending-title">
+          <div className={styles.sectionHead}>
+            <div>
+              <p className={styles.eyebrow}>Perlu ditinjau</p>
+              <h2 id="pending-title">Permintaan masuk</h2>
+            </div>
+            <p className={styles.sectionCount}>
+              {pendingList.length} permintaan menunggu
             </p>
           </div>
 
-          {attentionGroups.length > 0 && (
-            <dl className={styles.attentionDetails} aria-label="Ringkasan status rental">
-              {attentionGroups.map((group) => (
-                <div className={styles.attentionDetail} key={group.label}>
-                  <dt>{group.count}</dt>
-                  <dd>{group.label}</dd>
-                </div>
+          {pendingList.length > 0 ? (
+            <ul className={styles.recordList}>
+              {pendingList.map((rental) => (
+                <RentalRecord
+                  key={rental.id}
+                  rental={rental}
+                  onApprove={approve}
+                  onReject={reject}
+                  decisions={decisions}
+                />
               ))}
-            </dl>
+            </ul>
+          ) : (
+            <p className={styles.emptyState}>Tidak ada permintaan yang menunggu persetujuan.</p>
           )}
         </section>
 
-        <section className={styles.rentalSection} id="rental" aria-labelledby="rental-title">
-          <div className={styles.sectionHeading}>
+        {/* ── Rental Aktif ── */}
+        <section className={styles.section} aria-labelledby="active-title">
+          <div className={styles.sectionHead}>
             <div>
-              <p className={styles.eyebrow}>Aktivitas rental</p>
-              <h2 id="rental-title">Rental kamu</h2>
+              <p className={styles.eyebrow}>Sedang berlangsung</p>
+              <h2 id="active-title">Rental aktif</h2>
             </div>
             <p className={styles.sectionCount}>
-              {filteredRentals.length} rental di tampilan ini
+              {activeList.length} rental
             </p>
           </div>
 
-          <div className={styles.filterRow} role="group" aria-label="Filter rental">
-            {filters.map((filter) => (
+          {activeList.length > 0 ? (
+            <ul className={styles.recordList}>
+              {activeList.map((rental) => (
+                <RentalRecord
+                  key={rental.id}
+                  rental={rental}
+                  onApprove={approve}
+                  onReject={reject}
+                  decisions={decisions}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.emptyState}>Belum ada rental aktif saat ini.</p>
+          )}
+        </section>
+
+        {/* ── Riwayat Transaksi ── */}
+        <section className={styles.section} id="riwayat" aria-labelledby="history-title">
+          <div className={styles.sectionHead}>
+            <div>
+              <p className={styles.eyebrow}>Catatan transaksi</p>
+              <h2 id="history-title">Riwayat transaksi</h2>
+            </div>
+          </div>
+
+          <div className={styles.filterRow} role="group" aria-label="Filter riwayat">
+            {filterDefs.map((f) => (
               <button
-                className={`${styles.filterButton} ${activeFilter === filter ? styles.filterButtonActive : ""}`}
-                key={filter}
+                key={f.key}
                 type="button"
-                aria-pressed={activeFilter === filter}
-                onClick={() => setActiveFilter(filter)}
+                className={`${styles.filterBtn} ${filter === f.key ? styles.filterBtnActive : ""}`}
+                aria-pressed={filter === f.key}
+                onClick={() => setFilter(f.key)}
               >
-                {filter}
+                {f.key}
+                <span>{String(rentals.filter(f.match).length).padStart(2, "0")}</span>
               </button>
             ))}
           </div>
 
-          {activeFilter === "Aktif" && (
-            <p className={styles.filterHint}>
-              Aktif menampilkan rental yang sudah disetujui atau sedang disewa.
-            </p>
-          )}
-
-          {successMessage && (
-            <p className={styles.successMessage} aria-live="polite">
-              ✓ {successMessage}
-            </p>
-          )}
-
-          {activeFilter !== "Selesai" && (
-            <>
-              {currentRentals.length > 0 ? (
-                <RentalRecordList records={currentRentals} {...recordProps} />
-              ) : (
-                <p className={styles.emptyState}>Belum ada rental yang sesuai filter ini.</p>
-              )}
-
-              {activeFilter === "Semua" && historyRentals.length > 0 && (
-                <div className={styles.historyBlock}>
-                  <div className={styles.historyHeading}>
-                    <h3>Riwayat terbaru</h3>
-                    <span>{historyRentals.length} rental selesai</span>
-                  </div>
-                  <RentalRecordList records={historyRentals} {...recordProps} />
-                </div>
-              )}
-            </>
-          )}
-
-          {activeFilter === "Selesai" && (
-            <div className={styles.historyBlock}>
-              <div className={styles.historyHeading}>
-                <h3>Riwayat terbaru</h3>
-                <span>{historyRentals.length} rental selesai</span>
-              </div>
-              {historyRentals.length > 0 ? (
-                <RentalRecordList records={historyRentals} {...recordProps} />
-              ) : (
-                <p className={styles.emptyState}>Belum ada rental yang selesai.</p>
-              )}
-            </div>
+          {filtered.length > 0 ? (
+            <ul className={styles.recordList}>
+              {filtered.map((rental) => (
+                <RentalRecord
+                  key={rental.id}
+                  rental={rental}
+                  onApprove={approve}
+                  onReject={reject}
+                  decisions={decisions}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.emptyState}>Tidak ada transaksi yang cocok dengan filter ini.</p>
           )}
         </section>
 
-        <section className={styles.catalogContinuation} aria-labelledby="catalog-title">
+        {/* ── Closing CTA ── */}
+        <div className={styles.closing}>
           <div>
-            <p className={styles.eyebrow}>Berikutnya</p>
-            <h2 id="catalog-title">Cari kostum lagi</h2>
-            <p>Jelajahi koleksi saat kamu siap menyiapkan karakter berikutnya.</p>
+            <h2>Kelola inventori</h2>
+            <p>Tambah, edit, atau hapus item kostum dan aksesori di katalog toko kamu.</p>
           </div>
-          <Link className={styles.secondaryAction} href="/#katalog">
-            Buka koleksi <span aria-hidden="true">↗</span>
+          <Link href="/" className={styles.primaryAction}>
+            Buka katalog <span aria-hidden="true">↗</span>
           </Link>
-        </section>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
