@@ -24,6 +24,19 @@ test("filters by product name, category, and availability", () => {
   assert.deepEqual(result.map((item) => item.name), ["Costume Gojo"]);
 });
 
+test("filters categories across products beyond the landing preview", () => {
+  const products = Array.from({ length: 7 }, (_, index) => ({
+    name: `Costume ${index + 1}`,
+    category: index === 6 ? "Film" : "Anime",
+    pricePerDay: 100000,
+    status: "available",
+  }));
+
+  const result = filterAndSortProducts(products, { category: "Film" });
+
+  assert.deepEqual(result.map((item) => item.name), ["Costume 7"]);
+});
+
 test("sorts filtered products from the lowest price", () => {
   const result = filterAndSortProducts(sampleProducts, { sort: "Harga terendah" });
 

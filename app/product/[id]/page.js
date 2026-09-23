@@ -53,6 +53,7 @@ export async function generateMetadata({ params }) {
 function ProductChrome({ children }) {
   return (
     <div className={styles.page}>
+      <a href="#main" className={styles.skipLink}>Lewati navigasi</a>
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">
@@ -65,7 +66,7 @@ function ProductChrome({ children }) {
         </div>
       </header>
 
-      <main>
+      <main id="main" tabIndex={-1}>
         <div className={styles.detailInner}>{children}</div>
       </main>
 
@@ -113,54 +114,53 @@ export default async function ProductPage({ params }) {
 
   const product = result.product;
   const priceLabel = formatRupiah(product.pricePerDay);
-  const productIndex = String(product.id).padStart(2, "0");
   const isAvailable = product.status === "available";
   const statusLabel = isAvailable ? "Tersedia" : "Tidak tersedia";
+  const hasSize = product.size?.trim().length > 0;
+  const hasDescription = product.description?.trim().length > 0;
 
   return (
     <ProductChrome>
       <nav className={styles.breadcrumb} aria-label="Lokasi halaman">
         <Link href="/catalog">Koleksi</Link>
         <span aria-hidden="true">/</span>
-        <span>{product.category}</span>
-        <span aria-hidden="true">/</span>
         <span aria-current="page">{product.name}</span>
       </nav>
 
-      <div className={styles.productLayout}>
+      <div className={hasDescription ? styles.productLayout : `${styles.productLayout} ${styles.withoutDescription}`}>
         <section className={styles.productInfo} aria-labelledby="product-title">
           <div className={styles.identityMeta}>
             <p className={styles.sectionLabel}>{product.category}</p>
-            <span className={styles.productCode}>Spesimen {productIndex}</span>
           </div>
           <h1 id="product-title">{product.name}</h1>
-          <p className={styles.productLead}>
-            Lihat item, tarif harian, dan buat simulasi periode rental sebelum mengajukan.
-          </p>
 
           <dl className={styles.productFacts}>
-            <div>
+            <div className={styles.priceFact}>
               <dt>Tarif harian</dt>
               <dd className={styles.priceValue}>
                 {priceLabel} <span>/ hari</span>
               </dd>
             </div>
-            <div>
-              <dt>Keterangan</dt>
-              <dd className={isAvailable ? styles.statusAvailable : styles.statusUnavailable}>
+            <div className={styles.availabilityFacts}>
+              <dt className={styles.statusTerm}>Status</dt>
+              <dd className={`${isAvailable ? styles.statusAvailable : styles.statusUnavailable} ${styles.statusValue}`}>
                 <span className={styles.statusDot} aria-hidden="true" />
                 {statusLabel}
               </dd>
+              <dt className={styles.stockTerm}>Stok</dt>
+              <dd className={`${styles.factValue} ${styles.stockValue}`}>{product.stock} item</dd>
             </div>
+            {hasSize ? (
+              <div className={styles.sizeFact}>
+                <dt>Ukuran</dt>
+                <dd className={styles.factValue}>{product.size}</dd>
+              </div>
+            ) : null}
           </dl>
         </section>
 
         <div className={styles.productMediaColumn}>
           <div className={styles.productMedia} data-category={product.category}>
-            <div className={styles.mediaTopline}>
-              <span>Ruang ganti / {productIndex}</span>
-              <span>{product.category}</span>
-            </div>
             <div className={styles.mediaVisual}>
               <CatalogImage
                 alt={`Foto produk ${product.name}`}
@@ -171,17 +171,16 @@ export default async function ProductPage({ params }) {
                 sizes="(max-width: 900px) min(100vw - 40px, 600px), 46vw"
                 src={product.imageUrl}
               />
-              <div className={styles.mediaSpecimen}>
-                <p className={styles.mediaName}>{product.name}</p>
-                <span className={styles.mediaCategory}>{product.category}</span>
-              </div>
-            </div>
-            <div className={styles.mediaFooter}>
-              <span>Specimen placeholder</span>
-              <span>Siap untuk foto produk</span>
             </div>
           </div>
         </div>
+
+        {hasDescription ? (
+          <section className={styles.productDescription} aria-labelledby="product-description-title">
+            <h2 id="product-description-title">Deskripsi</h2>
+            <p>{product.description}</p>
+          </section>
+        ) : null}
 
         <RentalCalculator
           itemId={product.id}
