@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { filterAndSortProducts, getPriceValue } from "./catalog-utils.mjs";
+import {
+  buildCatalogSearchParams,
+  canResetCatalogFilters,
+  filterAndSortProducts,
+  getPriceValue,
+  hasActiveCatalogFilters,
+  parseCatalogSearchParams,
+} from "./catalog-utils.mjs";
 
 const sampleProducts = [
   { name: "Costume Gojo", category: "Anime", pricePerDay: 100000, status: "available" },
@@ -53,4 +60,75 @@ test("does not treat unsupported statuses as live availability values", () => {
   const result = filterAndSortProducts(sampleProducts, { status: "legacy" });
 
   assert.deepEqual(result, []);
+});
+
+test("does not activate reset for a whitespace-only query", () => {
+  assert.equal(hasActiveCatalogFilters({ query: "   " }), false);
+});
+
+test("activates reset for an effective search or non-default catalog control", () => {
+  assert.equal(hasActiveCatalogFilters({ query: "gojo" }), true);
+  assert.equal(hasActiveCatalogFilters({ category: "Anime" }), true);
+  assert.equal(hasActiveCatalogFilters({ status: "available" }), true);
+  assert.equal(hasActiveCatalogFilters({ sort: "Harga terendah" }), true);
+});
+
+test("does not offer reset when the catalog has no products", () => {
+  assert.equal(canResetCatalogFilters({ hasProducts: false, hasFilters: true }), false);
+  assert.equal(canResetCatalogFilters({ hasProducts: true, hasFilters: true }), true);
+});
+
+test("keeps whitespace-only queries unfiltered", () => {
+  assert.deepEqual(filterAndSortProducts(sampleProducts, { query: "   " }), sampleProducts);
+});
+
+const catalogCategories = ["Semua", "Anime", "Game"];
+
+test("restores valid catalog state from URL search params", () => {
+  const state = parseCatalogSearchParams(
+    new URLSearchParams("q=GENSHIN&category=Game&status=available&sort=Harga+terendah"),
+    catalogCategories,
+  );
+
+  assert.deepEqual(state, {
+    query: "GENSHIN",
+    category: "Game",
+    status: "available",
+    sort: "Harga terendah",
+  });
+});
+
+test("falls back to defaults for whitespace and invalid URL filter values", () => {
+  const state = parseCatalogSearchParams(
+    new URLSearchParams("q=%20%20%20&category=Unknown&status=limited&sort=price-asc"),
+    catalogCategories,
+  );
+
+  assert.deepEqual(state, {
+    query: "",
+    category: "Semua",
+    status: "Semua status",
+    sort: "Relevan",
+  });
+});
+
+test("serializes active state using only the compact catalog params", () => {
+  const params = buildCatalogSearchParams(
+    { query: "GENSHIN", category: "Game", status: "available", sort: "Harga terendah" },
+    catalogCategories,
+  );
+
+  assert.equal(
+    params.toString(),
+    "q=GENSHIN&category=Game&status=available&sort=Harga+terendah",
+  );
+});
+
+test("omits defaults, whitespace queries, and invalid catalog values from the URL", () => {
+  const params = buildCatalogSearchParams(
+    { query: "   ", category: "Unknown", status: "limited", sort: "price-asc" },
+    catalogCategories,
+  );
+
+  assert.equal(params.toString(), "");
 });

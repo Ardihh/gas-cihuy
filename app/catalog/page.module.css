@@ -110,7 +110,8 @@
 .emptyState .resetButton { margin-top: 18px; }
 .serviceMessage { min-height: 300px; display: grid; align-content: center; border-top: 1px solid var(--line); padding: 30px 0; }
 .serviceMessage h2 { margin-top: 12px; font-size: 34px; letter-spacing: -.045em; }
-.serviceMessage p:last-child { max-width: 420px; margin-top: 10px; color: var(--muted); font-size: 14px; }
+.serviceMessage > p:not(.eyebrow) { max-width: 420px; margin-top: 10px; color: var(--muted); font-size: 14px; }
+.serviceMessage .resetButton { justify-self: start; margin-top: 18px; }
 
 .footer { display: grid; grid-template-columns: 1fr auto; gap: 20px; border-top: 1px solid var(--line); padding-top: 28px; padding-bottom: 20px; }
 .footer > div > p { margin-top: 8px; color: var(--muted); font-size: 12px; }

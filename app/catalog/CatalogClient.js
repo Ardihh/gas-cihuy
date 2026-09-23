@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
 import { formatRupiah } from "../../lib/format-currency.mjs";
 import CatalogImage from "../CatalogImage";
-import { filterAndSortProducts } from "./catalog-utils.mjs";
+import {
+  buildCatalogSearchParams,
+  canResetCatalogFilters,
+  filterAndSortProducts,
+  hasActiveCatalogFilters,
+  parseCatalogSearchParams,
+} from "./catalog-utils.mjs";
 import styles from "./page.module.css";
 
 const statusOptions = [
@@ -15,6 +22,12 @@ const statusOptions = [
 ];
 
 const sortOptions = ["Relevan", "Harga terendah", "Harga tertinggi"];
+const defaultCatalogState = {
+  query: "",
+  category: "Semua",
+  status: "Semua status",
+  sort: "Relevan",
+};
 
 const statusLabels = {
   available: "Tersedia",
@@ -98,53 +111,81 @@ function ProductCard({ product }) {
   );
 }
 
-function EmptyState({ hasProducts, onReset }) {
+function EmptyState({ hasProducts, canReset, onReset }) {
   return (
     <div className={styles.emptyState} role="status">
       <p className={styles.eyebrow}>{hasProducts ? "Koleksi tidak ditemukan" : "Koleksi live"}</p>
       <h2>{hasProducts ? "Coba kata kunci atau filter lain." : "Belum ada item live."}</h2>
-      <p>{hasProducts ? "Belum ada item yang cocok dengan pencarianmu." : "Item akan tampil setelah tersedia di katalog."}</p>
-      <button type="button" className={styles.resetButton} onClick={onReset}>
-        Hapus semua filter <span aria-hidden="true">↗</span>
-      </button>
+      <p>{hasProducts ? "Tidak ada item yang cocok dengan pencarian atau filter yang dipilih." : "Item akan tampil setelah tersedia di katalog."}</p>
+      {canReset && (
+        <button type="button" className={styles.resetButton} onClick={onReset}>
+          Reset filter
+        </button>
+      )}
     </div>
   );
 }
 
-function ServiceUnavailable() {
+function ServiceUnavailable({ onRetry }) {
   return (
     <div className={styles.serviceMessage} role="alert">
       <p className={styles.eyebrow}>Koleksi live</p>
       <h2>Koleksi sedang tidak dapat dimuat.</h2>
       <p>Coba lagi sebentar untuk melihat katalog terbaru.</p>
+      <button type="button" className={styles.resetButton} onClick={onRetry}>
+        Coba lagi
+      </button>
     </div>
   );
 }
 
+function replaceCatalogSearchParams(searchParams) {
+  const nextUrl = new URL(window.location.href);
+  nextUrl.search = searchParams.toString();
+  window.history.replaceState(null, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+}
+
 export default function CatalogClient({ products = [], catalogState = "ready" }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("Semua");
-  const [status, setStatus] = useState("Semua status");
-  const [sort, setSort] = useState("Relevan");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchParamString = searchParams.toString();
 
   const categories = useMemo(
     () => ["Semua", ...new Set(products.map((item) => item.category))],
     [products],
   );
+  const urlState = useMemo(
+    () => parseCatalogSearchParams(new URLSearchParams(searchParamString), categories),
+    [categories, searchParamString],
+  );
+  const { query, category, status, sort } = urlState;
+
+  useEffect(() => {
+    if (catalogState === "error") return;
+
+    const canonicalParams = buildCatalogSearchParams(urlState, categories);
+
+    if (canonicalParams.toString() !== searchParamString) {
+      replaceCatalogSearchParams(canonicalParams);
+    }
+  }, [catalogState, categories, searchParamString, urlState]);
+
+  function updateCatalogState(patch) {
+    const nextState = { ...urlState, ...patch };
+    const nextParams = buildCatalogSearchParams(nextState, categories);
+    replaceCatalogSearchParams(nextParams);
+  }
+
   const visibleProducts = useMemo(
     () => filterAndSortProducts(products, { query, category, status, sort }),
     [category, products, query, sort, status],
   );
-  const hasFilters = Boolean(
-    query || category !== "Semua" || status !== "Semua status" || sort !== "Relevan",
-  );
+  const hasFilters = hasActiveCatalogFilters({ query, category, status, sort });
   const hasProducts = products.length > 0;
+  const canResetFilters = canResetCatalogFilters({ hasProducts, hasFilters });
 
   function resetFilters() {
-    setQuery("");
-    setCategory("Semua");
-    setStatus("Semua status");
-    setSort("Relevan");
+    updateCatalogState(defaultCatalogState);
   }
 
   return (
@@ -193,7 +234,7 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
 
         <section className={styles.catalogBody} aria-labelledby="discovery-title">
           <h2 id="discovery-title" className={styles.visuallyHidden}>Cari dan saring koleksi</h2>
-          {catalogState === "error" ? <ServiceUnavailable /> : (
+          {catalogState === "error" ? <ServiceUnavailable onRetry={() => router.refresh()} /> : (
             <>
               <div className={styles.controls}>
                 <label className={styles.searchField}>
@@ -203,7 +244,7 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
                     <input
                       type="search"
                       value={query}
-                      onChange={(event) => setQuery(event.target.value)}
+                      onChange={(event) => updateCatalogState({ query: event.target.value })}
                       placeholder="Nama kostum atau aksesori"
                       aria-label="Cari berdasarkan nama produk"
                     />
@@ -211,13 +252,13 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
                 </label>
                 <label className={styles.selectField}>
                   <span>Ketersediaan</span>
-                  <select value={status} onChange={(event) => setStatus(event.target.value)}>
+                  <select value={status} onChange={(event) => updateCatalogState({ status: event.target.value })}>
                     {statusOptions.map(([label, value]) => <option value={value} key={value}>{label}</option>)}
                   </select>
                 </label>
                 <label className={styles.selectField}>
                   <span>Urutkan</span>
-                  <select value={sort} onChange={(event) => setSort(event.target.value)}>
+                  <select value={sort} onChange={(event) => updateCatalogState({ sort: event.target.value })}>
                     {sortOptions.map((option) => <option value={option} key={option}>{option}</option>)}
                   </select>
                 </label>
@@ -233,7 +274,7 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
                     key={item}
                     type="button"
                     aria-pressed={category === item}
-                    onClick={() => setCategory(item)}
+                    onClick={() => updateCatalogState({ category: item })}
                   >
                     {item}
                     <span>{String(item === "Semua" ? products.length : products.filter((product) => product.category === item).length).padStart(2, "0")}</span>
@@ -246,14 +287,22 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
                   <strong>{visibleProducts.length}</strong> item ditampilkan
                   {category !== "Semua" && <> <span aria-hidden="true">/</span> {category}</>}
                 </p>
-                {hasFilters && <button type="button" onClick={resetFilters}>Reset filter</button>}
+                {canResetFilters && visibleProducts.length > 0 && (
+                  <button type="button" onClick={resetFilters}>Reset filter</button>
+                )}
               </div>
 
               {visibleProducts.length > 0 ? (
                 <ul className={styles.productGrid} aria-label="Daftar produk cosplay">
                   {visibleProducts.map((product) => <ProductCard key={product.id} product={product} />)}
                 </ul>
-              ) : <EmptyState hasProducts={hasProducts} onReset={resetFilters} />}
+              ) : (
+                <EmptyState
+                  hasProducts={hasProducts}
+                  canReset={canResetFilters}
+                  onReset={resetFilters}
+                />
+              )}
             </>
           )}
         </section>

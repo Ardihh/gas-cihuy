@@ -69,7 +69,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
   const featured = products[0];
   const categories = ["Semua", ...new Set(products.map((item) => item.category))];
   const filteredProducts = filterAndSortProducts(products, { category });
-  const visibleProducts = filteredProducts.slice(0, 6);
+  const visibleProducts = filteredProducts.slice(0, 8);
   const visibleCountLabel = filteredProducts.length > visibleProducts.length
     ? `${visibleProducts.length} dari ${filteredProducts.length} item ditampilkan`
     : `${filteredProducts.length} item`;
