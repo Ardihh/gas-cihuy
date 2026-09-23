@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { formatRupiah } from "../lib/format-currency.mjs";
+import { filterAndSortProducts } from "./catalog/catalog-utils.mjs";
 import CatalogImage from "./CatalogImage";
 import styles from "./page.module.css";
 
-const categories = ["Semua", "Anime", "Game", "Aksesoris"];
 const journey = [
   ["Pilih", "Temukan kostum atau aksesori yang ingin kamu pakai."],
   ["Atur tanggal", "Masuk ke akun, tentukan periode sewa dan jumlah item."],
@@ -67,7 +67,12 @@ export default function LandingClient({ products = [], catalogState = "ready" })
   const [category, setCategory] = useState("Semua");
   const menu = useRef(null);
   const featured = products[0];
-  const visibleProducts = products.filter((item) => category === "Semua" || item.category === category);
+  const categories = ["Semua", ...new Set(products.map((item) => item.category))];
+  const filteredProducts = filterAndSortProducts(products, { category });
+  const visibleProducts = filteredProducts.slice(0, 8);
+  const visibleCountLabel = filteredProducts.length > visibleProducts.length
+    ? `${visibleProducts.length} dari ${filteredProducts.length} item ditampilkan`
+    : `${filteredProducts.length} item`;
   const hasProducts = products.length > 0;
   const catalogUnavailable = catalogState === "error";
 
@@ -143,7 +148,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
                   </button>
                 ))}
               </div>
-              <p className={styles.collectionStatus} role="status" aria-live="polite" aria-atomic="true">{category === "Semua" ? "Seluruh koleksi" : category} <span aria-hidden="true">/</span> {visibleProducts.length} item</p>
+              <p className={styles.collectionStatus} role="status" aria-live="polite" aria-atomic="true">{category === "Semua" ? "Seluruh koleksi" : category} <span aria-hidden="true">/</span> {visibleCountLabel}</p>
               <ul className={styles.productRack} id="collection-products">
                 {visibleProducts.map((item) => (
                   <li key={item.id}>
@@ -169,6 +174,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
               {hasProducts ? <p className={styles.collectionNote}>Buka item untuk melihat detail dan mencoba estimasi rental.</p> : null}
             </>
           )}
+          <Link href="/catalog" className={styles.textLink}>View More <span aria-hidden="true">↗</span></Link>
         </section>
 
         <section id="cara-kerja" tabIndex={-1} className={styles.journey} aria-labelledby="journey-title">

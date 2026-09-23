@@ -67,7 +67,7 @@
 .categoryIndex button[aria-pressed="true"] { border-bottom-color: var(--color-accent); color: var(--color-text); font-weight: 700; }
 .categoryIndex button:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
 .collectionStatus { display: flex; gap: 10px; font-size: 12px; color: var(--color-text-muted); margin: 18px 0 22px; }
-.productRack { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 32px; align-items: start; }
+.productRack { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px 32px; align-items: start; }
 .productRack > li { min-width: 0; }
 .product { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); gap: 16px; align-items: center; border-top: 1px solid var(--color-border); padding-top: 16px; }
 .product .specimen { border-top: none; padding: 12px; }
@@ -111,7 +111,7 @@
 .footer nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .copyright { grid-column: 1 / -1; color: var(--color-text-muted); font-size: 11px; }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .headerInner { gap: 24px; }
   .hero { gap: 24px 28px; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
   .featured { padding-left: 0; }
@@ -119,7 +119,7 @@
   .featuredCaption { display: block; margin-left: 16px; }
   .featuredCaption p { margin-top: 8px; }
   .featuredCaption p > span { display: inline; }
-  .productRack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .productRack { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .product .specimen { max-height: 210px; }
   .journey, .pricing { gap: 40px; }
 }
@@ -137,7 +137,7 @@
   .featuredCaption h2 { font-size: 18px; }
   .heroDescription { font-size: 16px; }
   .journey { padding-inline: 24px; gap: 32px; }
-  .productRack { gap: 24px; }
+  .productRack { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   .productCaption h3 { font-size: 20px; }
   .product .specimenName { font-size: 19px; }
   .footer { grid-template-columns: 1fr; }
