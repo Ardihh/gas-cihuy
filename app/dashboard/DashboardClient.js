@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { logoutAction } from "../actions/auth.js";
 import { createReviewAction } from "../actions/reviews.js";
+import { cancelRentalAction } from "../actions/rentals.js";
 import {
   approveRentalAction,
   createItemAction,
@@ -165,11 +166,23 @@ function RentalRecord({
   reviewPending,
   onChooseFeedback,
 }) {
+  const router = useRouter();
+  const [cancelState, cancelAction, cancelPending] = useActionState(
+    cancelRentalAction,
+    { status: "idle" },
+  );
   const reviewPresentation = getReviewPresentation(rental, reviews, reviewState);
   const selected = selectedRentalId === rental.id;
   const feedbackAvailable = reviewPresentation.status !== "ineligible";
   const persistedReview = reviewPresentation.review;
   const feedbackReady = reviewPresentation.status === "available";
+  const canCancel = rental.status === "pending" || rental.status === "approved";
+
+  useEffect(() => {
+    if (cancelState?.status === "success") {
+      router.refresh();
+    }
+  }, [cancelState?.status, router]);
 
   return (
     <li className={`${styles.record} ${selected ? styles.recordSelected : ""}`}>
@@ -197,9 +210,9 @@ function RentalRecord({
           <strong>{formatRupiah(rental.totalPrice)}</strong>
         </div>
 
-        {feedbackAvailable && (
-          <div className={styles.recordAction}>
-            {persistedReview ? (
+        <div className={styles.recordAction}>
+          {feedbackAvailable && (
+            persistedReview ? (
               <PersistedReview review={persistedReview} />
             ) : !feedbackReady ? (
               <span className={styles.feedbackUnavailable}>Feedback belum dapat dimuat</span>
@@ -213,10 +226,34 @@ function RentalRecord({
               >
                 {selected ? "Tutup feedback" : "Beri feedback"}
               </button>
-            )}
-          </div>
-        )}
+            ))}
+          {canCancel && (
+            <form action={cancelAction}>
+              <input name="rentalId" type="hidden" value={rental.id} />
+              <button
+                className={styles.cancelButton}
+                disabled={cancelPending}
+                onClick={(event) => {
+                  if (!window.confirm("Batalkan pengajuan rental ini?")) event.preventDefault();
+                }}
+                type="submit"
+              >
+                {cancelPending ? "Membatalkan…" : "Batalkan rental"}
+              </button>
+            </form>
+          )}
+          {cancelState?.status === "error" && (
+            <span className={styles.feedbackUnavailable} role="alert">{cancelState.error}</span>
+          )}
+        </div>
       </div>
+
+      {rental.adminNote ? (
+        <p className={styles.recordAdminNote}>
+          <span className={styles.recordLabel}>Catatan admin</span>
+          {rental.adminNote}
+        </p>
+      ) : null}
 
       {selected && feedbackAvailable && feedbackReady && !persistedReview && (
         <FeedbackForm

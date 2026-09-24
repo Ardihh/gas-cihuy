@@ -485,6 +485,19 @@
   overflow-wrap: anywhere;
 }
 
+.recordAdminNote {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 680px;
+  margin: -4px 0 18px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--color-accent);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .recordAction {
   grid-area: action;
   justify-self: start;
@@ -504,6 +517,22 @@
 .submitButton:hover {
   background: var(--color-accent);
   color: var(--color-surface);
+}
+
+.cancelButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  color: var(--color-accent);
 }
 
 .feedbackDone {
