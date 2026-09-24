@@ -15,6 +15,7 @@ import {
 } from "../actions/owner.js";
 import { formatRupiah } from "../../lib/format-currency.mjs";
 import { getReviewPresentation } from "../../lib/review-adapter.mjs";
+import { getAllowedRentalTransitions } from "../../lib/rental-transitions.mjs";
 import {
   RENTAL_FILTERS,
   deriveRentalCounts,
@@ -56,7 +57,6 @@ const OWNER_STATUS_LABELS = {
   cancelled: "Dibatalkan",
 };
 
-const ALL_STATUSES = ["pending", "approved", "ongoing", "returned", "rejected", "cancelled"];
 const OWNER_RENTAL_FILTERS = ["Semua", "Menunggu", "Disetujui", "Berjalan", "Selesai", "Ditolak"];
 
 function getUserInitials(name) {
@@ -280,6 +280,7 @@ function OwnerRentalRow({ rental, expanded, onToggle }) {
 
   const isPending = approvePending || rejectPending || updatePending;
   const canApproveReject = rental.status === "pending";
+  const statusOptions = [rental.status, ...getAllowedRentalTransitions(rental.status)];
 
   return (
     <li>
@@ -368,7 +369,7 @@ function OwnerRentalRow({ rental, expanded, onToggle }) {
                 name="status"
                 defaultValue={rental.status}
               >
-                {ALL_STATUSES.map((s) => (
+                {statusOptions.map((s) => (
                   <option key={s} value={s}>{OWNER_STATUS_LABELS[s]}</option>
                 ))}
               </select>
@@ -673,7 +674,7 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
               <h2 id="catalog-cont-title">Tampilan pelanggan</h2>
               <p>Lihat bagaimana pelanggan melihat koleksi kamu di halaman depan.</p>
             </div>
-            <Link className={styles.secondaryAction} href="/#katalog">
+            <Link className={styles.secondaryAction} href="/katalog">
               Buka katalog <span aria-hidden="true">↗</span>
             </Link>
           </section>
@@ -741,7 +742,7 @@ function CustomerDashboardView({
             Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
           </p>
         </div>
-        <Link className={styles.catalogLink} href="/catalog">
+        <Link className={styles.catalogLink} href="/katalog">
           Lihat koleksi <span aria-hidden="true">↗</span>
         </Link>
       </header>
@@ -882,7 +883,7 @@ function CustomerDashboardView({
           <h2 id="catalog-title">Cari kostum lagi</h2>
           <p>Jelajahi koleksi saat kamu siap menyiapkan karakter berikutnya.</p>
         </div>
-        <Link className={styles.secondaryAction} href="/#katalog">
+        <Link className={styles.secondaryAction} href="/katalog">
           Buka koleksi <span aria-hidden="true">↗</span>
         </Link>
       </section>
@@ -926,7 +927,7 @@ export default function DashboardClient({
               >
                 Dashboard
               </a>
-              <Link className={styles.navLink} href="/#katalog">
+              <Link className={styles.navLink} href="/katalog">
                 Katalog
               </Link>
               <a className={styles.navLink} href="#rental">

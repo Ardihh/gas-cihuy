@@ -196,14 +196,14 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
           <Brand />
           <nav className={styles.desktopNav} aria-label="Navigasi utama">
             <Link href="/">Beranda</Link>
-            <Link href="/catalog" aria-current="page">Koleksi</Link>
+            <Link href="/katalog" aria-current="page">Koleksi</Link>
             <Link href="/dashboard">Dashboard</Link>
           </nav>
           <details className={styles.mobileMenu}>
             <summary>Menu <span aria-hidden="true">+</span></summary>
             <nav aria-label="Navigasi seluler">
               <Link href="/">Beranda <span aria-hidden="true">↗</span></Link>
-              <Link href="/catalog" aria-current="page">Koleksi <span aria-hidden="true">↗</span></Link>
+              <Link href="/katalog" aria-current="page">Koleksi <span aria-hidden="true">↗</span></Link>
               <Link href="/dashboard">Dashboard <span aria-hidden="true">↗</span></Link>
             </nav>
           </details>
@@ -315,7 +315,7 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
         </div>
         <nav aria-label="Navigasi footer">
           <Link href="/">Beranda</Link>
-          <Link href="/catalog">Koleksi</Link>
+          <Link href="/katalog">Koleksi</Link>
           <Link href="/dashboard">Dashboard</Link>
         </nav>
         <p className={styles.copyright}>© 2026 Cosplay Asik</p>

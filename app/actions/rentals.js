@@ -2,15 +2,18 @@
 
 import { ApiError } from "../../lib/api.js";
 import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
+import { getCatalogItem } from "../../lib/catalog.js";
 import {
   RentalInputError,
   RentalResponseError,
   createRental,
   validateRentalInput,
 } from "../../lib/rentals.js";
+import { isRentalAvailable } from "../../lib/rental-adapter.mjs";
 
 const VALIDATION_ERROR = "Periksa tanggal dan jumlah sebelum mengajukan rental.";
 const REQUEST_ERROR = "Pengajuan sewa tidak dapat diproses. Periksa kembali item, tanggal, dan jumlah.";
+const AVAILABILITY_ERROR = "Item ini sedang tidak tersedia untuk disewa atau stok tidak mencukupi.";
 const SERVICE_ERROR = "Layanan rental sedang tidak tersedia. Coba lagi nanti.";
 const UNAUTHENTICATED_ERROR = "Silakan masuk untuk mengajukan rental.";
 
@@ -30,6 +33,13 @@ function serviceUnavailableState() {
   return {
     status: "service_unavailable",
     error: SERVICE_ERROR,
+  };
+}
+
+function unavailableItemState() {
+  return {
+    status: "request_error",
+    error: AVAILABILITY_ERROR,
   };
 }
 
@@ -89,6 +99,22 @@ export async function createRentalAction(itemId, _previousState, formData) {
 
   if (currentUser.status !== "authenticated" || !currentUser.user) {
     return unauthenticatedState();
+  }
+
+  let item;
+
+  try {
+    item = await getCatalogItem(normalizedInput.itemId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return unavailableItemState();
+    }
+
+    return serviceUnavailableState();
+  }
+
+  if (!isRentalAvailable(item, normalizedInput.quantity)) {
+    return unavailableItemState();
   }
 
   try {

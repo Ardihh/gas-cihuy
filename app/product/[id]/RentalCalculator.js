@@ -22,7 +22,7 @@ function getRentalStatusLabel(status) {
   return status === "pending" ? "Menunggu persetujuan" : status;
 }
 
-export default function RentalCalculator({ itemId, priceLabel, pricePerDay }) {
+export default function RentalCalculator({ canRent, itemId, priceLabel, pricePerDay, stock }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [quantityInput, setQuantityInput] = useState("1");
@@ -39,10 +39,28 @@ export default function RentalCalculator({ itemId, priceLabel, pricePerDay }) {
     : null;
   const quantityError = quantity === null
     ? "Jumlah harus berupa bilangan bulat minimal 1."
-    : null;
-  const total = duration !== null && quantity !== null
+    : quantity > stock
+      ? `Jumlah melebihi stok tersedia (${stock} item).`
+      : null;
+  const total = duration !== null && quantity !== null && quantityError === null
     ? calculateEstimatedTotal(pricePerDay, duration, quantity)
     : null;
+
+  if (!canRent) {
+    return (
+      <section className={styles.calculatorSection} aria-labelledby="calculator-title">
+        <div className={styles.calculatorIntro}>
+          <div>
+            <p className={styles.sectionLabel}>Rental</p>
+            <h2 id="calculator-title">Hitung estimasi rental</h2>
+          </div>
+        </div>
+        <p className={styles.calculatorUnavailable} role="status">
+          Item ini sedang tidak tersedia untuk disewa.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.calculatorSection} aria-labelledby="calculator-title">
@@ -92,6 +110,7 @@ export default function RentalCalculator({ itemId, priceLabel, pricePerDay }) {
                 name="quantity"
                 type="number"
                 min="1"
+                max={stock}
                 step="1"
                 inputMode="numeric"
                 value={quantityInput}
@@ -111,7 +130,7 @@ export default function RentalCalculator({ itemId, priceLabel, pricePerDay }) {
             </p>
           ) : null}
           <p id="rental-quantity-help" className={styles.calculatorHint}>
-            Jumlah adalah simulasi unit; ketersediaan aktual diperiksa saat pengajuan.
+            Maksimal {stock} item sesuai stok saat ini; ketersediaan aktual diperiksa kembali saat pengajuan.
           </p>
           {quantityError ? (
             <p id="rental-quantity-error" className={styles.errorMessage} role="alert">
