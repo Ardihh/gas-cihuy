@@ -159,7 +159,7 @@ export async function cancelRentalAction(_previousState, formData) {
 
     if (error instanceof ApiError) {
       if (error.status === 401) return unauthenticatedState();
-      if (error.status === 400 || error.status === 404 || error.status === 409 || error.status === 422) {
+      if ([400, 404, 409, 422].includes(error.status)) {
         return { status: "request_error", error: CANCELLATION_ERROR };
       }
     }
