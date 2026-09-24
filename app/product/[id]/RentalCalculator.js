@@ -18,6 +18,15 @@ const initialSubmissionState = {
   result: null,
 };
 
+function getTodayCalendarDate() {
+  const today = new Date();
+  const year = today.getUTCFullYear();
+  const month = String(today.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(today.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function getRentalStatusLabel(status) {
   return status === "pending" ? "Menunggu persetujuan" : status;
 }
@@ -31,6 +40,7 @@ export default function RentalCalculator({ canRent, itemId, priceLabel, pricePer
     submitAction,
     initialSubmissionState,
   );
+  const today = getTodayCalendarDate();
 
   const duration = calculateInclusiveRentalDays(startDate, endDate);
   const quantity = parseQuantity(quantityInput);
@@ -84,6 +94,7 @@ export default function RentalCalculator({ canRent, itemId, priceLabel, pricePer
                 id="rental-start-date"
                 name="startDate"
                 type="date"
+                min={today}
                 value={startDate}
                 onChange={(event) => setStartDate(event.target.value)}
                 aria-describedby="rental-date-help"
@@ -96,6 +107,7 @@ export default function RentalCalculator({ canRent, itemId, priceLabel, pricePer
                 id="rental-end-date"
                 name="endDate"
                 type="date"
+                min={today}
                 value={endDate}
                 onChange={(event) => setEndDate(event.target.value)}
                 aria-invalid={Boolean(dateError)}

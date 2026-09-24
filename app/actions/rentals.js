@@ -6,6 +6,7 @@ import { getCatalogItem } from "../../lib/catalog.js";
 import {
   RentalInputError,
   RentalResponseError,
+  cancelRental,
   createRental,
   validateRentalInput,
 } from "../../lib/rentals.js";
@@ -16,6 +17,7 @@ const REQUEST_ERROR = "Pengajuan sewa tidak dapat diproses. Periksa kembali item
 const AVAILABILITY_ERROR = "Item ini sedang tidak tersedia untuk disewa atau stok tidak mencukupi.";
 const SERVICE_ERROR = "Layanan rental sedang tidak tersedia. Coba lagi nanti.";
 const UNAUTHENTICATED_ERROR = "Silakan masuk untuk mengajukan rental.";
+const CANCELLATION_ERROR = "Rental ini tidak dapat dibatalkan pada status sekarang.";
 
 function readFormValue(formData, field) {
   const value = formData?.get(field);
@@ -129,5 +131,39 @@ export async function createRentalAction(itemId, _previousState, formData) {
     };
   } catch (error) {
     return mapRentalRequestError(error);
+  }
+}
+
+export async function cancelRentalAction(_previousState, formData) {
+  let currentUser;
+
+  try {
+    currentUser = await getCurrentUser();
+  } catch {
+    return serviceUnavailableState();
+  }
+
+  if (currentUser.status !== "authenticated" || !currentUser.user) {
+    return unauthenticatedState();
+  }
+
+  const rentalId = Number(readFormValue(formData, "rentalId"));
+
+  try {
+    await cancelRental(currentUser.user.id, rentalId);
+    return { status: "success", message: "Rental berhasil dibatalkan." };
+  } catch (error) {
+    if (error instanceof RentalInputError) {
+      return { status: "request_error", error: CANCELLATION_ERROR };
+    }
+
+    if (error instanceof ApiError) {
+      if (error.status === 401) return unauthenticatedState();
+      if (error.status === 400 || error.status === 404 || error.status === 409 || error.status === 422) {
+        return { status: "request_error", error: CANCELLATION_ERROR };
+      }
+    }
+
+    return serviceUnavailableState();
   }
 }
