@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "../../lib/auth.js";
-import { getMyRentals } from "../../lib/rentals.js";
+import { getCatalogItems } from "../../lib/catalog.js";
+import { getMyRentals, getRentals } from "../../lib/rentals.js";
+import { getAllRentals, getOwnerStats } from "../../lib/owner.js";
 import { filterReviewsForDashboard, getReviews } from "../../lib/reviews.js";
 import DashboardClient from "./DashboardClient";
 
@@ -14,6 +16,43 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const isOwner = currentUser.user.role === "admin";
+
+  // ── OWNER / ADMIN PATH ──────────────────────────────────────
+  if (isOwner) {
+    let rentals = [];
+    let rentalState = "ready";
+    let items = [];
+    let itemsState = "ready";
+    let stats = { total: 0, pending: 0, ongoing: 0, returned: 0, approved: 0, totalRevenue: 0 };
+
+    try {
+      rentals = await getAllRentals();
+      stats = await getOwnerStats(rentals);
+    } catch {
+      rentalState = "unavailable";
+    }
+
+    try {
+      items = await getCatalogItems();
+    } catch {
+      itemsState = "unavailable";
+    }
+
+    return (
+      <DashboardClient
+        currentUser={currentUser.user}
+        role="admin"
+        rentalState={rentalState}
+        rentals={rentals}
+        stats={stats}
+        items={items}
+        itemsState={itemsState}
+      />
+    );
+  }
+
+  // ── CUSTOMER PATH ────────────────────────────────────────────
   let rentals = [];
   let rentalState = "ready";
   let reviews = [];
@@ -40,7 +79,8 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      currentUserName={currentUser.user.name}
+      currentUser={currentUser.user}
+      role="customer"
       rentalState={rentalState}
       rentals={rentals}
       reviewState={reviewState}

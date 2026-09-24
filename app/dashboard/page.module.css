@@ -1022,3 +1022,507 @@
     transition: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════
+   OWNER DASHBOARD STYLES
+   ═══════════════════════════════════════════ */
+
+.ownerRoleBadge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  margin-left: auto;
+}
+
+.ownerViewTabs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ownerViewTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.ownerViewTab:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+.ownerViewTabActive {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  color: var(--color-accent);
+}
+
+.ownerBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.ownerStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px;
+  border: 1px solid var(--color-border);
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ownerStat {
+  background: var(--color-surface);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ownerStatLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ownerStatValue {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.ownerStatWarn { color: #8b5a1c; }
+.ownerStatGood { color: #356447; }
+
+.ownerRentalList {
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ownerRentalRow {
+  display: grid;
+  grid-template-columns: 1fr 140px 130px 110px 200px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: background 120ms ease;
+}
+
+.ownerRentalRow:last-child { border-bottom: none; }
+.ownerRentalRow:hover { background: var(--color-surface-muted); }
+.ownerRentalRowExpanded { background: var(--color-surface-muted); }
+
+.ownerRentalInfo h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.ownerRentalInfo p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ownerRentalMeta { font-size: 12px; color: var(--color-text-muted); }
+
+.ownerRentalPrice {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.ownerRentalActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.ownerStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ownerStatusPending  { background: #fef6e8; color: #8b5a1c; }
+.ownerStatusApproved { background: #edf5ed; color: #356447; }
+.ownerStatusOngoing  { background: #e8f0f5; color: #3b5f7a; }
+.ownerStatusReturned { background: #eeebe2; color: #66605a; }
+.ownerStatusRejected { background: #fceaea; color: #963333; }
+.ownerStatusCancelled { background: #eeebe2; color: #66605a; }
+
+.btnApprove {
+  padding: 6px 12px;
+  border: 1px solid #356447;
+  border-radius: 3px;
+  background: transparent;
+  color: #356447;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.btnApprove:hover:not(:disabled) { background: #356447; color: white; }
+.btnApprove:disabled { opacity: 0.4; cursor: default; }
+
+.btnReject {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.btnReject:hover:not(:disabled) { border-color: #963333; color: #963333; }
+.btnReject:disabled { opacity: 0.4; cursor: default; }
+
+.btnDetail {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.btnDetail:hover { background: var(--color-surface-muted); color: var(--color-text); }
+
+.btnUpdate {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 3px;
+  background: var(--color-accent);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease;
+  white-space: nowrap;
+}
+
+.btnUpdate:hover:not(:disabled) { background: var(--accent-dark); }
+.btnUpdate:disabled { opacity: 0.4; cursor: default; }
+
+.ownerRentalDetail {
+  padding: 18px 20px;
+  border-top: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface-muted) 60%, transparent);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: start;
+}
+
+.ownerDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.ownerDetailItem { display: flex; flex-direction: column; gap: 2px; }
+
+.ownerDetailLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ownerDetailValue { font-size: 13px; font-weight: 500; color: var(--color-text); }
+
+.ownerNoteForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.ownerFormLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ownerNoteInput {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  resize: vertical;
+  transition: border-color 160ms ease;
+}
+
+.ownerNoteInput:focus { outline: none; border-color: var(--color-accent); }
+
+.ownerStatusRow { display: flex; gap: 8px; align-items: center; }
+
+.ownerStatusSelect {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+}
+
+.ownerStatusSelect:focus { outline: none; border-color: var(--color-accent); }
+
+.ownerFeedback { font-size: 12px; padding: 6px 10px; border-radius: 3px; }
+.ownerFeedbackSuccess { background: #edf5ed; color: #356447; }
+.ownerFeedbackError { background: #fceaea; color: #963333; }
+
+.ownerItemsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1px;
+  border: 1px solid var(--color-border);
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ownerItemCard { background: var(--color-surface); display: flex; flex-direction: column; }
+
+.ownerItemImage {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  object-fit: cover;
+  background: var(--color-surface-muted);
+}
+
+.ownerItemImageEmpty {
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-muted);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ownerItemBody {
+  padding: 14px 14px 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ownerItemCategory {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.ownerItemName { font-size: 13px; font-weight: 600; color: var(--color-text); line-height: 1.3; margin: 0; }
+.ownerItemMeta { font-size: 11px; color: var(--color-text-muted); }
+
+.ownerItemPrice {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-top: 2px;
+}
+
+.ownerItemFooter { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
+
+.btnDeleteItem {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.btnDeleteItem:hover:not(:disabled) { border-color: #963333; color: #963333; }
+.btnDeleteItem:disabled { opacity: 0.4; cursor: default; }
+
+.ownerAddItem {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ownerAddItemToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border: none;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease;
+  text-align: left;
+}
+
+.ownerAddItemToggle:hover {
+  background: color-mix(in srgb, var(--color-surface-muted) 80%, var(--color-border));
+}
+
+.ownerAddItemForm {
+  padding: 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.ownerFormGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.ownerFormField { display: flex; flex-direction: column; gap: 5px; }
+.ownerFormFieldWide { grid-column: 1 / -1; }
+
+.ownerFormInput {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  transition: border-color 160ms ease;
+}
+
+.ownerFormInput:focus { outline: none; border-color: var(--color-accent); }
+
+.ownerFormSelect {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+}
+
+.ownerFormSelect:focus { outline: none; border-color: var(--color-accent); }
+
+.ownerFormTextarea {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  resize: vertical;
+  transition: border-color 160ms ease;
+}
+
+.ownerFormTextarea:focus { outline: none; border-color: var(--color-accent); }
+
+.ownerAddItemFooter { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+.btnAddItem {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 3px;
+  background: var(--color-accent);
+  color: white;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.btnAddItem:hover:not(:disabled) { background: var(--accent-dark); }
+.btnAddItem:disabled { opacity: 0.4; cursor: default; }
+
+@media (max-width: 900px) {
+  .ownerRentalRow { grid-template-columns: 1fr; gap: 10px; }
+  .ownerRentalDetail { grid-template-columns: 1fr; }
+  .ownerNoteForm { min-width: unset; }
+}
+
+@media (max-width: 640px) {
+  .ownerStats { grid-template-columns: repeat(3, 1fr); }
+  .ownerViewTabs { flex-wrap: wrap; }
+}
