@@ -59,7 +59,7 @@ function ProductChrome({ children }) {
           <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">
             cosplay<span>asik.</span>
           </Link>
-          <Link href="/catalog" className={styles.backLink}>
+          <Link href="/katalog" className={styles.backLink}>
             <span aria-hidden="true">←</span>
             <span>Kembali ke koleksi</span>
           </Link>
@@ -78,7 +78,7 @@ function ProductChrome({ children }) {
             </Link>
             <p>Rental kostum &amp; aksesori cosplay per hari.</p>
           </div>
-          <Link href="/catalog">Kembali ke koleksi ↗</Link>
+          <Link href="/katalog">Kembali ke koleksi ↗</Link>
         </div>
       </footer>
     </div>
@@ -94,7 +94,7 @@ function ProductUnavailable() {
         <p>
           Coba lagi sebentar atau kembali ke koleksi untuk memilih item lain.
         </p>
-        <Link href="/catalog" className={styles.textLink}>Kembali ke koleksi <span aria-hidden="true">↗</span></Link>
+        <Link href="/katalog" className={styles.textLink}>Kembali ke koleksi <span aria-hidden="true">↗</span></Link>
       </section>
     </ProductChrome>
   );
@@ -114,7 +114,8 @@ export default async function ProductPage({ params }) {
 
   const product = result.product;
   const priceLabel = formatRupiah(product.pricePerDay);
-  const isAvailable = product.status === "available";
+  const canRent = product.status === "available" && product.stock > 0;
+  const isAvailable = canRent;
   const statusLabel = isAvailable ? "Tersedia" : "Tidak tersedia";
   const hasSize = product.size?.trim().length > 0;
   const hasDescription = product.description?.trim().length > 0;
@@ -122,7 +123,7 @@ export default async function ProductPage({ params }) {
   return (
     <ProductChrome>
       <nav className={styles.breadcrumb} aria-label="Lokasi halaman">
-        <Link href="/catalog">Koleksi</Link>
+        <Link href="/katalog">Koleksi</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{product.name}</span>
       </nav>
@@ -183,9 +184,11 @@ export default async function ProductPage({ params }) {
         ) : null}
 
         <RentalCalculator
+          canRent={canRent}
           itemId={product.id}
           priceLabel={priceLabel}
           pricePerDay={product.pricePerDay}
+          stock={product.stock}
         />
 
         <aside className={styles.accessNote} aria-label="Langkah setelah estimasi">

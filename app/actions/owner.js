@@ -42,7 +42,7 @@ export async function approveRentalAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, "approved", adminNote || null);
-    revalidatePath("/owner");
+    revalidatePath("/dashboard");
     return { status: "success", message: "Rental berhasil disetujui." };
   } catch (error) {
     if (error instanceof OwnerServiceError && error.code === "INVALID_INPUT") {
@@ -64,7 +64,7 @@ export async function rejectRentalAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, "rejected", adminNote || null);
-    revalidatePath("/owner");
+    revalidatePath("/dashboard");
     return { status: "success", message: "Rental berhasil ditolak." };
   } catch (error) {
     if (error instanceof ApiError) {
@@ -84,7 +84,7 @@ export async function updateRentalStatusAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, status, adminNote || null);
-    revalidatePath("/owner");
+    revalidatePath("/dashboard");
     return { status: "success", message: `Status rental berhasil diperbarui ke "${status}".` };
   } catch (error) {
     if (error instanceof ApiError) {
@@ -114,8 +114,8 @@ export async function createItemAction(_previousState, formData) {
 
   try {
     await createItem(input);
-    revalidatePath("/owner");
-    revalidatePath("/catalog");
+    revalidatePath("/dashboard");
+    revalidatePath("/katalog");
     revalidatePath("/");
     return { status: "success", message: `Koleksi "${input.name}" berhasil ditambahkan.` };
   } catch (error) {
@@ -137,8 +137,8 @@ export async function deleteItemAction(_previousState, formData) {
 
   try {
     await deleteItem(itemId);
-    revalidatePath("/owner");
-    revalidatePath("/catalog");
+    revalidatePath("/dashboard");
+    revalidatePath("/katalog");
     revalidatePath("/");
     return { status: "success", message: "Item berhasil dihapus dari koleksi." };
   } catch (error) {
