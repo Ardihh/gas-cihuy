@@ -24,6 +24,8 @@ export default async function DashboardPage() {
     let rentalState = "ready";
     let items = [];
     let itemsState = "ready";
+    let reviews = [];
+    let reviewState = "ready";
     let stats = { total: 0, pending: 0, ongoing: 0, returned: 0, approved: 0, totalRevenue: 0 };
 
     try {
@@ -39,15 +41,23 @@ export default async function DashboardPage() {
       itemsState = "unavailable";
     }
 
+    try {
+      reviews = await getReviews();
+    } catch {
+      reviewState = "unavailable";
+    }
+
     return (
       <DashboardClient
-        currentUser={currentUser.user}
+        userName={currentUser.user.name}
         role="admin"
         rentalState={rentalState}
         rentals={rentals}
         stats={stats}
         items={items}
         itemsState={itemsState}
+        reviewState={reviewState}
+        reviews={reviews}
       />
     );
   }
@@ -79,7 +89,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      currentUser={currentUser.user}
+      userName={currentUser.user.name}
       role="customer"
       rentalState={rentalState}
       rentals={rentals}

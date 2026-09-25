@@ -12,6 +12,7 @@ import {
   createItemAction,
   deleteItemAction,
   rejectRentalAction,
+  updateItemAction,
   updateRentalStatusAction,
 } from "../actions/owner.js";
 import { formatRupiah } from "../../lib/format-currency.mjs";
@@ -429,8 +430,75 @@ function OwnerRentalRow({ rental, expanded, onToggle }) {
   );
 }
 
+function OwnerItemEditForm({ item, onSaveSuccess, onCancel }) {
+  const router = useRouter();
+  const [formState, formAction, formPending] = useActionState(
+    updateItemAction,
+    { status: "idle" },
+  );
+
+  useEffect(() => {
+    if (formState?.status === "success") {
+      onSaveSuccess(formState.message);
+      router.refresh();
+    }
+  }, [formState?.message, formState?.status, onSaveSuccess, router]);
+
+  return (
+    <form action={formAction} className={styles.ownerItemEditForm} aria-label={`Edit ${item.name}`}>
+      <input name="itemId" type="hidden" value={item.id} />
+      <div className={styles.ownerFormGrid}>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-name-${item.id}`}>Nama kostum</label>
+          <input className={styles.ownerFormInput} id={`edit-name-${item.id}`} name="name" required defaultValue={item.name} />
+        </div>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-category-${item.id}`}>Kategori</label>
+          <input className={styles.ownerFormInput} id={`edit-category-${item.id}`} name="category" required defaultValue={item.category} />
+        </div>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-size-${item.id}`}>Ukuran</label>
+          <input className={styles.ownerFormInput} id={`edit-size-${item.id}`} name="size" defaultValue={item.size} />
+        </div>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-price-${item.id}`}>Harga/hari (Rp)</label>
+          <input className={styles.ownerFormInput} id={`edit-price-${item.id}`} name="pricePerDay" type="number" min="1" step="any" required defaultValue={item.pricePerDay} />
+        </div>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-stock-${item.id}`}>Stok</label>
+          <input className={styles.ownerFormInput} id={`edit-stock-${item.id}`} name="stock" type="number" min="0" step="1" required defaultValue={item.stock} />
+        </div>
+        <div className={styles.ownerFormField}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-status-${item.id}`}>Ketersediaan</label>
+          <select className={styles.ownerFormSelect} id={`edit-status-${item.id}`} name="status" defaultValue={item.stock === 0 ? "unavailable" : item.status}>
+            <option value="available">Tersedia</option>
+            <option value="unavailable">Tidak tersedia</option>
+          </select>
+        </div>
+        <div className={`${styles.ownerFormField} ${styles.ownerFormFieldWide}`}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-image-${item.id}`}>URL gambar</label>
+          <input className={styles.ownerFormInput} id={`edit-image-${item.id}`} name="imageUrl" type="url" defaultValue={item.imageUrl ?? ""} />
+        </div>
+        <div className={`${styles.ownerFormField} ${styles.ownerFormFieldWide}`}>
+          <label className={styles.ownerFormLabel} htmlFor={`edit-description-${item.id}`}>Deskripsi</label>
+          <textarea className={styles.ownerFormTextarea} id={`edit-description-${item.id}`} name="description" rows={3} defaultValue={item.description ?? ""} />
+        </div>
+      </div>
+      <div className={styles.ownerAddItemFooter}>
+        <button className={styles.btnAddItem} type="submit" disabled={formPending}>
+          {formPending ? "Menyimpan…" : "Simpan perubahan"}
+        </button>
+        <button className={styles.btnCancelEdit} type="button" onClick={onCancel}>Batal</button>
+        {formState?.status === "error" && <p className={`${styles.ownerFeedback} ${styles.ownerFeedbackError}`} role="alert">{formState.error}</p>}
+      </div>
+    </form>
+  );
+}
+
 function OwnerItemCard({ item }) {
   const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [editSuccessMessage, setEditSuccessMessage] = useState("");
   const [deleteState, deleteAction, deletePending] = useActionState(
     deleteItemAction,
     { status: "idle" },
@@ -451,10 +519,24 @@ function OwnerItemCard({ item }) {
       <div className={styles.ownerItemBody}>
         <span className={styles.ownerItemCategory}>{item.category}</span>
         <h3 className={styles.ownerItemName}>{item.name}</h3>
-        <span className={styles.ownerItemMeta}>Ukuran: {item.size} · Stok: {item.stock}</span>
+        <span className={styles.ownerItemMeta}>
+          Ukuran: {item.size} · Stok: {item.stock} · {item.stock > 0 && item.status === "available" ? "Tersedia" : "Tidak tersedia"}
+        </span>
         <span className={styles.ownerItemPrice}>{formatRupiah(item.pricePerDay)}/hari</span>
       </div>
       <div className={styles.ownerItemFooter}>
+        <button
+          className={styles.btnEditItem}
+          type="button"
+          aria-expanded={editing}
+          aria-controls={`edit-item-${item.id}`}
+          onClick={() => {
+            setEditSuccessMessage("");
+            setEditing((value) => !value);
+          }}
+        >
+          {editing ? "Tutup" : "Edit"}
+        </button>
         <form action={deleteAction}>
           <input type="hidden" name="itemId" value={item.id} />
           <button
@@ -467,6 +549,18 @@ function OwnerItemCard({ item }) {
           </button>
         </form>
       </div>
+      <div id={`edit-item-${item.id}`} hidden={!editing}>
+        {editing && <OwnerItemEditForm
+          item={item}
+          onSaveSuccess={(message) => {
+            setEditSuccessMessage(message);
+            setEditing(false);
+          }}
+          onCancel={() => setEditing(false)}
+        />}
+      </div>
+      {editSuccessMessage && <p className={`${styles.ownerFeedback} ${styles.ownerFeedbackSuccess}`} role="status">{editSuccessMessage}</p>}
+      {deleteState?.status === "error" && <p className={`${styles.ownerFeedback} ${styles.ownerFeedbackError}`} role="alert">{deleteState.error}</p>}
     </div>
   );
 }
@@ -558,7 +652,54 @@ function OwnerAddItemForm() {
 // OWNER DASHBOARD VIEW
 // ═══════════════════════════════════════════════════════════════════
 
-function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, itemsState }) {
+function OwnerFeedbackView({ reviews, reviewState, rentals, items }) {
+  return (
+    <section className={styles.rentalSection} aria-labelledby="owner-feedback-title">
+      <div className={styles.sectionHeading}>
+        <div>
+          <p className={styles.eyebrow}>Suara penyewa</p>
+          <h2 id="owner-feedback-title">Feedback pelanggan</h2>
+        </div>
+        <p className={styles.sectionCount} role="status" aria-live="polite">
+          {reviewState === "ready" ? `${reviews.length} feedback` : "Tidak tersedia"}
+        </p>
+      </div>
+
+      {reviewState === "unavailable" ? (
+        <div className={styles.serviceState} role="alert">
+          <strong>Feedback belum dapat dimuat.</strong>
+          <span>Coba muat ulang halaman.</span>
+        </div>
+      ) : reviews.length === 0 ? (
+        <p className={styles.emptyState} role="status">Belum ada feedback pelanggan.</p>
+      ) : (
+        <ul className={styles.ownerReviewList} aria-label="Feedback pelanggan tersimpan">
+          {reviews.map((review) => {
+            const linkedRental = rentals.find((rental) => (
+              rental.id === review.rentalId && rental.itemId === review.itemId
+            ));
+            const item = items.find((record) => record.id === review.itemId);
+            const itemName = linkedRental?.itemName ?? item?.name ?? `Item #${review.itemId}`;
+
+            return (
+              <li className={styles.ownerReview} key={review.id}>
+                <div className={styles.ownerReviewMeta}>
+                  <h3>{itemName}</h3>
+                  <span>Pelanggan #{review.userId}</span>
+                  <span>{review.rentalId ? `Rental #${review.rentalId}` : "Rental tidak terhubung"}</span>
+                </div>
+                <p className={styles.ownerReviewRating}>Rating {review.rating} dari 5</p>
+                <p className={styles.ownerReviewComment}>{review.comment || "Tanpa komentar tertulis."}</p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function OwnerDashboardView({ rentalState, rentals, stats, items, itemsState, reviewState, reviews }) {
   const [activeView, setActiveView] = useState("rentals");
   const [activeTab, setActiveTab] = useState("Semua");
   const [expandedId, setExpandedId] = useState(null);
@@ -572,12 +713,14 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
         <div>
           <p className={styles.eyebrow}>Panel operasional</p>
           <h1>
-            {activeView === "rentals" ? "Kelola Rental" : "Kelola Koleksi"}
+            {activeView === "rentals" ? "Kelola Rental" : activeView === "items" ? "Kelola Koleksi" : "Feedback Pelanggan"}
           </h1>
           <p className={styles.introDescription}>
             {activeView === "rentals"
               ? "Tinjau semua pengajuan, setujui atau tolak rental, dan perbarui status penyewaan."
-              : "Tambahkan kostum baru ke katalog atau hapus koleksi yang sudah tidak tersedia."}
+              : activeView === "items"
+                ? "Tambahkan, perbarui, atau hapus koleksi dan informasi stok."
+                : "Baca ulasan dan pengalaman pelanggan setelah rental selesai."}
           </p>
         </div>
 
@@ -586,17 +729,27 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
           <button
             className={`${styles.ownerViewTab} ${activeView === "rentals" ? styles.ownerViewTabActive : ""}`}
             type="button"
+            aria-pressed={activeView === "rentals"}
             onClick={() => setActiveView("rentals")}
           >
             Rental
-            {stats.pending > 0 && <span className={styles.ownerBadge}>{stats.pending}</span>}
+            {rentalState === "ready" && stats.pending > 0 && <span className={styles.ownerBadge}>{stats.pending}</span>}
           </button>
           <button
             className={`${styles.ownerViewTab} ${activeView === "items" ? styles.ownerViewTabActive : ""}`}
             type="button"
+            aria-pressed={activeView === "items"}
             onClick={() => setActiveView("items")}
           >
             Koleksi
+          </button>
+          <button
+            className={`${styles.ownerViewTab} ${activeView === "feedback" ? styles.ownerViewTabActive : ""}`}
+            type="button"
+            aria-pressed={activeView === "feedback"}
+            onClick={() => setActiveView("feedback")}
+          >
+            Feedback
           </button>
         </div>
       </header>
@@ -604,11 +757,11 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
       {/* Stats strip */}
       <section className={styles.ownerStats} aria-label="Ringkasan toko">
         {[
-          { label: "Total Rental", value: stats.total },
-          { label: "Menunggu", value: stats.pending, warn: stats.pending > 0 },
-          { label: "Disetujui", value: stats.approved, good: true },
-          { label: "Berjalan", value: stats.ongoing },
-          { label: "Selesai", value: stats.returned },
+          { label: "Total Rental", value: rentalState === "ready" ? stats.total : "—" },
+          { label: "Menunggu", value: rentalState === "ready" ? stats.pending : "—", warn: rentalState === "ready" && stats.pending > 0 },
+          { label: "Disetujui", value: rentalState === "ready" ? stats.approved : "—", good: rentalState === "ready" },
+          { label: "Berjalan", value: rentalState === "ready" ? stats.ongoing : "—" },
+          { label: "Selesai", value: rentalState === "ready" ? stats.returned : "—" },
           { label: "Koleksi", value: itemsState === "ready" ? items.length : "—" },
         ].map(({ label, value, warn, good }) => (
           <div className={styles.ownerStat} key={label}>
@@ -717,6 +870,15 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
           </section>
         </section>
       )}
+
+      {activeView === "feedback" && (
+        <OwnerFeedbackView
+          reviews={reviews}
+          reviewState={reviewState}
+          rentals={rentals}
+          items={items}
+        />
+      )}
     </>
   );
 }
@@ -726,7 +888,7 @@ function OwnerDashboardView({ currentUser, rentalState, rentals, stats, items, i
 // ═══════════════════════════════════════════════════════════════════
 
 function CustomerDashboardView({
-  currentUser,
+  userName,
   rentalState,
   rentals,
   reviewState,
@@ -774,7 +936,7 @@ function CustomerDashboardView({
       <header className={styles.pageIntro} id="dashboard">
         <div>
           <p className={styles.eyebrow}>Meja rental</p>
-          <h1>Rental kamu, {currentUser.name}.</h1>
+          <h1>Rental kamu, {userName}.</h1>
           <p className={styles.introDescription}>
             Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
           </p>
@@ -933,7 +1095,7 @@ function CustomerDashboardView({
 // ═══════════════════════════════════════════════════════════════════
 
 export default function DashboardClient({
-  currentUser,
+  userName,
   role,
   rentalState,
   rentals,
@@ -975,10 +1137,10 @@ export default function DashboardClient({
 
           <div className={styles.customerIdentity}>
             <span className={styles.customerMark} aria-hidden="true">
-              {getUserInitials(currentUser.name)}
+              {getUserInitials(userName)}
             </span>
             <span className={styles.customerDetails}>
-              <strong>{currentUser.name}</strong>
+              <strong>{userName}</strong>
               <span>{isOwner ? "Admin" : "Pelanggan"}</span>
             </span>
             <form className={styles.logoutForm} action={logoutAction}>
@@ -993,16 +1155,17 @@ export default function DashboardClient({
       <div className={styles.pageInner}>
         {isOwner ? (
           <OwnerDashboardView
-            currentUser={currentUser}
             rentalState={rentalState}
             rentals={rentals}
             stats={stats}
             items={items}
             itemsState={itemsState}
+            reviewState={reviewState}
+            reviews={reviews}
           />
         ) : (
           <CustomerDashboardView
-            currentUser={currentUser}
+            userName={userName}
             rentalState={rentalState}
             rentals={rentals}
             reviewState={reviewState}
