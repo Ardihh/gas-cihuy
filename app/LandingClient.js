@@ -35,7 +35,6 @@ function Specimen({ item, priority = false, sizes }) {
         className={styles.catalogImage}
       />
       <span className={styles.specimenIndex}>{String(item.id).padStart(2, "0")}</span>
-      <span className={styles.specimenName}>{item.name}</span>
     </div>
   );
 }

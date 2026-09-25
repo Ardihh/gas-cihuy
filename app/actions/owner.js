@@ -9,6 +9,7 @@ import {
   OwnerServiceError,
   createItem,
   deleteItem,
+  updateItem,
   updateRentalStatus,
 } from "../../lib/owner.js";
 
@@ -146,5 +147,38 @@ export async function deleteItemAction(_previousState, formData) {
       return { status: "error", error: `Gagal menghapus item: ${error.message}` };
     }
     return { status: "error", error: "Gagal menghapus item. Coba lagi." };
+  }
+}
+
+export async function updateItemAction(_previousState, formData) {
+  const auth = await verifyOwner();
+  if (!auth.authorized) return { status: "error", error: UNAUTHORIZED_MSG };
+
+  const itemId = Number(readFormValue(formData, "itemId"));
+  const input = {
+    name: readFormValue(formData, "name"),
+    category: readFormValue(formData, "category"),
+    description: readFormValue(formData, "description"),
+    size: readFormValue(formData, "size"),
+    pricePerDay: readFormValue(formData, "pricePerDay"),
+    stock: readFormValue(formData, "stock"),
+    imageUrl: readFormValue(formData, "imageUrl"),
+    status: readFormValue(formData, "status"),
+  };
+
+  try {
+    await updateItem(itemId, input);
+    revalidatePath("/dashboard");
+    revalidatePath("/katalog");
+    revalidatePath("/");
+    return { status: "success", message: `Koleksi "${input.name.trim()}" berhasil diperbarui.` };
+  } catch (error) {
+    if (error instanceof OwnerServiceError && error.code === "INVALID_INPUT") {
+      return { status: "error", error: error.message };
+    }
+    if (error instanceof ApiError) {
+      return { status: "error", error: `Gagal memperbarui item: ${error.message}` };
+    }
+    return { status: "error", error: "Gagal memperbarui koleksi. Coba lagi." };
   }
 }

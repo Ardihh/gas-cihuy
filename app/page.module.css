@@ -48,7 +48,6 @@
 .specimenName { font-family: var(--font-display); font-size: clamp(24px, 2.5vw, 36px); font-weight: 500; letter-spacing: -.045em; line-height: 1.1; max-width: 9ch; overflow-wrap: anywhere; }
 .photoNote { font-size: 11px; color: var(--color-text-muted); }
 .featured .specimen { background: #e4e0d5; }
-.featured .specimenName { font-size: clamp(36px, 4.2vw, 60px); }
 .featuredCaption { position: relative; display: flex; justify-content: space-between; align-items: end; gap: 16px; background: var(--color-surface); margin-top: -24px; margin-left: 24px; padding: 16px 0 0 18px; border-left: 2px solid var(--color-accent); }
 .featuredCaption h2 { font-size: 20px; letter-spacing: -.03em; margin-top: 4px; }
 .featuredCaption p { font-size: 12px; flex-shrink: 0; }
@@ -133,13 +132,11 @@
   .hero h1 { font-size: 46px; }
   .desktopBreak { display: none; }
   .featured .specimen { min-height: 240px; }
-  .featured .specimenName { font-size: 34px; }
   .featuredCaption h2 { font-size: 18px; }
   .heroDescription { font-size: 16px; }
   .journey { padding-inline: 24px; gap: 32px; }
   .productRack { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   .productCaption h3 { font-size: 20px; }
-  .product .specimenName { font-size: 19px; }
   .footer { grid-template-columns: 1fr; }
 }
 
@@ -163,7 +160,6 @@
   .featured { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 20px; align-items: center; border-top: 1px solid var(--color-border); padding-top: 18px; }
   .featuredMedia { width: 100%; margin: 0; }
   .featured .specimen { min-height: 0; max-height: 220px; padding: 12px; }
-  .featured .specimenName { font-size: 26px; }
   .featuredCaption { margin: 0; padding: 0 0 0 14px; }
   .featuredCaption h2 { font-size: 23px; line-height: 1.1; margin-top: 8px; }
   .featuredCaption p { font-size: 14px; margin-top: 16px; }
@@ -180,7 +176,6 @@
   .productRack { grid-template-columns: 1fr; gap: 18px; }
   .product { grid-template-columns: 100px minmax(0, 1fr); gap: 20px; padding-top: 18px; }
   .product .specimen { aspect-ratio: 3 / 4; padding: 10px; }
-  .product .specimenName { font-size: 20px; }
   .productCaption h3 { font-size: 23px; }
   .productCategory { font-size: 13px; }
   .price { font-size: 14px; margin-top: 12px; }
@@ -204,10 +199,8 @@
   .hero h1 { font-size: 36px; }
   .featured { gap: 14px; }
   .featured .specimen { padding: 12px; }
-  .featured .specimenName { font-size: 18px; letter-spacing: -.055em; overflow-wrap: normal; }
   .featuredCaption h2 { font-size: 21px; }
   .product { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; }
-  .product .specimenName { font-size: 18px; }
   .productCaption h3 { font-size: 21px; }
   .categoryIndex { gap: 4px; }
   .categoryIndex button { font-size: 13px; }

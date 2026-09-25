@@ -13,14 +13,16 @@
 .page a,
 .page button,
 .page textarea,
-.page input {
+.page input,
+.page select {
   -webkit-tap-highlight-color: transparent;
 }
 
 .page a:focus-visible,
 .page button:focus-visible,
 .page textarea:focus-visible,
-.page input:focus-visible {
+.page input:focus-visible,
+.page select:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 4px;
 }
@@ -1425,7 +1427,22 @@
   margin-top: 2px;
 }
 
-.ownerItemFooter { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
+.ownerItemFooter { padding: 0 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+
+.btnEditItem,
+.btnCancelEdit {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.btnEditItem:hover,
+.btnCancelEdit:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
 .btnDeleteItem {
   padding: 5px 10px;
@@ -1473,6 +1490,56 @@
   padding: 20px;
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
+}
+
+.ownerItemEditForm {
+  padding: 14px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+.ownerItemEditForm .ownerFormGrid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+
+.ownerReviewList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.ownerReview {
+  display: grid;
+  gap: 8px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ownerReviewMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ownerReviewMeta h3 {
+  margin: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.ownerReviewRating { font-size: 12px; font-weight: 600; color: var(--color-accent); }
+
+.ownerReviewComment {
+  max-width: 75ch;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .ownerFormGrid {
