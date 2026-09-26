@@ -83,23 +83,20 @@
 .productImage { position: relative; display: flex; flex-direction: column; justify-content: space-between; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--line); padding: 16px; background: #e4e0d5; color: var(--ink); }
 .productImage[data-category="Game"] { background: #dfe8dc; }
 .productImage[data-category="Aksesoris"] { background: var(--color-surface-muted); }
-.catalogImage { z-index: 0; object-fit: cover; opacity: .74; }
-.imageMeta { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
-.imageName { max-width: 9ch; margin: auto 0; font-family: var(--font-display); font-size: clamp(28px, 3.1vw, 45px); letter-spacing: -.05em; line-height: .98; overflow-wrap: anywhere; }
-.imageName, .imageNote { position: relative; z-index: 1; }
-.imageNote { color: var(--muted); font-size: 11px; }
+.catalogImage { z-index: 0; object-fit: cover; opacity: 1; }
+.imageNote { position: relative; z-index: 1; color: var(--muted); font-size: 11px; }
 .availabilityBadge { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid currentColor; padding: 6px 8px; background: var(--chalk); font-size: 11px; font-weight: 600; line-height: 1; }
 .statusMark, .inlineStatus { color: var(--muted); font-size: 9px; }
 .availabilityBadge[data-status="available"], .inlineStatus[data-status="available"] { color: var(--status-available); }
 .availabilityBadge[data-status="unavailable"], .inlineStatus[data-status="unavailable"] { color: var(--status-unavailable); }
 .productCard[data-status="unavailable"] .productImage { filter: grayscale(.8); opacity: .7; }
 .cardBody { padding-top: 16px; }
-.cardCategory { color: var(--muted); font-size: 11px; }
-.productName { margin-top: 6px; font-size: 24px; letter-spacing: -.04em; line-height: 1.05; overflow-wrap: anywhere; }
+.cardCategory { color: var(--muted); font-size: 12px; }
+.productName { margin-top: 6px; font-size: 22px; letter-spacing: -.035em; line-height: 1.15; overflow-wrap: anywhere; }
 .productPrice { display: flex; align-items: baseline; gap: 4px; margin-top: 14px; font-size: 13px; }
 .productPrice strong { font-size: 16px; font-weight: 600; }
 .productPrice span { color: var(--muted); }
-.cardFooter { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); font-size: 11px; }
+.cardFooter { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); font-size: 12px; }
 .cardAvailability { display: inline-flex; align-items: center; gap: 5px; }
 .cardAction { flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; color: var(--ink); }
 .cardAction > span { color: var(--accent); font-size: 15px; transition: transform 160ms ease; }
@@ -122,7 +119,6 @@
 @media (max-width: 1200px) {
   .introGrid { gap: 40px; }
   .productGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .imageName { font-size: clamp(30px, 4.2vw, 44px); }
 }
 
 @media (max-width: 800px) {
@@ -152,7 +148,7 @@
   .categoryRail { gap: 22px; }
   .productGrid { grid-template-columns: 1fr; gap: 28px; }
   .productCard { padding-top: 14px; }
-  .productName { font-size: 25px; }
+  .productName { font-size: 23px; }
   .footer { grid-template-columns: 1fr; }
   .copyright { grid-column: auto; }
 }
