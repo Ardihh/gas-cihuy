@@ -53,11 +53,6 @@ function ProductImage({ product }) {
         sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
         src={product.imageUrl}
       />
-      <div className={styles.imageMeta}>
-        <span>{String(product.id).padStart(2, "0")}</span>
-        <span>{product.category}</span>
-      </div>
-      <p className={styles.imageName}>{product.name}</p>
     </div>
   );
 }
