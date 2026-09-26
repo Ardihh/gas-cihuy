@@ -83,12 +83,16 @@ function filterOwnerRentals(rentals, tab) {
 
 const REVIEW_RATINGS = [1, 2, 3, 4, 5];
 const initialReviewState = { status: "idle", error: "" };
+const CANCELLATION_SUCCESS_VISIBLE_MS = 2000;
+const REVIEW_SUCCESS_VISIBLE_MS = 2000;
 
 // ═══════════════════════════════════════════════════════════════════
 // CUSTOMER COMPONENTS
 // ═══════════════════════════════════════════════════════════════════
 
 function FeedbackForm({ rental, action, actionState, pending }) {
+  const saved = actionState?.status === "success";
+
   return (
     <div className={styles.feedbackForm} id={`feedback-form-${rental.id}`}>
       <p className={styles.formEyebrow}>Feedback untuk</p>
@@ -103,7 +107,7 @@ function FeedbackForm({ rental, action, actionState, pending }) {
         aria-busy={pending}
       >
         <input name="rentalId" type="hidden" value={rental.id} />
-        <fieldset className={styles.ratingFieldset}>
+        <fieldset className={styles.ratingFieldset} disabled={saved}>
           <legend className={styles.formLabel}>Rating</legend>
           <div className={styles.ratingOptions}>
             {REVIEW_RATINGS.map((rating) => (
@@ -124,6 +128,7 @@ function FeedbackForm({ rental, action, actionState, pending }) {
         </label>
         <textarea
           className={styles.textarea}
+          disabled={saved}
           id={`feedback-text-${rental.id}`}
           maxLength={500}
           name="comment"
@@ -136,10 +141,20 @@ function FeedbackForm({ rental, action, actionState, pending }) {
             {actionState.error}
           </p>
         )}
+        {saved && (
+          <p
+            className={styles.reviewSuccessMessage}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            Feedback berhasil disimpan.
+          </p>
+        )}
         <div className={styles.formFooter}>
           <span>Maksimal 500 karakter</span>
-          <button className={styles.submitButton} disabled={pending} type="submit">
-            {pending ? "Menyimpan…" : "Simpan feedback →"}
+          <button className={styles.submitButton} disabled={pending || saved} type="submit">
+            {pending ? "Menyimpan…" : saved ? "Tersimpan" : "Simpan feedback →"}
           </button>
         </div>
       </form>
@@ -149,7 +164,7 @@ function FeedbackForm({ rental, action, actionState, pending }) {
 
 function PersistedReview({ review }) {
   return (
-    <div className={styles.persistedReview} aria-label="Feedback tersimpan">
+    <div className={styles.persistedReview}>
       <span className={styles.feedbackDone}>Feedback tersimpan</span>
       <span className={styles.persistedRating}>Rating {review.rating} dari 5</span>
       {review.comment && <p>{review.comment}</p>}
@@ -162,12 +177,13 @@ function RentalRecord({
   selectedRentalId,
   reviews,
   reviewState,
-  reviewActionState,
-  reviewAction,
-  reviewPending,
   onChooseFeedback,
 }) {
   const router = useRouter();
+  const [reviewActionState, reviewAction, reviewPending] = useActionState(
+    createReviewAction,
+    initialReviewState,
+  );
   const [cancelState, cancelAction, cancelPending] = useActionState(
     cancelRentalAction,
     { status: "idle" },
@@ -180,10 +196,26 @@ function RentalRecord({
   const canCancel = rental.status === "pending" || rental.status === "approved";
 
   useEffect(() => {
-    if (cancelState?.status === "success") {
-      router.refresh();
-    }
+    if (cancelState?.status !== "success") return;
+
+    const refreshTimeout = window.setTimeout(
+      () => router.refresh(),
+      CANCELLATION_SUCCESS_VISIBLE_MS,
+    );
+
+    return () => window.clearTimeout(refreshTimeout);
   }, [cancelState?.status, router]);
+
+  useEffect(() => {
+    if (reviewActionState?.status === "success") {
+      const refreshTimeout = window.setTimeout(
+        () => router.refresh(),
+        REVIEW_SUCCESS_VISIBLE_MS,
+      );
+
+      return () => window.clearTimeout(refreshTimeout);
+    }
+  }, [reviewActionState?.status, router]);
 
   return (
     <li className={`${styles.record} ${selected ? styles.recordSelected : ""}`}>
@@ -233,7 +265,7 @@ function RentalRecord({
               <input name="rentalId" type="hidden" value={rental.id} />
               <button
                 className={styles.cancelButton}
-                disabled={cancelPending}
+                disabled={cancelPending || cancelState?.status === "success"}
                 onClick={(event) => {
                   if (!window.confirm("Batalkan pengajuan rental ini?")) event.preventDefault();
                 }}
@@ -245,6 +277,11 @@ function RentalRecord({
           )}
           {cancelState?.status === "error" && (
             <span className={styles.feedbackUnavailable} role="alert">{cancelState.error}</span>
+          )}
+          {cancelState?.status === "success" && (
+            <span className={styles.cancelSuccessMessage} role="status" aria-live="polite">
+              {cancelState.message}
+            </span>
           )}
         </div>
       </div>
@@ -894,19 +931,8 @@ function CustomerDashboardView({
   reviewState,
   reviews,
 }) {
-  const router = useRouter();
-  const [reviewActionState, reviewAction, reviewPending] = useActionState(
-    createReviewAction,
-    initialReviewState,
-  );
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [selectedRentalId, setSelectedRentalId] = useState(null);
-
-  useEffect(() => {
-    if (reviewActionState?.status === "success") {
-      router.refresh();
-    }
-  }, [reviewActionState?.status, router]);
 
   const filteredRentals = rentals.filter((rental) =>
     matchesRentalFilter(rental, activeFilter),
@@ -925,9 +951,6 @@ function CustomerDashboardView({
     selectedRentalId,
     reviews,
     reviewState,
-    reviewActionState: selectedRentalId === null ? initialReviewState : reviewActionState,
-    reviewAction,
-    reviewPending,
     onChooseFeedback: chooseFeedback,
   };
 

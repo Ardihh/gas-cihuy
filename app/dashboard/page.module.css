@@ -545,10 +545,28 @@
   white-space: nowrap;
 }
 
+.reviewSuccessMessage {
+  margin: 10px 0 0;
+  color: var(--color-status-positive);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .feedbackUnavailable {
   color: var(--color-text-muted);
   font-size: 11px;
   line-height: 1.35;
+}
+
+.cancelSuccessMessage {
+  display: block;
+  max-width: 24rem;
+  color: var(--color-status-positive);
+  font-size: 11px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .persistedReview {
