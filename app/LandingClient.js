@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { getLandingAccountLink } from "../lib/auth-navigation.mjs";
 import { formatRupiah } from "../lib/format-currency.mjs";
 import { filterAndSortProducts } from "./katalog/catalog-utils.mjs";
 import CatalogImage from "./CatalogImage";
@@ -15,7 +16,7 @@ const journey = [
   ["Pakai", "Jadi karakter pilihanmu selama periode rental yang disetujui."],
   ["Kembalikan", "Kembalikan item setelah periode rental selesai."],
 ];
-const navigation = [["/katalog", "Koleksi"], ["#cara-kerja", "Cara rental"], ["#harga", "Harga"]];
+const navigation = [["#cara-kerja", "Cara rental"], ["#harga", "Harga"]];
 
 function Brand() {
   return <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">cosplay<span>asik.</span></Link>;
@@ -62,16 +63,15 @@ function EmptyFeatured({ catalogState }) {
   );
 }
 
-export default function LandingClient({ products = [], catalogState = "ready" }) {
+export default function LandingClient({ products = [], catalogState = "ready", isAuthenticated = false }) {
   const [category, setCategory] = useState("Semua");
   const menu = useRef(null);
+  const accountLink = getLandingAccountLink(isAuthenticated);
   const featured = products[0];
   const categories = ["Semua", ...new Set(products.map((item) => item.category))];
   const filteredProducts = filterAndSortProducts(products, { category });
-  const visibleProducts = filteredProducts.slice(0, 8);
-  const visibleCountLabel = filteredProducts.length > visibleProducts.length
-    ? `${visibleProducts.length} dari ${filteredProducts.length} item ditampilkan`
-    : `${filteredProducts.length} item`;
+  const visibleProducts = filteredProducts;
+  const visibleCountLabel = `${filteredProducts.length} item`;
   const hasProducts = products.length > 0;
   const catalogUnavailable = catalogState === "error";
 
@@ -88,7 +88,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
           <nav className={styles.desktopNav} aria-label="Navigasi utama">
             {navigation.map(([href, label]) => <a href={href} key={href}>{label}</a>)}
           </nav>
-          <Link href="/dashboard" className={styles.accountLink}>Dashboard</Link>
+          <Link href={accountLink.href} className={styles.accountLink}>{accountLink.label}</Link>
           <details ref={menu} className={styles.mobileMenu} onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
           }} onKeyDown={(event) => {
@@ -100,7 +100,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
             <summary>Menu <span aria-hidden="true">+</span></summary>
             <nav aria-label="Navigasi seluler" onClick={closeMenu}>
               {navigation.map(([href, label]) => <a href={href} key={href}>{label}<span aria-hidden="true">↗</span></a>)}
-              <Link href="/dashboard">Dashboard <span aria-hidden="true">↗</span></Link>
+              <Link href={accountLink.href}>{accountLink.label} <span aria-hidden="true">↗</span></Link>
             </nav>
           </details>
         </div>
@@ -173,7 +173,7 @@ export default function LandingClient({ products = [], catalogState = "ready" })
               {hasProducts ? <p className={styles.collectionNote}>Buka item untuk melihat detail dan mencoba estimasi rental.</p> : null}
             </>
           )}
-          <Link href="/katalog" className={styles.textLink}>View More <span aria-hidden="true">↗</span></Link>
+          <Link href="/katalog" className={styles.textLink}>Lihat katalog lengkap <span aria-hidden="true">↗</span></Link>
         </section>
 
         <section id="cara-kerja" tabIndex={-1} className={styles.journey} aria-labelledby="journey-title">
@@ -199,10 +199,10 @@ export default function LandingClient({ products = [], catalogState = "ready" })
           )}
         </section>
 
-        <section className={styles.closing} aria-labelledby="closing-title"><h2 id="closing-title">Sudah tahu<br />ingin jadi siapa?</h2><a href="#katalog" className={styles.primaryAction}>Temukan kostummu <span aria-hidden="true">↗</span></a></section>
+        <section className={styles.closing} aria-labelledby="closing-title"><h2 id="closing-title">Sudah tahu<br />ingin jadi siapa?</h2><Link href="/katalog" className={styles.primaryAction}>Lihat katalog lengkap <span aria-hidden="true">↗</span></Link></section>
       </main>
 
-      <footer className={styles.footer}><div><Brand /><p>Sewa kostum &amp; aksesori cosplay per hari.</p></div><nav aria-label="Navigasi footer">{navigation.map(([href, label]) => <a href={href} key={href}>{label}</a>)}<Link href="/dashboard">Dashboard</Link></nav><p className={styles.copyright}>© 2026 Cosplay Asik</p></footer>
+      <footer className={styles.footer}><div><Brand /><p>Sewa kostum &amp; aksesori cosplay per hari.</p></div><nav aria-label="Navigasi footer">{navigation.map(([href, label]) => <a href={href} key={href}>{label}</a>)}<Link href={accountLink.href}>{accountLink.label}</Link></nav><p className={styles.copyright}>© 2026 Cosplay Asik</p></footer>
     </div>
   );
 }

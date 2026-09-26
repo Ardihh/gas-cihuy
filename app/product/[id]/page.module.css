@@ -712,6 +712,17 @@
   color: var(--color-text);
 }
 
+.submissionSuccessLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  border-bottom: 1px solid currentColor;
+  color: var(--color-accent) !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .submissionDetails {
   display: flex;
   flex-wrap: wrap;

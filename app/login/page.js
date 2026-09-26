@@ -2,22 +2,24 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "../../lib/auth.js";
+import { getRegisterHref, getSafeReturnPath } from "../../lib/auth-navigation.mjs";
 import LoginForm from "./LoginForm";
 import styles from "./page.module.css";
 
 export default async function LoginPage({ searchParams }) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const nextPath = getSafeReturnPath(resolvedSearchParams?.next);
   const currentUser = await getCurrentUser();
 
   if (currentUser.status === "authenticated") {
-    redirect("/dashboard");
+    redirect(nextPath);
   }
 
-  const resolvedSearchParams = searchParams ? await searchParams : {};
   const registrationComplete = resolvedSearchParams?.registered === "1";
 
   return (
     <main className={styles.page}>
-      <a className={styles.skipLink} href="#login-title">
+      <a className={styles.skipLink} href="#login-form">
         Lewati ke form masuk
       </a>
 
@@ -27,7 +29,7 @@ export default async function LoginPage({ searchParams }) {
             cosplay<span>asik.</span>
           </Link>
           <Link className={styles.backLink} href="/">
-            ← Kembali ke koleksi
+            ← Kembali ke beranda
           </Link>
         </div>
       </header>
@@ -42,14 +44,14 @@ export default async function LoginPage({ searchParams }) {
         </div>
 
         <div className={styles.formPanel}>
-          <LoginForm />
+          <LoginForm nextPath={nextPath} />
           {registrationComplete && (
             <p className={styles.success} role="status">
               Registrasi berhasil. Silakan masuk.
             </p>
           )}
           <p className={styles.formNote}>
-            Belum punya akun? <Link href="/register">Daftar</Link>
+            Belum punya akun? <Link href={getRegisterHref(nextPath)}>Daftar</Link>
           </p>
         </div>
       </section>

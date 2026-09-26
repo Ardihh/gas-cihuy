@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 
 const initialState = { error: "" };
 
-export default function LoginForm() {
+export default function LoginForm({ nextPath = "/dashboard" }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
@@ -18,6 +18,7 @@ export default function LoginForm() {
       aria-busy={pending}
       aria-describedby={state?.error ? "login-error" : undefined}
     >
+      <input name="next" type="hidden" value={nextPath} />
       <div className={styles.field}>
         <label htmlFor="email">Email</label>
         <input

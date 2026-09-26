@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AuthServiceError, login, logout, registerUser } from "../../lib/auth.js";
+import { getLoginHref, getSafeReturnPath } from "../../lib/auth-navigation.mjs";
 
 const SESSION_COOKIE = "session_token";
 const LEGACY_PROFILE_COOKIE = "user_profile";
@@ -49,6 +50,7 @@ function getSessionCookieOptions(expiresIn) {
 }
 
 export async function loginAction(_previousState, formData) {
+  const nextPath = getSafeReturnPath(readFormValue(formData, "next"));
   const emailValue = formData?.get("email");
   const passwordValue = formData?.get("password");
   const email = typeof emailValue === "string" ? emailValue : "";
@@ -66,10 +68,11 @@ export async function loginAction(_previousState, formData) {
   cookieStore.delete(LEGACY_PROFILE_COOKIE);
   cookieStore.set(SESSION_COOKIE, session.token, getSessionCookieOptions(session.expiresIn));
 
-  redirect("/dashboard");
+  redirect(nextPath);
 }
 
 export async function registerAction(_previousState, formData) {
+  const nextPath = getSafeReturnPath(readFormValue(formData, "next"));
   const input = {
     name: readFormValue(formData, "name"),
     email: readFormValue(formData, "email"),
@@ -86,7 +89,7 @@ export async function registerAction(_previousState, formData) {
     };
   }
 
-  redirect("/login?registered=1");
+  redirect(getLoginHref(nextPath, { registered: true }));
 }
 
 export async function logoutAction() {
