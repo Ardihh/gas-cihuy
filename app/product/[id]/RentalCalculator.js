@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 
 import { createRentalAction } from "../../../app/actions/rentals.js";
+import { getLoginHref } from "../../../lib/auth-navigation.mjs";
 import { formatRupiah } from "../../../lib/format-currency.mjs";
 import {
   calculateEstimatedTotal,
@@ -206,7 +207,7 @@ export default function RentalCalculator({ canRent, itemId, priceLabel, pricePer
               {submissionState.status === "unauthenticated" ? (
                 <>
                   {" "}
-                  <Link href="/login">Masuk ke akun</Link>
+                  <Link href={getLoginHref(`/product/${itemId}`)}>Masuk ke akun</Link>
                 </>
               ) : null}
             </p>
@@ -230,6 +231,9 @@ export default function RentalCalculator({ canRent, itemId, priceLabel, pricePer
                   <dd>{formatRupiah(submissionState.result.calculation.totalPrice)}</dd>
                 </div>
               </dl>
+              <Link className={styles.submissionSuccessLink} href="/dashboard">
+                Lihat rental saya <span aria-hidden="true">↗</span>
+              </Link>
             </div>
           ) : null}
         </div>

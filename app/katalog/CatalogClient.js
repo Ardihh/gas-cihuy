@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { formatRupiah } from "../../lib/format-currency.mjs";
 import CatalogImage from "../CatalogImage";
@@ -109,7 +109,7 @@ function ProductCard({ product }) {
 function EmptyState({ hasProducts, canReset, onReset }) {
   return (
     <div className={styles.emptyState} role="status">
-      <p className={styles.eyebrow}>{hasProducts ? "Koleksi tidak ditemukan" : "Koleksi live"}</p>
+      <p className={styles.eyebrow}>{hasProducts ? "Item tidak ditemukan" : "Katalog live"}</p>
       <h2>{hasProducts ? "Coba kata kunci atau filter lain." : "Belum ada item live."}</h2>
       <p>{hasProducts ? "Tidak ada item yang cocok dengan pencarian atau filter yang dipilih." : "Item akan tampil setelah tersedia di katalog."}</p>
       {canReset && (
@@ -124,8 +124,8 @@ function EmptyState({ hasProducts, canReset, onReset }) {
 function ServiceUnavailable({ onRetry }) {
   return (
     <div className={styles.serviceMessage} role="alert">
-      <p className={styles.eyebrow}>Koleksi live</p>
-      <h2>Koleksi sedang tidak dapat dimuat.</h2>
+      <p className={styles.eyebrow}>Katalog live</p>
+      <h2>Katalog sedang tidak dapat dimuat.</h2>
       <p>Coba lagi sebentar untuk melihat katalog terbaru.</p>
       <button type="button" className={styles.resetButton} onClick={onRetry}>
         Coba lagi
@@ -143,6 +143,7 @@ function replaceCatalogSearchParams(searchParams) {
 export default function CatalogClient({ products = [], catalogState = "ready" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const mobileMenu = useRef(null);
   const searchParamString = searchParams.toString();
 
   const categories = useMemo(
@@ -183,6 +184,10 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
     updateCatalogState(defaultCatalogState);
   }
 
+  function closeMobileMenu() {
+    if (mobileMenu.current) mobileMenu.current.open = false;
+  }
+
   return (
     <div className={styles.page}>
       <a className={styles.skipLink} href="#main">Lewati navigasi</a>
@@ -191,14 +196,26 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
           <Brand />
           <nav className={styles.desktopNav} aria-label="Navigasi utama">
             <Link href="/">Beranda</Link>
-            <Link href="/katalog" aria-current="page">Koleksi</Link>
+            <Link href="/katalog" aria-current="page">Katalog</Link>
             <Link href="/dashboard">Dashboard</Link>
           </nav>
-          <details className={styles.mobileMenu}>
+          <details
+            ref={mobileMenu}
+            className={styles.mobileMenu}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) closeMobileMenu();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                closeMobileMenu();
+                mobileMenu.current?.querySelector("summary")?.focus();
+              }
+            }}
+          >
             <summary>Menu <span aria-hidden="true">+</span></summary>
-            <nav aria-label="Navigasi seluler">
+            <nav aria-label="Navigasi seluler" onClick={closeMobileMenu}>
               <Link href="/">Beranda <span aria-hidden="true">↗</span></Link>
-              <Link href="/katalog" aria-current="page">Koleksi <span aria-hidden="true">↗</span></Link>
+              <Link href="/katalog" aria-current="page">Katalog <span aria-hidden="true">↗</span></Link>
               <Link href="/dashboard">Dashboard <span aria-hidden="true">↗</span></Link>
             </nav>
           </details>
@@ -210,18 +227,18 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
           <nav className={styles.breadcrumb} aria-label="Lokasi halaman">
             <Link href="/">Beranda</Link>
             <span aria-hidden="true">/</span>
-            <span aria-current="page">Koleksi</span>
+            <span aria-current="page">Katalog</span>
           </nav>
           <div className={styles.introGrid}>
             <div>
-              <p className={styles.eyebrow}>Koleksi cosplay</p>
+              <p className={styles.eyebrow}>Katalog cosplay</p>
               <h1 id="catalog-title">Temukan karakter berikutnya.</h1>
               <p className={styles.introDescription}>
                 Jelajahi kostum dan aksesori live, cek harga sewa per hari, lalu buka detail item yang paling cocok.
               </p>
             </div>
             <p className={styles.introNote}>
-              <strong>{catalogState === "error" ? "Koleksi live" : `${products.length} item`}</strong>
+              <strong>{catalogState === "error" ? "Katalog live" : `${products.length} item`}</strong>
               <span>{catalogState === "error" ? "Data katalog sedang tidak tersedia." : "Harga ditampilkan per hari. Ketersediaan aktual diperiksa saat pengajuan."}</span>
             </p>
           </div>
@@ -310,7 +327,7 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
         </div>
         <nav aria-label="Navigasi footer">
           <Link href="/">Beranda</Link>
-          <Link href="/katalog">Koleksi</Link>
+          <Link href="/katalog">Katalog</Link>
           <Link href="/dashboard">Dashboard</Link>
         </nav>
         <p className={styles.copyright}>© 2026 Cosplay Asik</p>

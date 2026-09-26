@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { getLoginHref } from "../../lib/auth-navigation.mjs";
 import { getCurrentUser } from "../../lib/auth.js";
 import { getCatalogItems } from "../../lib/catalog.js";
 import { getMyRentals, getRentals } from "../../lib/rentals.js";
@@ -13,7 +14,7 @@ export default async function DashboardPage() {
   const currentUser = await getCurrentUser();
 
   if (currentUser.status !== "authenticated" || !currentUser.user) {
-    redirect("/login");
+    redirect(getLoginHref("/dashboard"));
   }
 
   const isOwner = currentUser.user.role === "admin";

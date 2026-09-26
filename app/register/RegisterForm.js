@@ -7,7 +7,7 @@ import styles from "../login/page.module.css";
 
 const initialState = { status: "", error: "" };
 
-export default function RegisterForm() {
+export default function RegisterForm({ nextPath = "/dashboard" }) {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
 
   return (
@@ -18,6 +18,7 @@ export default function RegisterForm() {
       aria-busy={pending}
       aria-describedby={state?.error ? "register-error" : undefined}
     >
+      <input name="next" type="hidden" value={nextPath} />
       <div className={styles.field}>
         <label htmlFor="name">Nama</label>
         <input

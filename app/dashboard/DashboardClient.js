@@ -965,7 +965,7 @@ function CustomerDashboardView({
           </p>
         </div>
         <Link className={styles.catalogLink} href="/katalog">
-          Lihat koleksi <span aria-hidden="true">↗</span>
+          Lihat katalog <span aria-hidden="true">↗</span>
         </Link>
       </header>
 
@@ -1132,6 +1132,9 @@ export default function DashboardClient({
 
   return (
     <main className={styles.page}>
+      <a className={styles.skipLink} href="#dashboard-content">
+        Lewati ke konten utama
+      </a>
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
           <Link href="/" className={styles.logo} aria-label="Cosplay Asik beranda">
@@ -1147,7 +1150,7 @@ export default function DashboardClient({
                 href="#dashboard"
                 aria-current="page"
               >
-                Dashboard
+                Ringkasan
               </a>
               <Link className={styles.navLink} href="/katalog">
                 Katalog
@@ -1175,7 +1178,7 @@ export default function DashboardClient({
         </div>
       </header>
 
-      <div className={styles.pageInner}>
+      <div className={styles.pageInner} id="dashboard-content" tabIndex={-1}>
         {isOwner ? (
           <OwnerDashboardView
             rentalState={rentalState}

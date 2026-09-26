@@ -59,9 +59,9 @@ function ProductChrome({ children }) {
           <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">
             cosplay<span>asik.</span>
           </Link>
-          <Link href="/katalog" className={styles.backLink}>
+          <Link href="/" className={styles.backLink}>
             <span aria-hidden="true">←</span>
-            <span>Kembali ke koleksi</span>
+            <span>Kembali ke beranda</span>
           </Link>
         </div>
       </header>
@@ -78,7 +78,7 @@ function ProductChrome({ children }) {
             </Link>
             <p>Rental kostum &amp; aksesori cosplay per hari.</p>
           </div>
-          <Link href="/katalog">Kembali ke koleksi ↗</Link>
+          <Link href="/katalog">Lihat katalog lengkap ↗</Link>
         </div>
       </footer>
     </div>
@@ -92,9 +92,9 @@ function ProductUnavailable() {
         <p className={styles.sectionLabel}>Koleksi live</p>
         <h1 id="product-unavailable-title">Produk sedang tidak dapat dimuat.</h1>
         <p>
-          Coba lagi sebentar atau kembali ke koleksi untuk memilih item lain.
+          Coba lagi sebentar atau kembali ke beranda untuk melihat pilihan lain.
         </p>
-        <Link href="/katalog" className={styles.textLink}>Kembali ke koleksi <span aria-hidden="true">↗</span></Link>
+        <Link href="/" className={styles.textLink}>Kembali ke beranda <span aria-hidden="true">↗</span></Link>
       </section>
     </ProductChrome>
   );
@@ -123,7 +123,7 @@ export default async function ProductPage({ params }) {
   return (
     <ProductChrome>
       <nav className={styles.breadcrumb} aria-label="Lokasi halaman">
-        <Link href="/katalog">Koleksi</Link>
+        <Link href="/katalog">Katalog</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{product.name}</span>
       </nav>
