@@ -53,7 +53,6 @@ export default function UserNavbar({ currentUser }) {
           <Link href="/" className={styles.brand} aria-label="Cosplay Asik beranda">
             cosplay<span>asik.</span>
           </Link>
-          <span className={styles.userBadge}>Area Pelanggan</span>
         </div>
 
         {/* Desktop Navigation Links */}

@@ -67,7 +67,6 @@ export default function OwnerNavbar({
           <Link href="/dashboard" className={styles.brand} aria-label="Cosplay Asik dashboard admin">
             cosplay<span>asik.</span>
           </Link>
-          <span className={styles.ownerBadge}>Pemilik Toko</span>
         </div>
 
         {/* Desktop Navigation Links */}
