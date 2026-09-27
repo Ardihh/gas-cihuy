@@ -709,9 +709,6 @@ export default function DashboardClient({
               <Link className={styles.navLink} href="/katalog">
                 Katalog
               </Link>
-              <a className={styles.navLink} href="#rental">
-                Rental saya
-              </a>
             </nav>
           )}
 

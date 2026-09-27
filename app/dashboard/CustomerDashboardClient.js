@@ -293,11 +293,7 @@ export default function CustomerDashboardClient({
     <>
       <header className={styles.pageIntro} id="dashboard">
         <div>
-          <p className={styles.eyebrow}>Meja rental</p>
           <h1>Rental kamu, {userName}.</h1>
-          <p className={styles.introDescription}>
-            Pantau pengajuan, jadwal rental, dan feedback kamu di satu tempat.
-          </p>
         </div>
         <Link className={styles.catalogLink} href="/katalog">
           Lihat katalog <span aria-hidden="true">↗</span>
@@ -314,7 +310,6 @@ export default function CustomerDashboardClient({
         ) : (
           <>
             <div className={styles.attentionCopy}>
-              <p className={styles.attentionLabel}>Perlu perhatian</p>
               <h2 id="attention-title">
                 {attentionCount > 0
                   ? `${attentionCount} rental perlu dipantau.`
@@ -350,14 +345,13 @@ export default function CustomerDashboardClient({
       <section className={styles.rentalSection} id="rental" aria-labelledby="rental-title">
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.eyebrow}>Aktivitas rental</p>
-            <h2 id="rental-title">Rental kamu</h2>
+            <h2 id="rental-title">Aktivitas rental</h2>
           </div>
-          <p className={styles.sectionCount} role="status" aria-live="polite" aria-atomic="true">
+          {/* <p className={styles.sectionCount} role="status" aria-live="polite" aria-atomic="true">
             {rentalState === "unavailable"
               ? "Rental tidak tersedia"
               : `${activeFilter === "Semua" ? counts.total : filteredRentals.length} rental${activeFilter === "Semua" ? "" : ` ${activeFilter.toLowerCase()}`} ditampilkan`}
-          </p>
+          </p> */}
         </div>
 
         {rentalState === "unavailable" ? (
@@ -382,8 +376,7 @@ export default function CustomerDashboardClient({
             </div>
 
             {activeFilter === "Aktif" && (
-              <p className={styles.filterHint}>
-                Aktif menampilkan rental yang sudah disetujui atau sedang disewa.
+              <p >
               </p>
             )}
 
@@ -405,7 +398,7 @@ export default function CustomerDashboardClient({
                   <div className={styles.historyBlock}>
                     <div className={styles.historyHeading}>
                       <h3>Riwayat terbaru</h3>
-                      <span>{historyRentals.length} rental dalam riwayat</span>
+                      {/* <span>{historyRentals.length} rental dalam riwayat</span> */}
                     </div>
                     <RentalRecordList records={historyRentals} {...recordProps} />
                   </div>
@@ -414,11 +407,7 @@ export default function CustomerDashboardClient({
             )}
 
             {activeFilter === "Selesai" && (
-              <div className={styles.historyBlock}>
-                <div className={styles.historyHeading}>
-                  <h3>Riwayat terbaru</h3>
-                  <span>{historyRentals.length} rental dalam riwayat</span>
-                </div>
+              <div >
                 {historyRentals.length > 0 ? (
                   <RentalRecordList records={historyRentals} {...recordProps} />
                 ) : (
@@ -436,7 +425,6 @@ export default function CustomerDashboardClient({
 
       <section className={styles.catalogContinuation} aria-labelledby="catalog-title">
         <div>
-          <p className={styles.eyebrow}>Berikutnya</p>
           <h2 id="catalog-title">Cari kostum lagi</h2>
           <p>Jelajahi koleksi saat kamu siap menyiapkan karakter berikutnya.</p>
         </div>
