@@ -41,9 +41,9 @@ function FeedbackForm({ rental, action, actionState, pending }) {
     <div className={styles.feedbackForm} id={`feedback-form-${rental.id}`}>
       <p className={styles.formEyebrow}>Feedback untuk</p>
       <h4 id={`feedback-title-${rental.id}`}>{rental.itemName}</h4>
-      <p className={styles.feedbackNote} id={`feedback-note-${rental.id}`}>
+      {/* <p className={styles.feedbackNote} id={`feedback-note-${rental.id}`}>
         Bagikan pengalamanmu agar tersimpan di akunmu.
-      </p>
+      </p> */}
       <form
         action={action}
         aria-labelledby={`feedback-title-${rental.id}`}
@@ -312,7 +312,7 @@ export default function CustomerDashboardClient({
             <div className={styles.attentionCopy}>
               <h2 id="attention-title">
                 {attentionCount > 0
-                  ? `${attentionCount} rental perlu dipantau.`
+                  ? `${attentionCount} rental dalam proses`
                   : counts.total === 0
                     ? "Belum ada pengajuan sewa."
                     : "Tidak ada rental yang perlu dipantau."}
@@ -320,8 +320,7 @@ export default function CustomerDashboardClient({
               <p>
                 {attentionGroups.length > 0
                   ? attentionGroups
-                      .map((group) => `${group.count} ${group.label.toLowerCase()}`)
-                      .join(" · ")
+                      .map((group) => ``)
                   : counts.total === 0
                     ? "Pilih item dari katalog untuk membuat pengajuan pertama."
                     : "Semua rental di daftar kamu sudah selesai."}
