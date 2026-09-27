@@ -999,3 +999,54 @@
     transition: none !important;
   }
 }
+
+.whatsappLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+
+  border: 1px solid #25211f;
+  border-radius: 4px;
+
+  background: transparent;
+  color: #25211f;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+
+  text-decoration: none;
+
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.whatsappLink:hover {
+  background: green;
+  border-color: #9a4f36;
+  color: #fffaf4;
+}
+
+.whatsappLink:active {
+  transform: translateY(1px);
+}
+
+.whatsappLink:focus-visible {
+  outline: 2px solid #9a4f36;
+  outline-offset: 3px;
+}
+
+.whatsappLink span {
+  transition: transform 160ms ease;
+}
+
+.whatsappLink:hover span {
+  transform: translate(2px, -2px);
+}
