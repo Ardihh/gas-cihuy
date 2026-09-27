@@ -6,5 +6,9 @@ export function getLandingRecommendations(products, category = "Semua") {
   ));
   const availableProducts = categoryProducts.filter((product) => product.status === "available");
 
-  return availableProducts.slice(0, LANDING_PREVIEW_LIMIT);
+  const sortedProducts = [...availableProducts].sort((left, right) => (
+    Number(left.id) - Number(right.id)
+  ));
+
+  return sortedProducts.slice(0, LANDING_PREVIEW_LIMIT);
 }

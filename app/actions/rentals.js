@@ -1,8 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ApiError } from "../../lib/api.js";
 import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
+import { getCatalogItem } from "../../lib/catalog.js";
+import { isRentalAvailable } from "../../lib/rental-adapter.mjs";
 import {
   RentalInputError,
   RentalResponseError,

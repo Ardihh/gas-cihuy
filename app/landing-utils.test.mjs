@@ -7,31 +7,51 @@ function product(id, { category = "Anime", status = "available", stock = 4 } = {
   return { id, name: `Product ${id}`, category, status, stock };
 }
 
-test("fills an eight-item preview from later available products in API order", () => {
+test("sorts available recommendations by numeric id and fills eight after unavailable items", () => {
   const products = [
-    product(1, { status: "unavailable", stock: 4 }),
-    product(2, { status: "unavailable", stock: 4 }),
-    ...Array.from({ length: 10 }, (_, index) => product(index + 3)),
+    ...Array.from({ length: 9 }, (_, index) => {
+      const id = 9 - index;
+      return product(id, { status: id === 1 ? "unavailable" : "available" });
+    }),
   ];
 
   const result = getLandingRecommendations(products);
 
-  assert.deepEqual(result.map(({ id }) => id), [3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.deepEqual(result.map(({ id }) => id), [2, 3, 4, 5, 6, 7, 8, 9]);
   assert.equal(result.length, 8);
   assert.ok(result.every(({ status }) => status === "available"));
 });
 
+test("returns a restocked low-id item to the first eight recommendations", () => {
+  const products = Array.from({ length: 9 }, (_, index) => {
+    const id = 9 - index;
+    return product(id, { status: id === 1 ? "unavailable" : "available" });
+  });
+
+  products.find(({ id }) => id === 1).status = "available";
+
+  assert.deepEqual(
+    getLandingRecommendations(products).map(({ id }) => id),
+    [1, 2, 3, 4, 5, 6, 7, 8],
+  );
+});
+
 test("filters category and availability before filling the eight-item preview", () => {
   const products = [
-    product(1, { category: "Game", status: "unavailable" }),
-    product(2, { category: "Game", status: "unavailable" }),
-    ...Array.from({ length: 10 }, (_, index) => product(index + 3, { category: "Game" })),
+    ...Array.from({ length: 10 }, (_, index) => {
+      const id = 10 - index;
+      return product(id, {
+        category: id === 9 ? "Film" : "Game",
+        status: id <= 2 ? "unavailable" : "available",
+      });
+    }),
     product(20, { category: "Film" }),
   ];
 
   const result = getLandingRecommendations(products, "Game");
 
-  assert.deepEqual(result.map(({ id }) => id), [3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.deepEqual(result.map(({ id }) => id), [3, 4, 5, 6, 7, 8, 10]);
+  assert.ok(result.every(({ category }) => category === "Game"));
 });
 
 test("uses status as the availability source, not stock", () => {
