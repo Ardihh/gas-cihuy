@@ -36,7 +36,6 @@ export default async function LoginPage({ searchParams }) {
 
       <section className={styles.shell} aria-labelledby="login-title">
         <div className={styles.intro}>
-          <p className={styles.eyebrow}>Meja rental</p>
           <h1 id="login-title">Masuk untuk melihat rental kamu.</h1>
           <p className={styles.description}>
             Gunakan akunmu untuk memantau pengajuan, jadwal, dan langkah berikutnya.

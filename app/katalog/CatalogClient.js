@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 import { formatRupiah } from "../../lib/format-currency.mjs";
+import Navbar from "@/components/navbar";
 import CatalogImage from "../CatalogImage";
 import {
   buildCatalogSearchParams,
@@ -41,6 +42,8 @@ function Brand() {
     </Link>
   );
 }
+
+
 
 function ProductImage({ product }) {
   return (
@@ -140,10 +143,13 @@ function replaceCatalogSearchParams(searchParams) {
   window.history.replaceState(null, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
 }
 
-export default function CatalogClient({ products = [], catalogState = "ready" }) {
+export default function CatalogClient({
+  currentUser = null,
+  products = [],
+  catalogState = "ready",
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const mobileMenu = useRef(null);
   const searchParamString = searchParams.toString();
 
   const categories = useMemo(
@@ -184,43 +190,10 @@ export default function CatalogClient({ products = [], catalogState = "ready" })
     updateCatalogState(defaultCatalogState);
   }
 
-  function closeMobileMenu() {
-    if (mobileMenu.current) mobileMenu.current.open = false;
-  }
-
   return (
     <div className={styles.page}>
       <a className={styles.skipLink} href="#main">Lewati navigasi</a>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Brand />
-          <nav className={styles.desktopNav} aria-label="Navigasi utama">
-            <Link href="/">Beranda</Link>
-            <Link href="/katalog" aria-current="page">Katalog</Link>
-            <Link href="/dashboard">Dashboard</Link>
-          </nav>
-          <details
-            ref={mobileMenu}
-            className={styles.mobileMenu}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget)) closeMobileMenu();
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") {
-                closeMobileMenu();
-                mobileMenu.current?.querySelector("summary")?.focus();
-              }
-            }}
-          >
-            <summary>Menu <span aria-hidden="true">+</span></summary>
-            <nav aria-label="Navigasi seluler" onClick={closeMobileMenu}>
-              <Link href="/">Beranda <span aria-hidden="true">↗</span></Link>
-              <Link href="/katalog" aria-current="page">Katalog <span aria-hidden="true">↗</span></Link>
-              <Link href="/dashboard">Dashboard <span aria-hidden="true">↗</span></Link>
-            </nav>
-          </details>
-        </div>
-      </header>
+      <Navbar currentUser={currentUser} />
 
       <main id="main" tabIndex={-1}>
         <section className={styles.catalogIntro} aria-labelledby="catalog-title">

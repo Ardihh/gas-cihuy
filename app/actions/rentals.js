@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
+import { redirect } from "next/navigation";
 import { ApiError } from "../../lib/api.js";
 import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
 import {
@@ -124,7 +123,23 @@ export async function createRentalAction(itemId, _previousState, formData) {
   }
 
   if (currentUser.status !== "authenticated" || !currentUser.user) {
-    return unauthenticatedState();
+    redirect(`/login?next=${encodeURIComponent(`/product/${itemId}`)}`);
+  }
+
+  let item;
+
+  try {
+    item = await getCatalogItem(normalizedInput.itemId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return unavailableItemState();
+    }
+
+    return serviceUnavailableState();
+  }
+
+  if (!isRentalAvailable(item, normalizedInput.quantity)) {
+    return unavailableItemState();
   }
 
   try {

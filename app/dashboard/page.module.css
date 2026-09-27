@@ -171,7 +171,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 40px;
-  padding: 56px 0 38px;
+  padding: 38px 0 38px;
 }
 
 .eyebrow,
@@ -299,7 +299,7 @@
 }
 
 .rentalSection {
-  padding-bottom: 50px;
+  /* padding-bottom: 50px; */
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -396,7 +396,7 @@
   align-items: center;
   gap: 12px 24px;
   min-width: 0;
-  padding: 18px 0;
+  padding: 18px;
 }
 
 .recordIdentity,
@@ -608,7 +608,7 @@
 }
 
 .feedbackForm {
-  max-width: 720px;
+  /* max-width: 720px; */
   margin: 0 0 18px;
   padding: 19px 20px 20px;
   border-left: 2px solid var(--color-accent);
@@ -832,6 +832,7 @@
       "action action";
     align-items: start;
     gap: 10px 20px;
+    margin: 12px;
   }
 
   .recordStatus,
