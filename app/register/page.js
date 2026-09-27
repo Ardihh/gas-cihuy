@@ -34,7 +34,6 @@ export default async function RegisterPage({ searchParams }) {
 
       <section className={styles.shell} aria-labelledby="register-title">
         <div className={styles.intro}>
-          <p className={styles.eyebrow}>Meja rental</p>
           <h1 id="register-title">Buat akun untuk mulai menyewa.</h1>
           <p className={styles.description}>
             Daftar untuk mengajukan rental dan memantau jadwal kostum pilihanmu.

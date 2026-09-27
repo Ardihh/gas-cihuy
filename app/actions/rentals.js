@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { ApiError } from "../../lib/api.js";
 import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
 import { getCatalogItem } from "../../lib/catalog.js";
@@ -100,7 +101,7 @@ export async function createRentalAction(itemId, _previousState, formData) {
   }
 
   if (currentUser.status !== "authenticated" || !currentUser.user) {
-    return unauthenticatedState();
+    redirect(`/login?next=${encodeURIComponent(`/product/${itemId}`)}`);
   }
 
   let item;
