@@ -191,12 +191,26 @@ export default async function ProductPage({ params }) {
           stock={product.stock}
         />
 
-        <aside className={styles.accessNote} aria-label="Langkah setelah estimasi">
-          <p className={styles.sectionLabel}>Setelah estimasi</p>
-          <p>
-            Ini simulasi biaya, bukan konfirmasi rental. Pengajuan membutuhkan akses akun pelanggan dan persetujuan pemilik toko.
-          </p>
-        </aside>
+        <section className={styles.contactAdmin} aria-labelledby="contact-admin-title">
+          <div>
+            <p className={styles.sectionLabel}>Butuh bantuan?</p>
+            <p>
+              Hubungi admin untuk menanyakan ukuran, kondisi kostum,
+              ketersediaan, atau informasi rental lainnya.
+            </p>
+          </div>
+
+          <a
+            href={`https://wa.me/6281234567890?text=${encodeURIComponent(
+              `Halo admin Cosplay Asik, saya ingin menanyakan lebih lanjut tentang ${product.name}.`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.whatsappLink}
+          >
+            Hubungi Admin via WhatsApp
+          </a>
+        </section>
       </div>
     </ProductChrome>
   );
