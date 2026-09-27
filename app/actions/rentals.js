@@ -1,8 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { ApiError } from "../../lib/api.js";
 import { AuthServiceError, getCurrentUser } from "../../lib/auth.js";
-import { getCatalogItem } from "../../lib/catalog.js";
 import {
   RentalInputError,
   RentalResponseError,
@@ -10,7 +11,10 @@ import {
   createRental,
   validateRentalInput,
 } from "../../lib/rentals.js";
-import { isRentalAvailable } from "../../lib/rental-adapter.mjs";
+import {
+  RentalAvailabilityError,
+  RentalStockSynchronizationError,
+} from "../../lib/rental-stock.mjs";
 
 const VALIDATION_ERROR = "Periksa tanggal dan jumlah sebelum mengajukan rental.";
 const REQUEST_ERROR = "Pengajuan sewa tidak dapat diproses. Periksa kembali item, tanggal, dan jumlah.";
@@ -45,10 +49,30 @@ function unavailableItemState() {
   };
 }
 
+function revalidateRentalViews(itemId) {
+  revalidatePath("/");
+  revalidatePath("/katalog");
+  revalidatePath("/dashboard");
+
+  if (Number.isSafeInteger(itemId) && itemId > 0) {
+    revalidatePath(`/product/${itemId}`);
+  } else {
+    revalidatePath("/product/[id]", "page");
+  }
+}
+
 function mapRentalRequestError(error) {
+  if (error instanceof RentalAvailabilityError) {
+    return unavailableItemState();
+  }
+
   if (error instanceof ApiError) {
     if (error.status === 401) {
       return unauthenticatedState();
+    }
+
+    if (error.status === 404) {
+      return unavailableItemState();
     }
 
     if (error.status === 400 || error.status === 409 || error.status === 422) {
@@ -103,33 +127,27 @@ export async function createRentalAction(itemId, _previousState, formData) {
     return unauthenticatedState();
   }
 
-  let item;
-
-  try {
-    item = await getCatalogItem(normalizedInput.itemId);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 404) {
-      return unavailableItemState();
-    }
-
-    return serviceUnavailableState();
-  }
-
-  if (!isRentalAvailable(item, normalizedInput.quantity)) {
-    return unavailableItemState();
-  }
-
   try {
     const result = await createRental({
       userId: currentUser.user.id,
       ...normalizedInput,
     });
 
+    revalidateRentalViews(normalizedInput.itemId);
     return {
       status: "success",
       result,
     };
   } catch (error) {
+    if (error instanceof RentalStockSynchronizationError) {
+      revalidateRentalViews(normalizedInput.itemId);
+      return {
+        status: "error",
+        partialFailure: true,
+        error: error.message,
+      };
+    }
+
     return mapRentalRequestError(error);
   }
 }
@@ -151,8 +169,14 @@ export async function cancelRentalAction(_previousState, formData) {
 
   try {
     await cancelRental(currentUser.user.id, rentalId);
+    revalidateRentalViews();
     return { status: "success", message: "Rental berhasil dibatalkan." };
   } catch (error) {
+    if (error instanceof RentalStockSynchronizationError) {
+      revalidateRentalViews();
+      return { status: "error", partialFailure: true, error: error.message };
+    }
+
     if (error instanceof RentalInputError) {
       return { status: "request_error", error: CANCELLATION_ERROR };
     }

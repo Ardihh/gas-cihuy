@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 
 import { getLandingAccountLink } from "../lib/auth-navigation.mjs";
 import { formatRupiah } from "../lib/format-currency.mjs";
-import { filterAndSortProducts } from "./katalog/catalog-utils.mjs";
+import { getLandingRecommendations } from "./landing-utils.mjs";
 import CatalogImage from "./CatalogImage";
 import styles from "./page.module.css";
 
@@ -40,24 +40,29 @@ function Specimen({ item, priority = false, sizes }) {
   );
 }
 
-function EmptyFeatured({ catalogState }) {
+function EmptyFeatured({ catalogState, hasProducts }) {
   const isError = catalogState === "error";
+  const emptyTitle = hasProducts ? "Belum tersedia" : "Belum ada item";
+  const emptyMessage = hasProducts
+    ? "Belum ada kostum yang tersedia saat ini."
+    : "Item baru akan tampil di sini.";
+  const emptyMediaLabel = hasProducts ? "Tidak ada item tersedia" : "Koleksi kosong";
 
   return (
-    <div className={styles.featured} aria-label={isError ? "Koleksi live tidak tersedia" : "Koleksi live kosong"}>
+    <div className={styles.featured} aria-label={isError ? "Koleksi live tidak tersedia" : emptyMediaLabel}>
       <div className={styles.featuredMedia}>
         <div className={styles.specimen} aria-hidden="true">
           <span className={styles.specimenIndex}>--</span>
-          <span className={styles.specimenName}>{isError ? "Koleksi live" : "Belum ada item"}</span>
-          <span className={styles.photoNote}>{isError ? "Coba lagi nanti" : "Koleksi kosong"}</span>
+          <span className={styles.specimenName}>{isError ? "Koleksi live" : emptyTitle}</span>
+          <span className={styles.photoNote}>{isError ? "Coba lagi nanti" : emptyMediaLabel}</span>
         </div>
       </div>
       <div className={styles.featuredCaption}>
         <div>
           <span className={styles.eyebrow}>Koleksi live</span>
-          <h2>{isError ? "Belum dapat dimuat" : "Belum ada item"}</h2>
+          <h2>{isError ? "Belum dapat dimuat" : emptyTitle}</h2>
         </div>
-        <p><span>{isError ? "Kembali lagi sebentar." : "Item baru akan tampil di sini."}</span></p>
+        <p><span>{isError ? "Kembali lagi sebentar." : emptyMessage}</span></p>
       </div>
     </div>
   );
@@ -67,12 +72,14 @@ export default function LandingClient({ products = [], catalogState = "ready", i
   const [category, setCategory] = useState("Semua");
   const menu = useRef(null);
   const accountLink = getLandingAccountLink(isAuthenticated);
-  const featured = products[0];
+  const featured = products.find((item) => item.status === "available");
   const categories = ["Semua", ...new Set(products.map((item) => item.category))];
-  const filteredProducts = filterAndSortProducts(products, { category });
-  const visibleProducts = filteredProducts;
-  const visibleCountLabel = `${filteredProducts.length} item`;
+  const visibleProducts = getLandingRecommendations(products, category);
+  const visibleCountLabel = `${visibleProducts.length} item`;
   const hasProducts = products.length > 0;
+  const hasProductsInCategory = category === "Semua"
+    ? hasProducts
+    : products.some((item) => item.category === category);
   const catalogUnavailable = catalogState === "error";
 
   function closeMenu() {
@@ -127,7 +134,7 @@ export default function LandingClient({ products = [], catalogState = "ready", i
                 <p><strong>{formatRupiah(featured.pricePerDay)}</strong><span> / hari <span aria-hidden="true">↗</span></span></p>
               </div>
             </Link>
-          ) : <EmptyFeatured catalogState={catalogState} />}
+          ) : <EmptyFeatured catalogState={catalogState} hasProducts={hasProducts} />}
           <p className={styles.heroFootnote}><span>Kostum. Kamu. Karaktermu.</span><span>{hasProducts ? "Koleksi live" : "Koleksi live · belum tersedia"}</span></p>
         </section>
 
@@ -167,7 +174,13 @@ export default function LandingClient({ products = [], catalogState = "ready", i
               </ul>
               {visibleProducts.length === 0 ? (
                 <p className={styles.collectionNote} role="status">
-                  {hasProducts ? `Belum ada item di kategori ${category}.` : "Koleksi belum memiliki item."}
+                  {!hasProducts
+                    ? "Koleksi belum memiliki item."
+                    : !hasProductsInCategory
+                      ? `Belum ada item di kategori ${category}.`
+                      : category === "Semua"
+                        ? "Belum ada item yang tersedia saat ini."
+                        : `Belum ada item tersedia di kategori ${category}.`}
                 </p>
               ) : null}
               {hasProducts ? <p className={styles.collectionNote}>Buka item untuk melihat detail dan mencoba estimasi rental.</p> : null}

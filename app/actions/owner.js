@@ -12,6 +12,7 @@ import {
   updateItem,
   updateRentalStatus,
 } from "../../lib/owner.js";
+import { RentalStockSynchronizationError } from "../../lib/rental-stock.mjs";
 
 const UNAUTHORIZED_MSG = "Akses ditolak. Hanya pemilik toko yang dapat melakukan aksi ini.";
 
@@ -34,6 +35,13 @@ function readFormValue(formData, field) {
   return typeof value === "string" ? value : "";
 }
 
+function revalidateRentalViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/");
+  revalidatePath("/katalog");
+  revalidatePath("/product/[id]", "page");
+}
+
 export async function approveRentalAction(_previousState, formData) {
   const auth = await verifyOwner();
   if (!auth.authorized) return { status: "error", error: UNAUTHORIZED_MSG };
@@ -43,9 +51,13 @@ export async function approveRentalAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, "approved", adminNote || null);
-    revalidatePath("/dashboard");
+    revalidateRentalViews();
     return { status: "success", message: "Rental berhasil disetujui." };
   } catch (error) {
+    if (error instanceof RentalStockSynchronizationError) {
+      revalidateRentalViews();
+      return { status: "error", error: error.message };
+    }
     if (error instanceof OwnerServiceError && error.code === "INVALID_INPUT") {
       return { status: "error", error: "Data tidak valid." };
     }
@@ -65,9 +77,13 @@ export async function rejectRentalAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, "rejected", adminNote || null);
-    revalidatePath("/dashboard");
+    revalidateRentalViews();
     return { status: "success", message: "Rental berhasil ditolak." };
   } catch (error) {
+    if (error instanceof RentalStockSynchronizationError) {
+      revalidateRentalViews();
+      return { status: "error", error: error.message };
+    }
     if (error instanceof ApiError) {
       return { status: "error", error: `Gagal memperbarui rental: ${error.message}` };
     }
@@ -85,9 +101,13 @@ export async function updateRentalStatusAction(_previousState, formData) {
 
   try {
     await updateRentalStatus(rentalId, status, adminNote || null);
-    revalidatePath("/dashboard");
+    revalidateRentalViews();
     return { status: "success", message: `Status rental berhasil diperbarui ke "${status}".` };
   } catch (error) {
+    if (error instanceof RentalStockSynchronizationError) {
+      revalidateRentalViews();
+      return { status: "error", error: error.message };
+    }
     if (error instanceof ApiError) {
       return { status: "error", error: `Gagal memperbarui rental: ${error.message}` };
     }
