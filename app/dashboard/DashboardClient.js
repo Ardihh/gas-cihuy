@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { logoutAction } from "../actions/auth.js";
+import Navbar from "@/components/navbar";
 import {
   approveRentalAction,
   createItemAction,
@@ -42,15 +42,7 @@ const OWNER_STATUS_LABELS = {
 
 const OWNER_RENTAL_FILTERS = ["Semua", "Menunggu", "Disetujui", "Berjalan", "Selesai", "Ditolak"];
 
-function getUserInitials(name) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
+
 
 function filterOwnerRentals(rentals, tab) {
   if (tab === "Semua") return rentals;
@@ -483,8 +475,16 @@ function OwnerFeedbackView({ reviews, reviewState, rentals, items }) {
   );
 }
 
-function OwnerDashboardView({ rentalState, rentals, stats, items, itemsState, reviewState, reviews }) {
-  const [activeView, setActiveView] = useState("rentals");
+function OwnerDashboardView({
+  activeView = "rentals",
+  rentalState,
+  rentals,
+  stats,
+  items,
+  itemsState,
+  reviewState,
+  reviews,
+}) {
   const [activeTab, setActiveTab] = useState("Semua");
   const [expandedId, setExpandedId] = useState(null);
 
@@ -508,34 +508,6 @@ function OwnerDashboardView({ rentalState, rentals, stats, items, itemsState, re
           </p>
         </div>
 
-        {/* Tab switcher */}
-        <div className={styles.ownerViewTabs} role="group" aria-label="Pilih tampilan">
-          <button
-            className={`${styles.ownerViewTab} ${activeView === "rentals" ? styles.ownerViewTabActive : ""}`}
-            type="button"
-            aria-pressed={activeView === "rentals"}
-            onClick={() => setActiveView("rentals")}
-          >
-            Rental
-            {rentalState === "ready" && stats.pending > 0 && <span className={styles.ownerBadge}>{stats.pending}</span>}
-          </button>
-          <button
-            className={`${styles.ownerViewTab} ${activeView === "items" ? styles.ownerViewTabActive : ""}`}
-            type="button"
-            aria-pressed={activeView === "items"}
-            onClick={() => setActiveView("items")}
-          >
-            Koleksi
-          </button>
-          <button
-            className={`${styles.ownerViewTab} ${activeView === "feedback" ? styles.ownerViewTabActive : ""}`}
-            type="button"
-            aria-pressed={activeView === "feedback"}
-            onClick={() => setActiveView("feedback")}
-          >
-            Feedback
-          </button>
-        </div>
       </header>
 
       {/* Stats strip */}
@@ -683,55 +655,30 @@ export default function DashboardClient({
   itemsState = "ready",
 }) {
   const isOwner = role === "admin";
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const [selectedView, setSelectedView] = useState(null);
+
+  const activeView =
+    selectedView ||
+    (viewParam === "items" || viewParam === "feedback" ? viewParam : "rentals");
 
   return (
     <main className={styles.page}>
       <a className={styles.skipLink} href="#dashboard-content">
         Lewati ke konten utama
       </a>
-      <header className={styles.topbar}>
-        <div className={styles.topbarInner}>
-          <Link href="/" className={styles.logo} aria-label="Cosplay Asik beranda">
-            cosplay<span>asik.</span>
-          </Link>
-
-          {isOwner ? (
-            <span className={styles.ownerRoleBadge}>Pemilik Toko</span>
-          ) : (
-            <nav className={styles.primaryNav} aria-label="Navigasi pelanggan">
-              <a
-                className={`${styles.navLink} ${styles.navLinkActive}`}
-                href="#dashboard"
-                aria-current="page"
-              >
-                Ringkasan
-              </a>
-              <Link className={styles.navLink} href="/katalog">
-                Katalog
-              </Link>
-            </nav>
-          )}
-
-          <div className={styles.customerIdentity}>
-            <span className={styles.customerMark} aria-hidden="true">
-              {getUserInitials(userName)}
-            </span>
-            <span className={styles.customerDetails}>
-              <strong>{userName}</strong>
-              <span>{isOwner ? "Admin" : "Pelanggan"}</span>
-            </span>
-            <form className={styles.logoutForm} action={logoutAction}>
-              <button className={styles.logoutButton} type="submit">
-                Keluar
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <Navbar
+        currentUser={{ name: userName, role: isOwner ? "admin" : "customer" }}
+        pendingCount={stats?.pending || 0}
+        activeView={activeView}
+        onViewChange={setSelectedView}
+      />
 
       <div className={styles.pageInner} id="dashboard-content" tabIndex={-1}>
         {isOwner ? (
           <OwnerDashboardView
+            activeView={activeView}
             rentalState={rentalState}
             rentals={rentals}
             stats={stats}

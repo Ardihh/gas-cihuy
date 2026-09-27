@@ -24,6 +24,12 @@ export default async function CatalogPage() {
     catalogState = "error";
   }
 
-  return <CatalogClient products={products} catalogState={catalogState} />;
+  return (
+    <CatalogClient
+      currentUser={currentUser?.user || null}
+      products={products}
+      catalogState={catalogState}
+    />
+  );
 }
 
