@@ -29,7 +29,7 @@ export default function CatalogImage({
       className={className}
       fill
       onError={() => setHasError(true)}
-      priority={priority}
+      preload={priority}
       sizes={sizes}
       src={normalizedSrc}
     />
