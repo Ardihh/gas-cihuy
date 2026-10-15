@@ -1,6 +1,7 @@
 import { getCatalogItems } from "../lib/catalog.js";
 import { getCurrentUser } from "../lib/auth.js";
 import LandingClient from "./LandingClient";
+import LandingContent from "./landing/LandingContent";
 
 const LANDING_PREVIEW_LIMIT = 8;
 
@@ -20,9 +21,12 @@ export default async function LandingPage() {
 
   return (
     <LandingClient
-      products={products.slice(0, LANDING_PREVIEW_LIMIT)}
-      catalogState={catalogState}
       isAuthenticated={isAuthenticated}
-    />
+    >
+      <LandingContent
+        products={products.slice(0, LANDING_PREVIEW_LIMIT)}
+        catalogState={catalogState}
+      />
+    </LandingClient>
   );
 }
